@@ -1,0 +1,46 @@
+.brand {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+
+.account-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--md-sys-color-primary, #0d6812);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  padding: 0 6px;
+  margin-left: 6px;
+}
+
+.active-link {
+  background-color: #083024;
+//   color: black;
+  border-radius: 6px;
+  padding: 6px 10px;
+  transition: background-color 160ms linear;
+}
+
+mat-toolbar {
+  background-color: var(#beb1ab);
+  color: rgb(31, 31, 31);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+}
+
+
+/* size the icon inside the account bubble */
+.account-bubble mat-icon {
+  font-size: 20px;
+  line-height: 20px;
+}

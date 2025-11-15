@@ -1,0 +1,61 @@
+@use '@angular/material' as mat;
+@use './theme-colors' as palettes;
+
+@include mat.core();
+
+$recipe-frontend-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: palettes.$primary-palette,
+    tertiary: palettes.$tertiary-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto, sans-serif',
+    plain-family: 'Roboto, sans-serif',
+  ),
+  density: (
+    scale: 0,
+  )
+));
+
+:root {
+  @include mat.all-component-themes($recipe-frontend-theme);
+
+  --app-primary: #0b3d2e;
+  --app-accent:  #8b5e3c; /* moderate brown */
+  --app-cream:   #fff7e6; /* main backsplash / surface */
+  --app-surface: var(--app-cream);
+
+  --md-sys-color-primary: var(--app-primary);
+  --md-sys-color-on-primary: #e9e7e1;
+  --md-sys-color-secondary: var(--app-accent);
+  --md-sys-color-surface: var(--app-surface);
+  --md-sys-color-background: var(--app-surface);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: var(--app-surface);
+  color: rgba(20, 20, 20, 0.87);
+}
+
+mat-toolbar {
+  background-color: var(--app-primary) !important;
+  color: var(--md-sys-color-on-primary, #e9e7e1) !important;
+}
+
+/* Buttons and links on the toolbar */
+a[mat-button], button[mat-button], button[mat-icon-button] {
+  color: var(--md-sys-color-on-primary, #e9e7e1) !important;
+}
+
+.mat-mdc-card, .auth-form, .card {
+  background: var(--app-cream);
+}
+
+.muted { color: rgba(0,0,0,0.6); }

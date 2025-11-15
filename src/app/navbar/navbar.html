@@ -1,0 +1,30 @@
+<mat-toolbar>
+  <span class="brand">Recipe Site</span>
+  <span class="spacer"></span>
+
+  <ng-container *ngIf="user as user; else anonLinks">
+    <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
+    <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
+    <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
+
+    <button mat-icon-button [matMenuTriggerFor]="accountMenu" aria-label="Account menu" class="account-button">
+      <div class="account-bubble">
+        <mat-icon aria-hidden="false" aria-label="Account">person</mat-icon>
+      </div>
+    </button>
+
+    <mat-menu #accountMenu="matMenu">
+      <button mat-menu-item routerLink="/profile">Account</button>
+      <button mat-menu-item routerLink="/settings">Settings</button>
+      <button mat-menu-item (click)="logout()">Logout</button>
+    </mat-menu>
+  </ng-container>
+
+  <ng-template #anonLinks>
+    <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
+    <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
+    <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
+    <a mat-button routerLink="/login" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Login</a>
+    <a mat-button routerLink="/signup" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Sign Up</a>
+  </ng-template>
+</mat-toolbar>
