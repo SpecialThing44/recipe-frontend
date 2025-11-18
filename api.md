@@ -1,34 +1,31 @@
 Below is a full specification of the recipe API backend.
 
+GET / http.healthcheck.HealthCheckController.check()
+GET /health http.healthcheck.HealthCheckController.check()
 
-GET           /                       http.healthcheck.HealthCheckController.check()
-GET           /health                 http.healthcheck.HealthCheckController.check()
+POST /signup http.authentication.AuthenticationController.signup()
+POST /login http.authentication.AuthenticationController.login()
+POST /logout http.authentication.AuthenticationController.logout()
 
-POST          /signup                 http.authentication.AuthenticationController.signup()
-POST          /login                  http.authentication.AuthenticationController.login()
-POST          /logout                 http.authentication.AuthenticationController.logout()
+POST /user/query http.users.UsersController.list()
+GET /user/:id http.users.UsersController.get(id: java.util.UUID)
+PUT /user/:id http.users.UsersController.put(id: java.util.UUID)
+DELETE /user/:id http.users.UsersController.delete(id: java.util.UUID)
 
-GET           /user                   http.users.UsersController.list()
-GET           /user/:id               http.users.UsersController.get(id: java.util.UUID)
-PUT           /user/:id               http.users.UsersController.put(id: java.util.UUID)
-DELETE        /user/:id               http.users.UsersController.delete(id: java.util.UUID)
+POST /recipes/query http.recipes.RecipesController.list()
+POST /recipes http.recipes.RecipesController.post()
 
+GET /recipes/:id http.recipes.RecipesController.get(id: java.util.UUID)
+PUT /recipes/:id http.recipes.RecipesController.put(id: java.util.UUID)
 
-GET           /recipes                http.recipes.RecipesController.list()
-POST          /recipes                http.recipes.RecipesController.post()
+POST /ingredients/query http.ingredients.IngredientsController.list()
+POST /ingredients http.ingredients.IngredientsController.post()
 
-GET           /recipes/:id            http.recipes.RecipesController.get(id: java.util.UUID)
-PUT           /recipes/:id            http.recipes.RecipesController.put(id: java.util.UUID)
+GET /ingredients/:id http.ingredients.IngredientsController.get(id: java.util.UUID)
+PUT /ingredients/:id http.ingredients.IngredientsController.put(id: java.util.UUID)
+DELETE /ingredients/:id http.ingredients.IngredientsController.delete(id: java.util.UUID)
 
-
-GET           /ingredients            http.ingredients.IngredientsController.list()
-POST          /ingredients            http.ingredients.IngredientsController.post()
-
-GET           /ingredients/:id        http.ingredients.IngredientsController.get(id: java.util.UUID)
-PUT           /ingredients/:id        http.ingredients.IngredientsController.put(id: java.util.UUID)
-DELETE        /ingredients/:id        http.ingredients.IngredientsController.delete(id: java.util.UUID)
-
-GET           /tags                   http.tags.TagsController.list()
+POST /tags/query http.tags.TagsController.list()
 
 case class User(
 name: String,
@@ -53,7 +50,6 @@ countryOfOrigin: Option[String] = None,
 )
 
 case class LoginInput(email: String, password: String)
-
 
 case class Recipe(
 name: String,
@@ -101,7 +97,6 @@ wikiLink: Option[String] = None,
 instructions: Option[String] = None,
 )
 
-
 case class Ingredient(
 name: String,
 aliases: Seq[String],
@@ -143,7 +138,6 @@ unit: Unit, // Type!
 amount: Int
 )
 
-
 enum Unit(val name: String, val isVolume: Boolean, val wikiLink: String) extends Wikified:
 case Cup extends Unit("cup", true, "")
 case Milliliter extends Unit("milliliter", true, "")
@@ -179,8 +173,13 @@ analyzedEntity: Option[UUID],
 ingredientSimilarity: Option[SimilarityFilter],
 coSaveSimilarity: Option[SimilarityFilter],
 tagSimilarity: Option[SimilarityFilter],
+orderBy: Option[OrderBy],
 limit: Option[Int],
 page: Option[Int],
+)
+
+case class OrderBy(
+name: Option[Boolean]
 )
 
 case class NumberFilter(

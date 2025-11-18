@@ -1,12 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { catchError, finalize, tap, switchMap, map } from 'rxjs/operators';
 
 export interface User {
   id?: string;
   name?: string;
   email?: string;
+  countryOfOrigin?: string;
+  createdOn?: string;
+  updatedOn?: string;
+}
+
+interface TokenResponse {
+  accessToken: string;
+  message: string;
 }
 
 @Injectable({
@@ -16,15 +24,76 @@ export class AuthService {
   currentUser$ = new BehaviorSubject<User | null>(null);
   loading$ = new BehaviorSubject<boolean>(false);
   error$ = new BehaviorSubject<string | null>(null);
+  
+  private accessToken: string | null = null;
+  private initialized = false;
 
   constructor(private http: HttpClient) {
-    this.loadCurrentUser();
-  }
+          }
 
   private readonly API_BASE = 'http://localhost:9000';
 
+  getAccessToken(): string | null {
+    return this.accessToken;
+  }
+
+  private setAccessToken(token: string): void {
+    this.accessToken = token;
+  }
+
+  private clearAccessToken(): void {
+    this.accessToken = null;
+  }
+
+  clearAuthState(): void {
+    this.clearAccessToken();
+    this.currentUser$.next(null);
+  }
+
+  refreshAccessToken(): Observable<string> {
+            return this.http.post<TokenResponse>(`${this.API_BASE}/refresh`, {}, { 
+      withCredentials: true 
+    }).pipe(
+      tap(response => {
+                        this.setAccessToken(response.accessToken);
+        
+                const decoded = this.decodeToken(response.accessToken);
+        if (decoded && decoded.id && !this.currentUser$.value) {
+                              this.http.get<User>(`${this.API_BASE}/user/${decoded.id}`, {
+            withCredentials: true,
+            headers: { 'Authorization': `Bearer ${response.accessToken}` }
+          }).subscribe(user => {
+                        this.currentUser$.next(user);
+          });
+        }
+      }),
+      map(response => response.accessToken),
+      catchError(err => {
+        console.error('Token refresh failed:', err);
+        this.clearAuthState();
+        return throwError(() => err);
+      })
+    );
+  }
+
+  private decodeToken(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      console.error('Failed to decode token', e);
+      return null;
+    }
+  }
+
   private handleError(err: HttpErrorResponse) {
-    // Try to extract a helpful message from the response body
     let message = 'Server error';
     try {
       if (err.error) {
@@ -47,20 +116,37 @@ export class AuthService {
   }
 
   loadCurrentUser(): void {
-    this.http.get<User>(`${this.API_BASE}/user`, { withCredentials: true }).pipe(
-      catchError(() => {
-        this.currentUser$.next(null);
-        return of(null as User | null);
-      })
-    ).subscribe((u: any) => {
-      if (u && Object.keys(u).length) { this.currentUser$.next(u); }
+    if (this.initialized) {
+      return;
+    }
+    this.initialized = true;
+    
+            this.refreshAccessToken().subscribe({
+      next: () => {
+                      },
+      error: (err) => {
+                        this.clearAuthState();
+      }
     });
   }
 
   signup(input: { name: string; email: string; password: string }): Observable<User> {
     this.loading$.next(true);
     this.error$.next(null);
-    return this.http.post<User>(`${this.API_BASE}/signup`, input, { withCredentials: true }).pipe(
+    return this.http.post<TokenResponse>(`${this.API_BASE}/signup`, input, { withCredentials: true }).pipe(
+      switchMap(response => {
+                this.setAccessToken(response.accessToken);
+        
+                const decoded = this.decodeToken(response.accessToken);
+        if (!decoded || !decoded.id) {
+          throw new Error('Invalid token received');
+        }
+
+                return this.http.get<User>(`${this.API_BASE}/user/${decoded.id}`, {
+          withCredentials: true,
+          headers: { 'Authorization': `Bearer ${response.accessToken}` }
+        });
+      }),
       tap(user => this.currentUser$.next(user)),
       catchError(err => this.handleError(err)),
       finalize(() => this.loading$.next(false))
@@ -70,7 +156,20 @@ export class AuthService {
   login(input: { email: string; password: string }): Observable<User> {
     this.loading$.next(true);
     this.error$.next(null);
-    return this.http.post<User>(`${this.API_BASE}/login`, input, { withCredentials: true }).pipe(
+    return this.http.post<TokenResponse>(`${this.API_BASE}/login`, input, { withCredentials: true }).pipe(
+      switchMap(response => {
+                this.setAccessToken(response.accessToken);
+        
+                const decoded = this.decodeToken(response.accessToken);
+        if (!decoded || !decoded.id) {
+          throw new Error('Invalid token received');
+        }
+
+                return this.http.get<User>(`${this.API_BASE}/user/${decoded.id}`, {
+          withCredentials: true,
+          headers: { 'Authorization': `Bearer ${response.accessToken}` }
+        });
+      }),
       tap(user => this.currentUser$.next(user)),
       catchError(err => this.handleError(err)),
       finalize(() => this.loading$.next(false))
@@ -80,9 +179,20 @@ export class AuthService {
   logout(): Observable<void> {
     this.loading$.next(true);
     this.error$.next(null);
-    return this.http.post<void>(`${this.API_BASE}/logout`, {}, { withCredentials: true }).pipe(
-      tap(() => this.currentUser$.next(null)),
-      catchError(err => this.handleError(err)),
+    
+    return this.http.post(`${this.API_BASE}/logout`, {}, { 
+      withCredentials: true 
+    }).pipe(
+      map(() => undefined),
+      tap(() => {
+                        this.clearAccessToken();
+        this.currentUser$.next(null);
+      }),
+      catchError(err => {
+                this.clearAccessToken();
+        this.currentUser$.next(null);
+        return this.handleError(err);
+      }),
       finalize(() => this.loading$.next(false))
     );
   }
