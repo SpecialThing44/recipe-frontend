@@ -8,6 +8,7 @@ export interface User {
   name?: string;
   email?: string;
   countryOfOrigin?: string;
+  avatarUrl?: string;
   createdOn?: string;
   updatedOn?: string;
 }
@@ -59,11 +60,12 @@ export class AuthService {
         
                 const decoded = this.decodeToken(response.accessToken);
         if (decoded && decoded.id && !this.currentUser$.value) {
-                              this.http.get<User>(`${this.API_BASE}/user/${decoded.id}`, {
+                              this.http.get<any>(`${this.API_BASE}/user/${decoded.id}`, {
             withCredentials: true,
             headers: { 'Authorization': `Bearer ${response.accessToken}` }
-          }).subscribe(user => {
-                        this.currentUser$.next(user);
+          }).subscribe(response => {
+                        const user = response?.Body || response;
+            this.currentUser$.next(user);
           });
         }
       }),
@@ -142,10 +144,12 @@ export class AuthService {
           throw new Error('Invalid token received');
         }
 
-                return this.http.get<User>(`${this.API_BASE}/user/${decoded.id}`, {
+                return this.http.get<any>(`${this.API_BASE}/user/${decoded.id}`, {
           withCredentials: true,
           headers: { 'Authorization': `Bearer ${response.accessToken}` }
-        });
+        }).pipe(
+          map(response => response?.Body || response)
+        );
       }),
       tap(user => this.currentUser$.next(user)),
       catchError(err => this.handleError(err)),
@@ -165,10 +169,12 @@ export class AuthService {
           throw new Error('Invalid token received');
         }
 
-                return this.http.get<User>(`${this.API_BASE}/user/${decoded.id}`, {
+                return this.http.get<any>(`${this.API_BASE}/user/${decoded.id}`, {
           withCredentials: true,
           headers: { 'Authorization': `Bearer ${response.accessToken}` }
-        });
+        }).pipe(
+          map(response => response?.Body || response)
+        );
       }),
       tap(user => this.currentUser$.next(user)),
       catchError(err => this.handleError(err)),

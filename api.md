@@ -10,6 +10,35 @@ POST /logout http.authentication.AuthenticationController.logout()
 POST /user/query http.users.UsersController.list()
 GET /user/:id http.users.UsersController.get(id: java.util.UUID)
 PUT /user/:id http.users.UsersController.put(id: java.util.UUID)
+PUT /user/:id/avatar
+{
+**Headers:**
+
+- `Authorization: Bearer <access_token>` - Required for authentication
+- `Content-Type: image/jpeg` (or image/png, image/gif, etc.)
+
+**Body:**
+
+- Raw binary image data
+
+**Response:**
+
+```json
+{
+  "Body": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "countryOfOrigin": "USA",
+    "avatarUrl": "http://localhost:8888/avatars/550e8400-e29b-41d4-a716-446655440000/avatar.jpeg",
+    "createdOn": "2025-11-20T10:00:00Z",
+    "updatedOn": "2025-11-20T12:30:00Z"
+  }
+}
+```
+
+}
+
 DELETE /user/:id http.users.UsersController.delete(id: java.util.UUID)
 
 POST /recipes/query http.recipes.RecipesController.list()
@@ -31,6 +60,7 @@ case class User(
 name: String,
 email: String,
 countryOfOrigin: Option[String] = None,
+avatarUrl: Option[String] = None,
 createdOn: Instant,
 updatedOn: Instant,
 id: UUID

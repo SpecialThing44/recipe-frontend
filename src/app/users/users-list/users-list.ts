@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -61,7 +62,8 @@ export class UsersListComponent implements OnInit {
 
   constructor(
     private usersService: UsersService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) {
     this.filterForm = this.fb.group({
       id: [''],
@@ -178,5 +180,9 @@ export class UsersListComponent implements OnInit {
     this.pageSize = this.filterForm.value.pageSize;
     this.currentPage = 0;
     this.loadUsers();
+  }
+
+  viewUser(userId: string): void {
+    this.router.navigate(['/users', userId]);
   }
 }

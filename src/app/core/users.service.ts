@@ -8,6 +8,7 @@ export interface User {
   name: string;
   email: string;
   countryOfOrigin?: string;
+  avatarUrl?: string;
   createdOn: string;
   updatedOn: string;
 }
@@ -83,7 +84,28 @@ export class UsersService {
   getUser(id: string): Observable<User> {
     return this.http.get<User>(`${this.API_BASE}/user/${id}`, { 
       withCredentials: true 
-    });
+    }).pipe(
+      map((response: any) => response?.Body || response)
+    );
+  }
+
+  updateUser(id: string, updates: Partial<User>): Observable<User> {
+    return this.http.put<any>(`${this.API_BASE}/user/${id}`, updates, {
+      withCredentials: true
+    }).pipe(
+      map((response: any) => response?.Body || response)
+    );
+  }
+
+  uploadAvatar(id: string, imageFile: File): Observable<User> {
+    return this.http.put<any>(`${this.API_BASE}/user/${id}/avatar`, imageFile, {
+      withCredentials: true,
+      headers: {
+        'Content-Type': imageFile.type
+      }
+    }).pipe(
+      map((response: any) => response?.Body || response)
+    );
   }
 
   deleteUser(id: string): Observable<void> {
