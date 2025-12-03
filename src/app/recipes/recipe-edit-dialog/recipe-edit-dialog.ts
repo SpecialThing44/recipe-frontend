@@ -89,6 +89,17 @@ export class RecipeEditDialogComponent {
   ) {
     this.recipeId = data.recipe.id;
     
+    let instructions = data.recipe.instructions;
+    if (typeof instructions === 'string') {
+      try {
+        // Sanitize string to handle control characters
+        const sanitizedInstructions = instructions.replace(/\n/g, '\\n');
+        instructions = JSON.parse(sanitizedInstructions);
+      } catch (e) {
+        console.error('Error parsing instructions in edit dialog:', e);
+      }
+    }
+
     this.recipeForm = this.fb.group({
       name: [data.recipe.name, Validators.required],
       prepTime: [data.recipe.prepTime, [Validators.required, Validators.min(0)]],
@@ -101,7 +112,7 @@ export class RecipeEditDialogComponent {
       tags: this.fb.array([]),
       ingredients: this.fb.array([]),
       // Instructions comes as object from backend
-      instructions: [data.recipe.instructions, Validators.required]
+      instructions: [instructions, Validators.required]
     });
 
     // Populate tags

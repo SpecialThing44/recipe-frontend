@@ -187,6 +187,18 @@ export class RecipesService {
     );
   }
 
+  saveRecipe(id: string): Observable<void> {
+    return this.http.post<void>(`${this.API_BASE}/recipes/${id}/save`, {}, {
+      withCredentials: true
+    });
+  }
+
+  unsaveRecipe(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.API_BASE}/recipes/${id}/save`, {
+      withCredentials: true
+    });
+  }
+
   deleteRecipe(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_BASE}/recipes/${id}`, {
       withCredentials: true

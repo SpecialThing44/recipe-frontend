@@ -323,3 +323,25 @@
     text-align: center;
   }
 }
+
+.full-width {
+  width: 100%;
+}
+
+.advanced-filters-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+  
+  button {
+    color: var(--app-primary, #0b3d2e);
+  }
+}
+
+.advanced-filters {
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0,0,0,0.05);
+}

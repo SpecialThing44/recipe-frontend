@@ -169,6 +169,7 @@
       <quill-editor 
         formControlName="instructions"
         [modules]="quillModules"
+        format="object"
         (onEditorCreated)="onEditorCreated($event)"
         placeholder="Enter cooking instructions...">
       </quill-editor>
