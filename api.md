@@ -46,6 +46,10 @@ POST /recipes http.recipes.RecipesController.post()
 
 GET /recipes/:id http.recipes.RecipesController.get(id: java.util.UUID)
 PUT /recipes/:id http.recipes.RecipesController.put(id: java.util.UUID)
+PUT /recipes/:id/image http.recipes.RecipesController.uploadImage(id: java.util.UUID)
+DELETE /recipes/:id/image http.recipes.RecipesController.deleteImage(id: java.util.UUID)
+POST /recipes/:id/instruction-image http.recipes.RecipesController.uploadInstructionImage(id: java.util.UUID)
+POST /recipes/:id/save http.recipes.RecipesController.save(id: java.util.UUID)
 
 POST /ingredients/query http.ingredients.IngredientsController.list()
 POST /ingredients http.ingredients.IngredientsController.post()
@@ -65,6 +69,7 @@ large: String
 case class User(
 name: String,
 email: String,
+admin: Boolean,
 countryOfOrigin: Option[String] = None,
 avatar: Option[AvatarUrls] = None,
 createdOn: Instant,
@@ -132,7 +137,9 @@ vegan: Option[Boolean] = None,
 countryOfOrigin: Option[String] = None,
 public: Option[Boolean] = None,
 wikiLink: Option[String] = None,
-instructions: Option[String] = None,
+instructions: Option[String] = None, // Quill Delta JSON format
+instructionImages: Option[Seq[String]] = None,
+image: Option[ImageUrls] = None,
 )
 
 case class Ingredient(

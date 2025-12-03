@@ -1,0 +1,187 @@
+<h2 mat-dialog-title>Create New Recipe</h2>
+<mat-dialog-content>
+  <form [formGroup]="recipeForm" class="recipe-form">
+    <!-- Basic Info Section -->
+    <div class="form-section">
+      <h3>Basic Information</h3>
+      
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Recipe Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g., Chocolate Chip Cookies">
+        <mat-icon matPrefix>restaurant_menu</mat-icon>
+        <mat-error *ngIf="recipeForm.get('name')?.hasError('required')">
+          Name is required
+        </mat-error>
+      </mat-form-field>
+
+      <div class="time-fields">
+        <mat-form-field appearance="fill">
+          <mat-label>Prep Time (minutes)</mat-label>
+          <input matInput type="number" formControlName="prepTime" min="0">
+          <mat-icon matPrefix>schedule</mat-icon>
+          <mat-error *ngIf="recipeForm.get('prepTime')?.hasError('required')">
+            Prep time is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Cook Time (minutes)</mat-label>
+          <input matInput type="number" formControlName="cookTime" min="0">
+          <mat-icon matPrefix>timer</mat-icon>
+          <mat-error *ngIf="recipeForm.get('cookTime')?.hasError('required')">
+            Cook time is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Country of Origin (Optional)</mat-label>
+        <input matInput formControlName="countryOfOrigin" placeholder="Search for a country..." [matAutocomplete]="autoCountry">
+        <mat-icon matPrefix>public</mat-icon>
+        <mat-autocomplete #autoCountry="matAutocomplete" [displayWith]="displayCountry">
+          <mat-option *ngFor="let country of countrySuggestions | async" [value]="country">
+            {{ country.name }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Wikipedia Link (Optional)</mat-label>
+        <input matInput formControlName="wikiLink" placeholder="https://en.wikipedia.org/wiki/...">
+        <mat-icon matPrefix>link</mat-icon>
+        <mat-error *ngIf="recipeForm.get('wikiLink')?.hasError('invalidWikipediaUrl')">
+          Must be a valid Wikipedia URL
+        </mat-error>
+      </mat-form-field>
+
+      <div class="checkboxes">
+        <mat-checkbox formControlName="vegan">Vegan</mat-checkbox>
+        <mat-checkbox formControlName="vegetarian">Vegetarian</mat-checkbox>
+        <mat-checkbox formControlName="public">Public Recipe</mat-checkbox>
+      </div>
+    </div>
+
+    <!-- Tags Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h3>Tags</h3>
+        <button mat-icon-button type="button" (click)="addTag()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+      <div formArrayName="tags">
+        <div *ngFor="let tag of tags.controls; let i = index" class="tag-row">
+          <mat-form-field appearance="fill" class="tag-field">
+            <mat-label>Tag {{ i + 1 }}</mat-label>
+            <input 
+              matInput 
+              [formControlName]="i" 
+              placeholder="e.g., dessert, quick"
+              [matAutocomplete]="autoTag">
+            <mat-autocomplete #autoTag="matAutocomplete">
+              <mat-option *ngFor="let suggestion of tagSuggestions[i] | async" [value]="suggestion">
+                {{ suggestion }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <button mat-icon-button type="button" (click)="removeTag(i)" color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ingredients Section -->
+    <div class="form-section">
+      <div class="section-header">
+        <h3>Ingredients</h3>
+        <button mat-icon-button type="button" (click)="addIngredient()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+      <div formArrayName="ingredients">
+        <div *ngFor="let ingredient of ingredients.controls; let i = index" [formGroupName]="i" class="ingredient-row">
+          <mat-form-field appearance="fill" class="ingredient-field">
+            <mat-label>Ingredient</mat-label>
+            <input 
+              matInput 
+              formControlName="ingredientName" 
+              placeholder="Search ingredient..."
+              [matAutocomplete]="autoIngredient">
+            <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="onIngredientSelected(i, $event)">
+              <mat-option *ngFor="let suggestion of ingredientSuggestions[i] | async" [value]="suggestion">
+                {{ suggestion.name }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error *ngIf="ingredient.get('ingredientId')?.hasError('required')">
+              Ingredient is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="amount-field">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" formControlName="amount" min="0" step="0.1">
+            <mat-error *ngIf="ingredient.get('amount')?.hasError('required')">
+              Required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="unit-field">
+            <mat-label>Unit</mat-label>
+            <mat-select formControlName="unit">
+              <mat-option *ngFor="let unit of availableUnits" [value]="unit.value">
+                {{ unit.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="ingredient.get('unit')?.hasError('required')">
+              Required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="description-field">
+            <mat-label>Description (Optional)</mat-label>
+            <input matInput formControlName="description" placeholder="e.g., chopped">
+          </mat-form-field>
+
+          <button mat-icon-button type="button" (click)="removeIngredient(i)" color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Section -->
+    <div class="form-section">
+      <h3>Recipe Image (Optional)</h3>
+      <div class="image-upload">
+        <input #imageInput type="file" accept="image/*" (change)="onImageSelected($event)" style="display: none;">
+        <button mat-raised-button type="button" (click)="imageInput.click()">
+          <mat-icon>add_photo_alternate</mat-icon>
+          Choose Image
+        </button>
+        <span *ngIf="selectedImage" class="file-name">{{ selectedImage.name }}</span>
+      </div>
+    </div>
+
+    <!-- Instructions Section -->
+    <div class="form-section">
+      <h3>Instructions</h3>
+      <quill-editor 
+        formControlName="instructions"
+        [modules]="quillModules"
+        (onEditorCreated)="onEditorCreated($event)"
+        placeholder="Enter cooking instructions...">
+      </quill-editor>
+      <mat-error *ngIf="recipeForm.get('instructions')?.hasError('required') && recipeForm.get('instructions')?.touched">
+        Instructions are required
+      </mat-error>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="recipeForm.invalid || saving">
+    <mat-icon *ngIf="!saving">save</mat-icon>
+    {{ saving ? 'Creating...' : 'Create Recipe' }}
+  </button>
+</mat-dialog-actions>

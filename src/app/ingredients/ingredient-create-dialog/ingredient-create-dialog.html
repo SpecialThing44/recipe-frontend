@@ -1,0 +1,86 @@
+<h2 mat-dialog-title>Create New Ingredient</h2>
+<mat-dialog-content>
+  <form [formGroup]="ingredientForm" class="ingredient-form">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="e.g., Tomato">
+      <mat-icon matPrefix>restaurant</mat-icon>
+      <mat-error *ngIf="ingredientForm.get('name')?.hasError('required')">
+        Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Wikipedia Link</mat-label>
+      <input matInput formControlName="wikiLink" placeholder="https://en.wikipedia.org/wiki/...">
+      <mat-icon matPrefix>link</mat-icon>
+      <mat-error *ngIf="ingredientForm.get('wikiLink')?.hasError('required')">
+        Wikipedia link is required
+      </mat-error>
+      <mat-error *ngIf="ingredientForm.get('wikiLink')?.hasError('invalidWikipediaUrl')">
+        Must be a valid Wikipedia URL (e.g., https://en.wikipedia.org/wiki/...)
+      </mat-error>
+    </mat-form-field>
+
+    <div class="aliases-section">
+      <div class="section-header">
+        <label>Aliases</label>
+        <button mat-icon-button type="button" (click)="addAlias()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+      <div formArrayName="aliases">
+        <div *ngFor="let alias of aliases.controls; let i = index" class="alias-row">
+          <mat-form-field appearance="fill" class="alias-field">
+            <mat-label>Alias {{ i + 1 }}</mat-label>
+            <input matInput [formControlName]="i" placeholder="Alternative name">
+          </mat-form-field>
+          <button mat-icon-button type="button" (click)="removeAlias(i)" color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tags-section">
+      <div class="section-header">
+        <label>Tags</label>
+        <button mat-icon-button type="button" (click)="addTag()">
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+      <div formArrayName="tags">
+        <div *ngFor="let tag of tags.controls; let i = index" class="tag-row">
+          <mat-form-field appearance="fill" class="tag-field">
+            <mat-label>Tag {{ i + 1 }}</mat-label>
+            <input 
+              matInput 
+              [formControlName]="i" 
+              placeholder="e.g., fruit, vegetable"
+              [matAutocomplete]="auto">
+            <mat-autocomplete #auto="matAutocomplete">
+              <mat-option *ngFor="let suggestion of tagSuggestions[i] | async" [value]="suggestion">
+                {{ suggestion }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <button mat-icon-button type="button" (click)="removeTag(i)" color="warn">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="checkboxes">
+      <mat-checkbox formControlName="vegan">Vegan</mat-checkbox>
+      <mat-checkbox formControlName="vegetarian">Vegetarian</mat-checkbox>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="ingredientForm.invalid || saving">
+    <mat-icon *ngIf="!saving">save</mat-icon>
+    {{ saving ? 'Creating...' : 'Create' }}
+  </button>
+</mat-dialog-actions>
