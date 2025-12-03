@@ -88,8 +88,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
               this.profileForm.disable({ emitEvent: false });
             }
             
-            if (user.avatarUrl) {
-              this.avatarPreview = user.avatarUrl;
+            if (user.avatar?.large) {
+              this.avatarPreview = user.avatar.large;
             }
             this.loading = false;
             
@@ -204,7 +204,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           this.authService.currentUser$.next(updatedUser);
         }
         this.avatarFile = null;
-        this.avatarPreview = updatedUser.avatarUrl || null;
+        this.avatarPreview = updatedUser.avatar?.large || null;
         this.saving = false;
         this.snackBar.open('Profile updated successfully', 'Close', { duration: 3000 });
       },

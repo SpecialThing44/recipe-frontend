@@ -3,12 +3,19 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+export interface AvatarUrls {
+  thumbnail: string;
+  medium: string;
+  large: string;
+}
+
 export interface User {
   id: string;
   name: string;
   email: string;
+  admin: boolean;
   countryOfOrigin?: string;
-  avatarUrl?: string;
+  avatar?: AvatarUrls;
   createdOn: string;
   updatedOn: string;
 }

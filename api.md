@@ -56,11 +56,17 @@ DELETE /ingredients/:id http.ingredients.IngredientsController.delete(id: java.u
 
 POST /tags/query http.tags.TagsController.list()
 
+case class AvatarUrls(
+thumbnail: String,
+medium: String,
+large: String
+)
+
 case class User(
 name: String,
 email: String,
 countryOfOrigin: Option[String] = None,
-avatarUrl: Option[String] = None,
+avatar: Option[AvatarUrls] = None,
 createdOn: Instant,
 updatedOn: Instant,
 id: UUID
@@ -93,7 +99,9 @@ vegan: Boolean,
 countryOfOrigin: Option[String],
 public: Boolean,
 wikiLink: Option[String],
-instructions: String,
+instructions: String, // Quill Delta JSON format
+instructionImages: Seq[String] = Seq.empty, // URLs of images embedded in instructions
+image: Option[ImageUrls] = None,
 createdOn: Instant,
 updatedOn: Instant,
 id: UUID

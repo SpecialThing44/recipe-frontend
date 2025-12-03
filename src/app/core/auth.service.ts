@@ -3,12 +3,19 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { catchError, finalize, tap, switchMap, map } from 'rxjs/operators';
 
+export interface AvatarUrls {
+  thumbnail: string;
+  medium: string;
+  large: string;
+}
+
 export interface User {
   id?: string;
   name?: string;
   email?: string;
+  admin?: boolean;
   countryOfOrigin?: string;
-  avatarUrl?: string;
+  avatar?: AvatarUrls;
   createdOn?: string;
   updatedOn?: string;
 }
