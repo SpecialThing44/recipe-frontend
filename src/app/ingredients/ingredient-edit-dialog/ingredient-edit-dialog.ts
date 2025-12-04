@@ -14,6 +14,7 @@ import { IngredientsService, Ingredient, IngredientInput } from '../../core/ingr
 import { TagsService } from '../../core/tags.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
 
 @Component({
   selector: 'app-ingredient-edit-dialog',
@@ -48,7 +49,7 @@ export class IngredientEditDialogComponent {
   ) {
     this.ingredientForm = this.fb.group({
       name: [data.ingredient.name, Validators.required],
-      wikiLink: [data.ingredient.wikiLink, [Validators.required, this.wikipediaUrlValidator]],
+      wikiLink: [data.ingredient.wikiLink, [Validators.required, wikipediaUrlValidator]],
       aliases: this.fb.array([]),
       tags: this.fb.array([]),
       vegan: [data.ingredient.vegan],
@@ -82,21 +83,6 @@ export class IngredientEditDialogComponent {
 
   get tags(): FormArray {
     return this.ingredientForm.get('tags') as FormArray;
-  }
-
-  wikipediaUrlValidator(control: any): { [key: string]: any } | null {
-    if (!control.value) {
-      return null;
-    }
-    
-    const url = control.value.trim();
-    const wikiPattern = /^https?:\/\/(en\.)?wikipedia\.org\/wiki\/.+$/i;
-    
-    if (!wikiPattern.test(url)) {
-      return { invalidWikipediaUrl: true };
-    }
-    
-    return null;
   }
 
   addAlias(): void {

@@ -17,6 +17,9 @@ import { TagsService } from '../../core/tags.service';
 import { CountriesService, Country } from '../../core/countries.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
+import {getQuillModules} from '../../shared/quill/quill-modules';
+import {availableUnits} from '../../shared/units/available-units';
 
 @Component({
   selector: 'app-recipe-create-dialog',
@@ -47,35 +50,7 @@ export class RecipeCreateDialogComponent {
   quillEditor: any;
   createdRecipeId: string | null = null;
 
-  availableUnits = [
-    { value: 'cup', label: 'Cup' },
-    { value: 'milliliter', label: 'Milliliter' },
-    { value: 'liter', label: 'Liter' },
-    { value: 'teaspoon', label: 'Teaspoon' },
-    { value: 'tablespoon', label: 'Tablespoon' },
-    { value: 'piece', label: 'Piece' },
-    { value: 'gram', label: 'Gram' },
-    { value: 'kilogram', label: 'Kilogram' },
-    { value: 'ounce', label: 'Ounce' },
-    { value: 'pound', label: 'Pound' }
-  ];
-
-  quillModules = {
-    toolbar: {
-      container: [
-        ['bold', 'italic', 'underline', 'strike'],
-        ['blockquote', 'code-block'],
-        [{ 'header': 1 }, { 'header': 2 }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'indent': '-1'}, { 'indent': '+1' }],
-        ['link', 'image'],
-        ['clean']
-      ],
-      handlers: {
-        image: () => this.imageHandler()
-      }
-    }
-  };
+  quillModules = getQuillModules(this.imageHandler)
 
   constructor(
     private fb: FormBuilder,
@@ -91,7 +66,7 @@ export class RecipeCreateDialogComponent {
       prepTime: [0, [Validators.required, Validators.min(0)]],
       cookTime: [0, [Validators.required, Validators.min(0)]],
       countryOfOrigin: [''],
-      wikiLink: ['', this.wikipediaUrlValidator],
+      wikiLink: ['', wikipediaUrlValidator],
       vegan: [false],
       vegetarian: [false],
       public: [true],
@@ -125,21 +100,6 @@ export class RecipeCreateDialogComponent {
     return this.recipeForm.get('ingredients') as FormArray;
   }
 
-  wikipediaUrlValidator(control: any): { [key: string]: any } | null {
-    if (!control.value || control.value.trim() === '') {
-      return null;
-    }
-    
-    const url = control.value.trim();
-    const wikiPattern = /^https?:\/\/(en\.)?wikipedia\.org\/wiki\/.+$/i;
-    
-    if (!wikiPattern.test(url)) {
-      return { invalidWikipediaUrl: true };
-    }
-    
-    return null;
-  }
-
   onEditorCreated(editor: any): void {
     this.quillEditor = editor;
   }
@@ -154,7 +114,7 @@ export class RecipeCreateDialogComponent {
       const file = input.files?.[0];
       if (file && this.createdRecipeId) {
         const range = this.quillEditor.getSelection(true);
-        
+
         // Upload image to backend
         this.recipesService.uploadInstructionImage(this.createdRecipeId, file).subscribe({
           next: (response) => {
@@ -177,7 +137,7 @@ export class RecipeCreateDialogComponent {
     const index = this.tags.length;
     const tagControl = this.fb.control('');
     this.tags.push(tagControl);
-    
+
     this.tagSuggestions[index] = tagControl.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
@@ -208,9 +168,9 @@ export class RecipeCreateDialogComponent {
       unit: ['', Validators.required],
       description: ['']
     });
-    
+
     this.ingredients.push(ingredientGroup);
-    
+
     // Setup autocomplete for ingredient name
     const ingredientNameControl = ingredientGroup.get('ingredientName');
     if (ingredientNameControl) {
@@ -301,7 +261,7 @@ export class RecipeCreateDialogComponent {
     this.recipesService.createRecipe(input).subscribe({
       next: (recipe) => {
         this.createdRecipeId = recipe.id;
-        
+
         // Upload image if selected
         if (this.selectedImage) {
           this.recipesService.uploadRecipeImage(recipe.id, this.selectedImage).subscribe({
@@ -327,4 +287,6 @@ export class RecipeCreateDialogComponent {
       }
     });
   }
+
+  protected readonly availableUnits = availableUnits;
 }

@@ -17,6 +17,9 @@ import { TagsService } from '../../core/tags.service';
 import { CountriesService, Country } from '../../core/countries.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
+import {getQuillModules} from '../../shared/quill/quill-modules';
+import {availableUnits} from '../../shared/units/available-units';
 
 @Component({
   selector: 'app-recipe-edit-dialog',
@@ -47,35 +50,7 @@ export class RecipeEditDialogComponent {
   quillEditor: any;
   recipeId: string;
 
-  availableUnits = [
-    { value: 'cup', label: 'Cup' },
-    { value: 'milliliter', label: 'Milliliter' },
-    { value: 'liter', label: 'Liter' },
-    { value: 'teaspoon', label: 'Teaspoon' },
-    { value: 'tablespoon', label: 'Tablespoon' },
-    { value: 'piece', label: 'Piece' },
-    { value: 'gram', label: 'Gram' },
-    { value: 'kilogram', label: 'Kilogram' },
-    { value: 'ounce', label: 'Ounce' },
-    { value: 'pound', label: 'Pound' }
-  ];
-
-  quillModules = {
-    toolbar: {
-      container: [
-        ['bold', 'italic', 'underline', 'strike'],
-        ['blockquote', 'code-block'],
-        [{ 'header': 1 }, { 'header': 2 }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-        [{ 'indent': '-1'}, { 'indent': '+1' }],
-        ['link', 'image'],
-        ['clean']
-      ],
-      handlers: {
-        image: () => this.imageHandler()
-      }
-    }
-  };
+  quillModules = getQuillModules(this.imageHandler)
 
   constructor(
     private fb: FormBuilder,
@@ -88,7 +63,7 @@ export class RecipeEditDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { recipe: Recipe }
   ) {
     this.recipeId = data.recipe.id;
-    
+
     let instructions = data.recipe.instructions;
     if (typeof instructions === 'string') {
       try {
@@ -105,7 +80,7 @@ export class RecipeEditDialogComponent {
       prepTime: [data.recipe.prepTime, [Validators.required, Validators.min(0)]],
       cookTime: [data.recipe.cookTime, [Validators.required, Validators.min(0)]],
       countryOfOrigin: [data.recipe.countryOfOrigin || ''],
-      wikiLink: [data.recipe.wikiLink || '', this.wikipediaUrlValidator],
+      wikiLink: [data.recipe.wikiLink || '', wikipediaUrlValidator],
       vegan: [data.recipe.vegan],
       vegetarian: [data.recipe.vegetarian],
       public: [data.recipe.public],
@@ -127,10 +102,10 @@ export class RecipeEditDialogComponent {
     data.recipe.ingredients.forEach(ing => {
       const index = this.ingredients.length;
       // Handle unit - could be string or object with name property
-      const unitValue = typeof ing.quantity.unit === 'string' 
-        ? ing.quantity.unit.toLowerCase() 
+      const unitValue = typeof ing.quantity.unit === 'string'
+        ? ing.quantity.unit.toLowerCase()
         : (ing.quantity.unit as any).name?.toLowerCase() || 'piece';
-      
+
       const ingredientGroup = this.fb.group({
         ingredientName: [ing.ingredient.name],
         ingredientId: [ing.ingredient.id, Validators.required],
@@ -172,21 +147,6 @@ export class RecipeEditDialogComponent {
     return typeof country === 'string' ? country : country.name;
   }
 
-  wikipediaUrlValidator(control: any): { [key: string]: any } | null {
-    if (!control.value || control.value.trim() === '') {
-      return null;
-    }
-    
-    const url = control.value.trim();
-    const wikiPattern = /^https?:\/\/(en\.)?wikipedia\.org\/wiki\/.+$/i;
-    
-    if (!wikiPattern.test(url)) {
-      return { invalidWikipediaUrl: true };
-    }
-    
-    return null;
-  }
-
   onEditorCreated(editor: any): void {
     this.quillEditor = editor;
   }
@@ -201,7 +161,7 @@ export class RecipeEditDialogComponent {
       const file = input.files?.[0];
       if (file && this.recipeId) {
         const range = this.quillEditor.getSelection(true);
-        
+
         // Upload image to backend
         this.recipesService.uploadInstructionImage(this.recipeId, file).subscribe({
           next: (response) => {
@@ -277,7 +237,7 @@ export class RecipeEditDialogComponent {
       unit: ['', Validators.required],
       description: ['']
     });
-    
+
     this.ingredients.push(ingredientGroup);
     this.setupIngredientAutocomplete(index, ingredientGroup);
   }
@@ -371,4 +331,6 @@ export class RecipeEditDialogComponent {
       }
     });
   }
+
+  protected readonly availableUnits = availableUnits;
 }

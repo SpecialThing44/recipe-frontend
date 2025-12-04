@@ -14,6 +14,7 @@ import { IngredientsService, IngredientInput } from '../../core/ingredients.serv
 import { TagsService } from '../../core/tags.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
 
 @Component({
   selector: 'app-ingredient-create-dialog',
@@ -47,7 +48,7 @@ export class IngredientCreateDialogComponent {
   ) {
     this.ingredientForm = this.fb.group({
       name: ['', Validators.required],
-      wikiLink: ['', [Validators.required, this.wikipediaUrlValidator]],
+      wikiLink: ['', [Validators.required, wikipediaUrlValidator]],
       aliases: this.fb.array([]),
       tags: this.fb.array([]),
       vegan: [false],
@@ -70,21 +71,6 @@ export class IngredientCreateDialogComponent {
     return this.ingredientForm.get('tags') as FormArray;
   }
 
-  wikipediaUrlValidator(control: any): { [key: string]: any } | null {
-    if (!control.value) {
-      return null;
-    }
-    
-    const url = control.value.trim();
-    const wikiPattern = /^https?:\/\/(en\.)?wikipedia\.org\/wiki\/.+$/i;
-    
-    if (!wikiPattern.test(url)) {
-      return { invalidWikipediaUrl: true };
-    }
-    
-    return null;
-  }
-
   addAlias(): void {
     this.aliases.push(this.fb.control(''));
   }
@@ -97,7 +83,7 @@ export class IngredientCreateDialogComponent {
     const index = this.tags.length;
     const tagControl = this.fb.control('');
     this.tags.push(tagControl);
-    
+
     // Set up autocomplete for this tag input
     this.tagSuggestions[index] = tagControl.valueChanges.pipe(
       startWith(''),
