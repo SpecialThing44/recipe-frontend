@@ -25,7 +25,7 @@
     <div class="aliases-section">
       <div class="section-header">
         <label>Aliases</label>
-        <button mat-icon-button type="button" (click)="addAlias()">
+        <button mat-icon-button type="button" (click)="addAlias()" color="primary">
           <mat-icon>add</mat-icon>
         </button>
       </div>
@@ -35,7 +35,7 @@
             <mat-label>Alias {{ i + 1 }}</mat-label>
             <input matInput [formControlName]="i" placeholder="Alternative name">
           </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeAlias(i)" color="warn">
+          <button mat-icon-button type="button" (click)="removeAlias(i)" color="primary">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -45,7 +45,7 @@
     <div class="tags-section">
       <div class="section-header">
         <label>Tags</label>
-        <button mat-icon-button type="button" (click)="addTag()">
+        <button mat-icon-button type="button" (click)="addTag()" color="primary">
           <mat-icon>add</mat-icon>
         </button>
       </div>
@@ -64,7 +64,7 @@
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeTag(i)" color="warn">
+          <button mat-icon-button type="button" (click)="removeTag(i)" color="primary">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -78,7 +78,7 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button mat-dialog-close>Cancel</button>
   <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="ingredientForm.invalid || saving">
     <mat-icon *ngIf="!saving">save</mat-icon>
     {{ saving ? 'Creating...' : 'Create' }}

@@ -332,9 +332,14 @@
   display: flex;
   justify-content: center;
   margin: 16px 0;
+}
+
+.save-button {
+  background-color: rgba(0, 0, 0, 0.04);
+  margin-right: 8px;
   
-  button {
-    color: var(--app-primary, #0b3d2e);
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.08);
   }
 }
 

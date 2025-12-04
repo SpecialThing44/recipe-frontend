@@ -65,7 +65,7 @@
     <div class="form-section">
       <div class="section-header">
         <h3>Tags</h3>
-        <button mat-icon-button type="button" (click)="addTag()">
+        <button mat-icon-button type="button" (click)="addTag()" color="primary">
           <mat-icon>add</mat-icon>
         </button>
       </div>
@@ -84,7 +84,7 @@
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeTag(i)" color="warn">
+          <button mat-icon-button type="button" (click)="removeTag(i)" color="primary">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -95,7 +95,7 @@
     <div class="form-section">
       <div class="section-header">
         <h3>Ingredients</h3>
-        <button mat-icon-button type="button" (click)="addIngredient()">
+        <button mat-icon-button type="button" (click)="addIngredient()" color="primary">
           <mat-icon>add</mat-icon>
         </button>
       </div>
@@ -143,7 +143,7 @@
             <input matInput formControlName="description" placeholder="e.g., chopped">
           </mat-form-field>
 
-          <button mat-icon-button type="button" (click)="removeIngredient(i)" color="warn">
+          <button mat-icon-button type="button" (click)="removeIngredient(i)" color="primary">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -180,7 +180,7 @@
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-raised-button mat-dialog-close>Cancel</button>
   <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="recipeForm.invalid || saving">
     <mat-icon *ngIf="!saving">save</mat-icon>
     {{ saving ? 'Updating...' : 'Update Recipe' }}
