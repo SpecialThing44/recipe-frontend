@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Edit Ingredient</h2>
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Ingredient' : 'Create New Ingredient' }}</h2>
 <mat-dialog-content>
   <form [formGroup]="ingredientForm" class="ingredient-form">
     <mat-form-field appearance="fill" class="full-width">
@@ -36,6 +36,6 @@
   <button mat-raised-button mat-dialog-close>Cancel</button>
   <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="ingredientForm.invalid || saving">
     <mat-icon *ngIf="!saving">save</mat-icon>
-    {{ saving ? 'Updating...' : 'Update' }}
+    {{ saving ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update' : 'Create') }}
   </button>
 </mat-dialog-actions>

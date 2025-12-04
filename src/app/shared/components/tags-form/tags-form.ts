@@ -23,7 +23,6 @@ import { debounceTime, distinctUntilChanged, startWith, switchMap } from 'rxjs/o
     MatAutocompleteModule
   ],
   templateUrl: './tags-form.html',
-  styleUrl: './tags-form.scss'
 })
 export class TagsFormComponent implements OnInit {
   @Input() tags!: FormArray;

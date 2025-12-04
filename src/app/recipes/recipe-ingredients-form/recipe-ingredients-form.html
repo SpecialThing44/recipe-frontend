@@ -1,17 +1,17 @@
     <div class="form-section">
       <div class="section-header">
         <h3>Ingredients</h3>
-        <button mat-icon-button type="button" (click)="addIngredient()" color="primary">
-          <mat-icon>add</mat-icon>
+        <button mat-icon-button type="button" (click)="addIngredient()">
+          <mat-icon class="green">add</mat-icon>
         </button>
       </div>
       <div>
         <div *ngFor="let ingredient of ingredients.controls; let i = index" [formGroup]="getAsFormGroup(ingredient)" class="ingredient-row">
           <mat-form-field appearance="fill" class="ingredient-field">
             <mat-label>Ingredient</mat-label>
-            <input 
-              matInput 
-              formControlName="ingredientName" 
+            <input
+              matInput
+              formControlName="ingredientName"
               placeholder="Search ingredient..."
               [matAutocomplete]="autoIngredient">
             <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="onIngredientSelected(i, $event)">
@@ -49,8 +49,8 @@
             <input matInput formControlName="description" placeholder="e.g., chopped">
           </mat-form-field>
 
-          <button mat-icon-button type="button" (click)="removeIngredient(i)" color="primary">
-            <mat-icon>delete</mat-icon>
+          <button mat-icon-button type="button" (click)="removeIngredient(i)">
+            <mat-icon class="green">delete</mat-icon>
           </button>
         </div>
       </div>

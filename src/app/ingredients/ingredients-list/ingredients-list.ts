@@ -15,8 +15,7 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { IngredientsService, Ingredient, IngredientsFilters } from '../../core/ingredients.service';
 import { AuthService } from '../../core/auth.service';
-import { IngredientCreateDialogComponent } from '../ingredient-create-dialog/ingredient-create-dialog';
-import { IngredientEditDialogComponent } from '../ingredient-edit-dialog/ingredient-edit-dialog';
+import { IngredientDialogComponent } from '../ingredient-dialog/ingredient-dialog';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
@@ -187,25 +186,29 @@ export class IngredientsListComponent implements OnInit {
   }
 
   openCreateDialog(): void {
-    const dialogRef = this.dialog.open(IngredientCreateDialogComponent, {
+    const dialogRef = this.dialog.open(IngredientDialogComponent, {
       width: '600px',
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadIngredients();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadIngredients();
+      }
     });
   }
 
   openEditDialog(ingredient: Ingredient): void {
-    const dialogRef = this.dialog.open(IngredientEditDialogComponent, {
+    const dialogRef = this.dialog.open(IngredientDialogComponent, {
       width: '600px',
       disableClose: true,
       data: { ingredient }
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadIngredients();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadIngredients();
+      }
     });
   }
 

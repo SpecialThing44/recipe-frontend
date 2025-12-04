@@ -102,3 +102,18 @@ a[mat-button], button[mat-button], button[mat-icon-button] {
   gap: 24px;
   flex-wrap: wrap;
 }
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+
+  .field {
+    flex: 1;
+  }
+}
+
+.green {
+  color: black !important;
+}

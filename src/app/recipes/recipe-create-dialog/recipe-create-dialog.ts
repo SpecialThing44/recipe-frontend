@@ -9,21 +9,17 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
 import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
 import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
 import { RecipesService, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
-import { IngredientsService, Ingredient } from '../../core/ingredients.service';
-import { TagsService } from '../../core/tags.service';
-
 
 import { CountriesService, Country } from '../../core/countries.service';
-import { debounceTime, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { startWith, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
 import {getQuillModules} from '../../shared/quill/quill-modules';
-import {availableUnits} from '../../shared/units/available-units';
 
 @Component({
   selector: 'app-recipe-create-dialog',
@@ -59,8 +55,6 @@ export class RecipeCreateDialogComponent {
   constructor(
     private fb: FormBuilder,
     private recipesService: RecipesService,
-    private ingredientsService: IngredientsService,
-    private tagsService: TagsService,
     private countriesService: CountriesService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,18 +6,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDialogModule, MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { IngredientsService, IngredientInput } from '../../core/ingredients.service';
+import { IngredientsService, Ingredient, IngredientInput } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
 import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
 import { AliasesFormComponent } from '../../shared/components/aliases-form/aliases-form';
-import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
+import { wikipediaUrlValidator } from '../../shared/validators/wikipedia-url-validator';
 
 @Component({
-  selector: 'app-ingredient-create-dialog',
+  selector: 'app-ingredient-dialog',
   standalone: true,
   imports: [
     CommonModule,
@@ -33,28 +33,45 @@ import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-valid
     TagsFormComponent,
     AliasesFormComponent
   ],
-  templateUrl: './ingredient-create-dialog.html',
-  styleUrl: './ingredient-create-dialog.scss',
+  templateUrl: './ingredient-dialog.html',
+  styleUrl: './ingredient-dialog.scss',
 })
-export class IngredientCreateDialogComponent {
+export class IngredientDialogComponent {
   ingredientForm: FormGroup;
   saving = false;
+  isEditMode = false;
 
   constructor(
     private fb: FormBuilder,
     private ingredientsService: IngredientsService,
     private tagsService: TagsService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialogRef: MatDialogRef<IngredientDialogComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: { ingredient?: Ingredient }
   ) {
+    const ingredient = data?.ingredient;
+    this.isEditMode = !!ingredient;
+
     this.ingredientForm = this.fb.group({
-      name: ['', Validators.required],
-      wikiLink: ['', [Validators.required, wikipediaUrlValidator]],
+      name: [ingredient?.name || '', Validators.required],
+      wikiLink: [ingredient?.wikiLink || '', [Validators.required, wikipediaUrlValidator]],
       aliases: this.fb.array([]),
       tags: this.fb.array([]),
-      vegan: [false],
-      vegetarian: [false]
+      vegan: [ingredient?.vegan || false],
+      vegetarian: [ingredient?.vegetarian || false]
     });
+
+    if (ingredient) {
+      // Populate aliases
+      ingredient.aliases.forEach(alias => {
+        this.aliases.push(this.fb.control(alias));
+      });
+
+      // Populate tags
+      ingredient.tags.forEach(tag => {
+        this.tags.push(this.fb.control(tag));
+      });
+    }
 
     // When vegan is checked, automatically check vegetarian
     this.ingredientForm.get('vegan')?.valueChanges.subscribe(isVegan => {
@@ -89,16 +106,30 @@ export class IngredientCreateDialogComponent {
       vegetarian: formValue.vegetarian
     };
 
-    this.ingredientsService.createIngredient(input).subscribe({
-      next: (ingredient) => {
-        this.snackBar.open('Ingredient created successfully', 'Close', { duration: 3000 });
-        this.dialog.closeAll();
-      },
-      error: (err) => {
-        console.error('Error creating ingredient:', err);
-        this.snackBar.open('Failed to create ingredient', 'Close', { duration: 3000 });
-        this.saving = false;
-      }
-    });
+    if (this.isEditMode && this.data?.ingredient) {
+      this.ingredientsService.updateIngredient(this.data.ingredient.id, input).subscribe({
+        next: (ingredient) => {
+          this.snackBar.open('Ingredient updated successfully', 'Close', { duration: 3000 });
+          this.dialogRef.close(ingredient);
+        },
+        error: (err) => {
+          console.error('Error updating ingredient:', err);
+          this.snackBar.open('Failed to update ingredient', 'Close', { duration: 3000 });
+          this.saving = false;
+        }
+      });
+    } else {
+      this.ingredientsService.createIngredient(input).subscribe({
+        next: (ingredient) => {
+          this.snackBar.open('Ingredient created successfully', 'Close', { duration: 3000 });
+          this.dialogRef.close(ingredient);
+        },
+        error: (err) => {
+          console.error('Error creating ingredient:', err);
+          this.snackBar.open('Failed to create ingredient', 'Close', { duration: 3000 });
+          this.saving = false;
+        }
+      });
+    }
   }
 }

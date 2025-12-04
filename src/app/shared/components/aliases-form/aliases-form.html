@@ -1,0 +1,19 @@
+<div class="form-section">
+  <div class="section-header">
+    <h3>Aliases</h3>
+    <button mat-icon-button type="button" (click)="addAlias()">
+      <mat-icon class="green">add</mat-icon>
+    </button>
+  </div>
+  <div class="aliases-list">
+    <div *ngFor="let alias of aliases.controls; let i = index" class="row">
+      <mat-form-field appearance="fill" class="field">
+        <mat-label>Alias {{ i + 1 }}</mat-label>
+        <input matInput [formControl]="$any(alias)" placeholder="Alternative name">
+      </mat-form-field>
+      <button mat-icon-button type="button" (click)="removeAlias(i)">
+        <mat-icon class="green">delete</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
