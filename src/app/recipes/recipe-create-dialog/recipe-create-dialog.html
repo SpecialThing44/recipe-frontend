@@ -62,36 +62,7 @@
     </div>
 
     <!-- Tags Section -->
-    <div class="form-section">
-      <div class="section-header">
-        <h3>Tags</h3>
-        <button mat-icon-button type="button" (click)="addTag()" color="black">
-          <mat-icon class="icon-black">add</mat-icon>
-        </button>
-      </div>
-      <div formArrayName="tags">
-        <div *ngFor="let tag of tags.controls; let i = index" class="tag-row">
-          <mat-form-field appearance="fill" class="tag-field">
-            <mat-label>Tag {{ i + 1 }}</mat-label>
-            <input 
-              matInput 
-              [formControlName]="i" 
-              placeholder="e.g., dessert, quick"
-              [matAutocomplete]="autoTag">
-            <mat-autocomplete #autoTag="matAutocomplete">
-              <mat-option *ngFor="let suggestion of tagSuggestions[i] | async" [value]="suggestion">
-                {{ suggestion }}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeTag(i)" color="primary">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Ingredients Section -->
+    <app-tags-form [tags]="tags" placeholder="e.g., dessert, quick"></app-tags-form>    <!-- Ingredients Section -->
     <app-recipe-ingredients-form [ingredients]="ingredients"></app-recipe-ingredients-form>
 
     <!-- Image Section -->

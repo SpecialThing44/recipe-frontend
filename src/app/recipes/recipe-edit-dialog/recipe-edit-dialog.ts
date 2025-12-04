@@ -12,9 +12,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
 import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
+import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
 import { RecipesService, Recipe, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
+
 
 import { CountriesService, Country } from '../../core/countries.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
@@ -38,7 +40,8 @@ import {availableUnits} from '../../shared/units/available-units';
     MatSelectModule,
     MatAutocompleteModule,
     QuillModule,
-    RecipeIngredientsFormComponent
+    RecipeIngredientsFormComponent,
+    TagsFormComponent
   ],
   templateUrl: './recipe-edit-dialog.html',
   styleUrl: './recipe-edit-dialog.scss',
@@ -46,7 +49,6 @@ import {availableUnits} from '../../shared/units/available-units';
 export class RecipeEditDialogComponent {
   recipeForm: FormGroup;
   saving = false;
-  tagSuggestions: Observable<string[]>[] = [];
   countrySuggestions!: Observable<Country[]>;
   selectedImage: File | null = null;
   quillEditor: any;
@@ -94,10 +96,8 @@ export class RecipeEditDialogComponent {
 
     // Populate tags
     data.recipe.tags.forEach(tag => {
-      const index = this.tags.length;
       const tagControl = this.fb.control(tag);
       this.tags.push(tagControl);
-      this.setupTagAutocomplete(index, tagControl);
     });
 
     // Populate ingredients
@@ -177,36 +177,6 @@ export class RecipeEditDialogComponent {
         });
       }
     };
-  }
-
-  setupTagAutocomplete(index: number, tagControl: any): void {
-    this.tagSuggestions[index] = tagControl.valueChanges.pipe(
-      startWith(tagControl.value || ''),
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((value: any) => {
-        if (!value || (typeof value === 'string' && value.trim().length === 0)) {
-          return of([]);
-        }
-        const searchValue = typeof value === 'string' ? value.trim() : '';
-        return this.tagsService.listTags({
-          name: { contains: searchValue },
-          limit: 10
-        });
-      })
-    );
-  }
-
-  addTag(): void {
-    const index = this.tags.length;
-    const tagControl = this.fb.control('');
-    this.tags.push(tagControl);
-    this.setupTagAutocomplete(index, tagControl);
-  }
-
-  removeTag(index: number): void {
-    this.tags.removeAt(index);
-    this.tagSuggestions.splice(index, 1);
   }
 
   onImageSelected(event: any): void {

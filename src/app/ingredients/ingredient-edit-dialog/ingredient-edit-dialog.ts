@@ -14,7 +14,8 @@ import { IngredientsService, Ingredient, IngredientInput } from '../../core/ingr
 import { TagsService } from '../../core/tags.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
-import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
+import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
+import { wikipediaUrlValidator } from '../../shared/validators/wikipedia-url-validator';
 
 @Component({
   selector: 'app-ingredient-edit-dialog',
@@ -29,7 +30,8 @@ import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-valid
     MatCheckboxModule,
     MatDialogModule,
     MatChipsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    TagsFormComponent
   ],
   templateUrl: './ingredient-edit-dialog.html',
   styleUrl: './ingredient-edit-dialog.scss',
@@ -37,7 +39,6 @@ import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-valid
 export class IngredientEditDialogComponent {
   ingredientForm: FormGroup;
   saving = false;
-  tagSuggestions: Observable<string[]>[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -61,12 +62,9 @@ export class IngredientEditDialogComponent {
       this.aliases.push(this.fb.control(alias));
     });
 
-    // Populate tags with autocomplete
+    // Populate tags
     data.ingredient.tags.forEach(tag => {
-      const index = this.tags.length;
-      const tagControl = this.fb.control(tag);
-      this.tags.push(tagControl);
-      this.setupTagAutocomplete(index, tagControl);
+      this.tags.push(this.fb.control(tag));
     });
 
     // When vegan is checked, automatically check vegetarian
@@ -91,36 +89,6 @@ export class IngredientEditDialogComponent {
 
   removeAlias(index: number): void {
     this.aliases.removeAt(index);
-  }
-
-  setupTagAutocomplete(index: number, tagControl: any): void {
-    this.tagSuggestions[index] = tagControl.valueChanges.pipe(
-      startWith(tagControl.value || ''),
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap((value: any) => {
-        if (!value || (typeof value === 'string' && value.trim().length === 0)) {
-          return of([]);
-        }
-        const searchValue = typeof value === 'string' ? value.trim() : '';
-        return this.tagsService.listTags({
-          name: { contains: searchValue },
-          limit: 10
-        });
-      })
-    );
-  }
-
-  addTag(): void {
-    const index = this.tags.length;
-    const tagControl = this.fb.control('');
-    this.tags.push(tagControl);
-    this.setupTagAutocomplete(index, tagControl);
-  }
-
-  removeTag(index: number): void {
-    this.tags.removeAt(index);
-    this.tagSuggestions.splice(index, 1);
   }
 
   onSubmit(): void {

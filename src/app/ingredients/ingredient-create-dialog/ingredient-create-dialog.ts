@@ -10,8 +10,10 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
 import { IngredientsService, IngredientInput } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
+
 import { debounceTime, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
@@ -29,7 +31,8 @@ import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-valid
     MatCheckboxModule,
     MatDialogModule,
     MatChipsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    TagsFormComponent
   ],
   templateUrl: './ingredient-create-dialog.html',
   styleUrl: './ingredient-create-dialog.scss',
@@ -37,7 +40,6 @@ import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-valid
 export class IngredientCreateDialogComponent {
   ingredientForm: FormGroup;
   saving = false;
-  tagSuggestions: Observable<string[]>[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -77,33 +79,6 @@ export class IngredientCreateDialogComponent {
 
   removeAlias(index: number): void {
     this.aliases.removeAt(index);
-  }
-
-  addTag(): void {
-    const index = this.tags.length;
-    const tagControl = this.fb.control('');
-    this.tags.push(tagControl);
-
-    // Set up autocomplete for this tag input
-    this.tagSuggestions[index] = tagControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(value => {
-        if (!value || value.trim().length === 0) {
-          return of([]);
-        }
-        return this.tagsService.listTags({
-          name: { contains: value.trim() },
-          limit: 10
-        });
-      })
-    );
-  }
-
-  removeTag(index: number): void {
-    this.tags.removeAt(index);
-    this.tagSuggestions.splice(index, 1);
   }
 
   onSubmit(): void {

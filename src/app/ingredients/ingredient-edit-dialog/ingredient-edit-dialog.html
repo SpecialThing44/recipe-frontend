@@ -42,34 +42,7 @@
       </div>
     </div>
 
-    <div class="tags-section">
-      <div class="section-header">
-        <label>Tags</label>
-        <button mat-icon-button type="button" (click)="addTag()" color="primary">
-          <mat-icon>add</mat-icon>
-        </button>
-      </div>
-      <div formArrayName="tags">
-        <div *ngFor="let tag of tags.controls; let i = index" class="tag-row">
-          <mat-form-field appearance="fill" class="tag-field">
-            <mat-label>Tag {{ i + 1 }}</mat-label>
-            <input 
-              matInput 
-              [formControlName]="i" 
-              placeholder="e.g., fruit, vegetable"
-              [matAutocomplete]="auto">
-            <mat-autocomplete #auto="matAutocomplete">
-              <mat-option *ngFor="let suggestion of tagSuggestions[i] | async" [value]="suggestion">
-                {{ suggestion }}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeTag(i)" color="primary">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-tags-form [tags]="tags" placeholder="e.g., fruit, vegetable"></app-tags-form>
 
     <div class="checkboxes">
       <mat-checkbox formControlName="vegan">Vegan</mat-checkbox>

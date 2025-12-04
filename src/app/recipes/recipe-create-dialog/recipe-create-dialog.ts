@@ -12,9 +12,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
 import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
+import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
 import { RecipesService, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
+
 
 import { CountriesService, Country } from '../../core/countries.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
@@ -38,7 +40,8 @@ import {availableUnits} from '../../shared/units/available-units';
     MatSelectModule,
     MatAutocompleteModule,
     QuillModule,
-    RecipeIngredientsFormComponent
+    RecipeIngredientsFormComponent,
+    TagsFormComponent
   ],
   templateUrl: './recipe-create-dialog.html',
   styleUrl: './recipe-create-dialog.scss',
@@ -46,7 +49,6 @@ import {availableUnits} from '../../shared/units/available-units';
 export class RecipeCreateDialogComponent {
   recipeForm: FormGroup;
   saving = false;
-  tagSuggestions: Observable<string[]>[] = [];
   countrySuggestions!: Observable<Country[]>;
   selectedImage: File | null = null;
   quillEditor: any;
@@ -133,32 +135,6 @@ export class RecipeCreateDialogComponent {
         this.snackBar.open('Please save the recipe first before adding images to instructions', 'Close', { duration: 3000 });
       }
     };
-  }
-
-  addTag(): void {
-    const index = this.tags.length;
-    const tagControl = this.fb.control('');
-    this.tags.push(tagControl);
-
-    this.tagSuggestions[index] = tagControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(value => {
-        if (!value || value.trim().length === 0) {
-          return of([]);
-        }
-        return this.tagsService.listTags({
-          name: { contains: value.trim() },
-          limit: 10
-        });
-      })
-    );
-  }
-
-  removeTag(index: number): void {
-    this.tags.removeAt(index);
-    this.tagSuggestions.splice(index, 1);
   }
 
   displayCountry(country: Country | string | null): string {
