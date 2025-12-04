@@ -11,9 +11,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
+import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
 import { RecipesService, Recipe, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
+
 import { CountriesService, Country } from '../../core/countries.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
@@ -35,7 +37,8 @@ import {availableUnits} from '../../shared/units/available-units';
     MatDialogModule,
     MatSelectModule,
     MatAutocompleteModule,
-    QuillModule
+    QuillModule,
+    RecipeIngredientsFormComponent
   ],
   templateUrl: './recipe-edit-dialog.html',
   styleUrl: './recipe-edit-dialog.scss',
@@ -44,7 +47,6 @@ export class RecipeEditDialogComponent {
   recipeForm: FormGroup;
   saving = false;
   tagSuggestions: Observable<string[]>[] = [];
-  ingredientSuggestions: Observable<Ingredient[]>[] = [];
   countrySuggestions!: Observable<Country[]>;
   selectedImage: File | null = null;
   quillEditor: any;
@@ -114,7 +116,6 @@ export class RecipeEditDialogComponent {
         description: [ing.description || '']
       });
       this.ingredients.push(ingredientGroup);
-      this.setupIngredientAutocomplete(index, ingredientGroup);
     });
 
     // When vegan is checked, automatically check vegetarian
@@ -196,26 +197,6 @@ export class RecipeEditDialogComponent {
     );
   }
 
-  setupIngredientAutocomplete(index: number, ingredientGroup: FormGroup): void {
-    const ingredientNameControl = ingredientGroup.get('ingredientName');
-    if (ingredientNameControl) {
-      this.ingredientSuggestions[index] = ingredientNameControl.valueChanges.pipe(
-        startWith(ingredientNameControl.value || ''),
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap((value: any) => {
-          if (!value || typeof value !== 'string' || value.trim().length === 0) {
-            return of([]);
-          }
-          return this.ingredientsService.listIngredients({
-            name: { contains: value.trim() },
-            limit: 10
-          });
-        })
-      );
-    }
-  }
-
   addTag(): void {
     const index = this.tags.length;
     const tagControl = this.fb.control('');
@@ -226,34 +207,6 @@ export class RecipeEditDialogComponent {
   removeTag(index: number): void {
     this.tags.removeAt(index);
     this.tagSuggestions.splice(index, 1);
-  }
-
-  addIngredient(): void {
-    const index = this.ingredients.length;
-    const ingredientGroup = this.fb.group({
-      ingredientName: [''],
-      ingredientId: ['', Validators.required],
-      amount: [0, [Validators.required, Validators.min(0)]],
-      unit: ['', Validators.required],
-      description: ['']
-    });
-
-    this.ingredients.push(ingredientGroup);
-    this.setupIngredientAutocomplete(index, ingredientGroup);
-  }
-
-  removeIngredient(index: number): void {
-    this.ingredients.removeAt(index);
-    this.ingredientSuggestions.splice(index, 1);
-  }
-
-  onIngredientSelected(index: number, event: MatAutocompleteSelectedEvent): void {
-    const ingredient = event.option.value as Ingredient;
-    const ingredientGroup = this.ingredients.at(index) as FormGroup;
-    ingredientGroup.patchValue({
-      ingredientId: ingredient.id,
-      ingredientName: ingredient.name
-    });
   }
 
   onImageSelected(event: any): void {

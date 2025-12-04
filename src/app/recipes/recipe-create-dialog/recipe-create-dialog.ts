@@ -11,9 +11,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
+import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
 import { RecipesService, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
+
 import { CountriesService, Country } from '../../core/countries.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
@@ -35,7 +37,8 @@ import {availableUnits} from '../../shared/units/available-units';
     MatDialogModule,
     MatSelectModule,
     MatAutocompleteModule,
-    QuillModule
+    QuillModule,
+    RecipeIngredientsFormComponent
   ],
   templateUrl: './recipe-create-dialog.html',
   styleUrl: './recipe-create-dialog.scss',
@@ -44,7 +47,6 @@ export class RecipeCreateDialogComponent {
   recipeForm: FormGroup;
   saving = false;
   tagSuggestions: Observable<string[]>[] = [];
-  ingredientSuggestions: Observable<Ingredient[]>[] = [];
   countrySuggestions!: Observable<Country[]>;
   selectedImage: File | null = null;
   quillEditor: any;
@@ -159,55 +161,9 @@ export class RecipeCreateDialogComponent {
     this.tagSuggestions.splice(index, 1);
   }
 
-  addIngredient(): void {
-    const index = this.ingredients.length;
-    const ingredientGroup = this.fb.group({
-      ingredientName: [''],
-      ingredientId: ['', Validators.required],
-      amount: [0, [Validators.required, Validators.min(0)]],
-      unit: ['', Validators.required],
-      description: ['']
-    });
-
-    this.ingredients.push(ingredientGroup);
-
-    // Setup autocomplete for ingredient name
-    const ingredientNameControl = ingredientGroup.get('ingredientName');
-    if (ingredientNameControl) {
-      this.ingredientSuggestions[index] = ingredientNameControl.valueChanges.pipe(
-        startWith(''),
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap(value => {
-          if (!value || typeof value !== 'string' || value.trim().length === 0) {
-            return of([]);
-          }
-          return this.ingredientsService.listIngredients({
-            name: { contains: value.trim() },
-            limit: 10
-          });
-        })
-      );
-    }
-  }
-
-  removeIngredient(index: number): void {
-    this.ingredients.removeAt(index);
-    this.ingredientSuggestions.splice(index, 1);
-  }
-
   displayCountry(country: Country | string | null): string {
     if (!country) return '';
     return typeof country === 'string' ? country : country.name;
-  }
-
-  onIngredientSelected(index: number, event: MatAutocompleteSelectedEvent): void {
-    const ingredient = event.option.value as Ingredient;
-    const ingredientGroup = this.ingredients.at(index) as FormGroup;
-    ingredientGroup.patchValue({
-      ingredientId: ingredient.id,
-      ingredientName: ingredient.name
-    });
   }
 
   onImageSelected(event: any): void {
@@ -287,6 +243,4 @@ export class RecipeCreateDialogComponent {
       }
     });
   }
-
-  protected readonly availableUnits = availableUnits;
 }

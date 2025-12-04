@@ -92,63 +92,7 @@
     </div>
 
     <!-- Ingredients Section -->
-    <div class="form-section">
-      <div class="section-header">
-        <h3>Ingredients</h3>
-        <button mat-icon-button type="button" (click)="addIngredient()" color="primary">
-          <mat-icon>add</mat-icon>
-        </button>
-      </div>
-      <div formArrayName="ingredients">
-        <div *ngFor="let ingredient of ingredients.controls; let i = index" [formGroupName]="i" class="ingredient-row">
-          <mat-form-field appearance="fill" class="ingredient-field">
-            <mat-label>Ingredient</mat-label>
-            <input 
-              matInput 
-              formControlName="ingredientName" 
-              placeholder="Search ingredient..."
-              [matAutocomplete]="autoIngredient">
-            <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="onIngredientSelected(i, $event)">
-              <mat-option *ngFor="let suggestion of ingredientSuggestions[i] | async" [value]="suggestion">
-                {{ suggestion.name }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="ingredient.get('ingredientId')?.hasError('required')">
-              Ingredient is required
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="amount-field">
-            <mat-label>Amount</mat-label>
-            <input matInput type="number" formControlName="amount" min="0" step="0.1">
-            <mat-error *ngIf="ingredient.get('amount')?.hasError('required')">
-              Required
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="unit-field">
-            <mat-label>Unit</mat-label>
-            <mat-select formControlName="unit">
-              <mat-option *ngFor="let unit of availableUnits" [value]="unit.value">
-                {{ unit.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="ingredient.get('unit')?.hasError('required')">
-              Required
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="fill" class="description-field">
-            <mat-label>Description (Optional)</mat-label>
-            <input matInput formControlName="description" placeholder="e.g., chopped">
-          </mat-form-field>
-
-          <button mat-icon-button type="button" (click)="removeIngredient(i)" color="primary">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-recipe-ingredients-form [ingredients]="ingredients"></app-recipe-ingredients-form>
 
     <!-- Image Section -->
     <div class="form-section">
