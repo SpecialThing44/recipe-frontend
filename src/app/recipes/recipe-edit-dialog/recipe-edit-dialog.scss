@@ -6,25 +6,6 @@
   min-width: 700px;
   max-width: 900px;
 
-  .form-section {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    h3 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
-    }
-  }
-
   .full-width {
     width: 100%;
   }
@@ -39,16 +20,6 @@
     display: flex;
     gap: 24px;
     flex-wrap: wrap;
-  }
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    h3 {
-      margin: 0;
-    }
   }
 
   .tag-row {
@@ -97,7 +68,7 @@
 
   quill-editor {
     min-height: 300px;
-    
+
     ::ng-deep .ql-container {
       min-height: 250px;
       font-family: 'Roboto', sans-serif;
@@ -115,7 +86,7 @@
 
     .ingredient-row {
       grid-template-columns: 1fr;
-      
+
       button {
         justify-self: start;
       }

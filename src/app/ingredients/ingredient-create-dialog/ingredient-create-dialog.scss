@@ -10,18 +10,6 @@
     width: 100%;
   }
 
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-
-    label {
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
-    }
-  }
-
   .alias-row, .tag-row {
     display: flex;
     gap: 8px;

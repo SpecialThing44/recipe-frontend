@@ -41,16 +41,6 @@
     flex-wrap: wrap;
   }
 
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    h3 {
-      margin: 0;
-    }
-  }
-
   .tag-row {
     display: flex;
     gap: 8px;
@@ -97,7 +87,7 @@
 
   quill-editor {
     min-height: 300px;
-    
+
     ::ng-deep .ql-container {
       min-height: 250px;
       font-family: 'Roboto', sans-serif;
@@ -119,7 +109,7 @@
 
     .ingredient-row {
       grid-template-columns: 1fr;
-      
+
       button {
         justify-self: start;
       }
