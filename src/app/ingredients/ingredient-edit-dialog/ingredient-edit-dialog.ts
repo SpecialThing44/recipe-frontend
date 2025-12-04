@@ -15,6 +15,7 @@ import { TagsService } from '../../core/tags.service';
 import { debounceTime, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
+import { AliasesFormComponent } from '../../shared/components/aliases-form/aliases-form';
 import { wikipediaUrlValidator } from '../../shared/validators/wikipedia-url-validator';
 
 @Component({
@@ -31,7 +32,8 @@ import { wikipediaUrlValidator } from '../../shared/validators/wikipedia-url-val
     MatDialogModule,
     MatChipsModule,
     MatAutocompleteModule,
-    TagsFormComponent
+    TagsFormComponent,
+    AliasesFormComponent
   ],
   templateUrl: './ingredient-edit-dialog.html',
   styleUrl: './ingredient-edit-dialog.scss',
@@ -81,14 +83,6 @@ export class IngredientEditDialogComponent {
 
   get tags(): FormArray {
     return this.ingredientForm.get('tags') as FormArray;
-  }
-
-  addAlias(): void {
-    this.aliases.push(this.fb.control(''));
-  }
-
-  removeAlias(index: number): void {
-    this.aliases.removeAt(index);
   }
 
   onSubmit(): void {

@@ -86,3 +86,19 @@ a[mat-button], button[mat-button], button[mat-icon-button] {
     color: rgba(0, 0, 0, 0.87);
   }
 }
+
+.full-width {
+  width: 100%;
+}
+
+.time-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.checkboxes {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}

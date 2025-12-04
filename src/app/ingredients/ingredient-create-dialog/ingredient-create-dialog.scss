@@ -5,26 +5,6 @@
   padding: 16px 0;
   min-width: 500px;
   max-width: 600px;
-
-  .full-width {
-    width: 100%;
-  }
-
-  .alias-row, .tag-row {
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-    margin-bottom: 8px;
-
-    .alias-field, .tag-field {
-      flex: 1;
-    }
-  }
-
-  .checkboxes {
-    display: flex;
-    gap: 24px;
-  }
 }
 
 @media (max-width: 600px) {

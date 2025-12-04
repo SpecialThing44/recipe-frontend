@@ -22,25 +22,7 @@
       </mat-error>
     </mat-form-field>
 
-    <div class="aliases-section">
-      <div class="section-header">
-        <label>Aliases</label>
-        <button mat-icon-button type="button" (click)="addAlias()" color="primary">
-          <mat-icon>add</mat-icon>
-        </button>
-      </div>
-      <div formArrayName="aliases">
-        <div *ngFor="let alias of aliases.controls; let i = index" class="alias-row">
-          <mat-form-field appearance="fill" class="alias-field">
-            <mat-label>Alias {{ i + 1 }}</mat-label>
-            <input matInput [formControlName]="i" placeholder="Alternative name">
-          </mat-form-field>
-          <button mat-icon-button type="button" (click)="removeAlias(i)" color="primary">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-aliases-form [aliases]="aliases"></app-aliases-form>
 
     <app-tags-form [tags]="tags" placeholder="e.g., fruit, vegetable"></app-tags-form>
 

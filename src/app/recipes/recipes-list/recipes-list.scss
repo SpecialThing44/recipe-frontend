@@ -324,9 +324,7 @@
   }
 }
 
-.full-width {
-  width: 100%;
-}
+
 
 .advanced-filters-toggle {
   display: flex;
@@ -337,7 +335,7 @@
 .save-button {
   background-color: rgba(0, 0, 0, 0.04);
   margin-right: 8px;
-  
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.08);
   }
