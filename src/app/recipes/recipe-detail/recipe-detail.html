@@ -65,17 +65,6 @@
 
     <!-- Dietary Info & Tags -->
     <div class="badges-section">
-      <div class="dietary-badges" *ngIf="recipe.vegetarian || recipe.vegan">
-        <mat-chip *ngIf="recipe.vegetarian" class="dietary-chip vegetarian">
-          <mat-icon>eco</mat-icon>
-          Vegetarian
-        </mat-chip>
-        <mat-chip *ngIf="recipe.vegan" class="dietary-chip vegan">
-          <mat-icon>spa</mat-icon>
-          Vegan
-        </mat-chip>
-      </div>
-
       <div class="tags" *ngIf="recipe.tags.length > 0">
         <mat-chip *ngFor="let tag of recipe.tags">{{ tag }}</mat-chip>
       </div>

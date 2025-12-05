@@ -53,16 +53,6 @@
         </mat-form-field>
       </div>
 
-      <!-- Dietary Filters -->
-      <div class="filter-row checkbox-row">
-        <mat-checkbox formControlName="vegetarian" [indeterminate]="filterForm.get('vegetarian')?.value === null">
-          Vegetarian
-        </mat-checkbox>
-        <mat-checkbox formControlName="vegan" [indeterminate]="filterForm.get('vegan')?.value === null">
-          Vegan
-        </mat-checkbox>
-      </div>
-
       <!-- Sorting & Page Size -->
       <div class="filter-row">
         <mat-form-field appearance="fill" class="filter-field">
@@ -132,17 +122,6 @@
             <mat-icon>link</mat-icon>
             <span class="info-label">Wiki:</span>
             <a [href]="ingredient.wikiLink" target="_blank" class="wiki-link">{{ ingredient.wikiLink }}</a>
-          </div>
-
-          <div class="dietary-badges">
-            <mat-chip *ngIf="ingredient.vegetarian" class="dietary-chip vegetarian">
-              <mat-icon>eco</mat-icon>
-              Vegetarian
-            </mat-chip>
-            <mat-chip *ngIf="ingredient.vegan" class="dietary-chip vegan">
-              <mat-icon>spa</mat-icon>
-              Vegan
-            </mat-chip>
           </div>
 
           <div class="aliases" *ngIf="ingredient.aliases.length > 0">

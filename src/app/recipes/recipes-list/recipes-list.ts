@@ -95,8 +95,6 @@ export class RecipesListComponent implements OnInit {
       id: [''],
       nameFilterType: ['contains'],
       nameValue: [''],
-      vegetarian: [null],
-      vegan: [null],
       publicOnly: [null],
       myRecipes: [false],
       savedRecipes: [false],
@@ -131,8 +129,6 @@ export class RecipesListComponent implements OnInit {
           return prev.id === curr.id &&
                  prev.nameFilterType === curr.nameFilterType &&
                  prev.nameValue === curr.nameValue &&
-                 prev.vegetarian === curr.vegetarian &&
-                 prev.vegan === curr.vegan &&
                  prev.publicOnly === curr.publicOnly &&
                  prev.myRecipes === curr.myRecipes &&
                  prev.savedRecipes === curr.savedRecipes &&
@@ -259,14 +255,6 @@ export class RecipesListComponent implements OnInit {
       filters.name[nameFilterType as keyof typeof filters.name] = formValue.nameValue.trim();
     }
 
-    if (formValue.vegetarian !== null) {
-      filters.vegetarian = formValue.vegetarian;
-    }
-
-    if (formValue.vegan !== null) {
-      filters.vegan = formValue.vegan;
-    }
-
     if (formValue.publicOnly !== null) {
       filters.public = formValue.publicOnly;
     }
@@ -338,8 +326,6 @@ export class RecipesListComponent implements OnInit {
       id: '',
       nameFilterType: 'contains',
       nameValue: '',
-      vegetarian: null,
-      vegan: null,
       publicOnly: null,
       myRecipes: false,
       savedRecipes: false,

@@ -4,8 +4,7 @@ import {RecipeDetailComponent} from './recipes/recipe-detail/recipe-detail';
 import {IngredientsListComponent} from './ingredients/ingredients-list/ingredients-list';
 import {UsersListComponent} from './users/users-list/users-list';
 import {UserProfileComponent} from './users/user-profile/user-profile';
-import {LoginComponent} from './auth/login/login';
-import {SignupComponent} from './auth/signup/signup';
+import {CallbackComponent} from './callback/callback.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'recipes', pathMatch: 'full' },
@@ -14,6 +13,6 @@ export const routes: Routes = [
   { path: 'ingredients', component: IngredientsListComponent },
   { path: 'users', component: UsersListComponent },
   { path: 'users/:id', component: UserProfileComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent }
+  { path: 'callback', component: CallbackComponent },
+  { path: 'unauthorized', redirectTo: 'recipes' }
 ];

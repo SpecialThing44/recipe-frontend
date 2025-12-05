@@ -34,7 +34,6 @@
     <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
     <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
     <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
-    <a mat-button routerLink="/login" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Login</a>
-    <a mat-button routerLink="/signup" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Sign Up</a>
+    <button mat-button (click)="login()">Login/Signup</button>
   </ng-template>
 </mat-toolbar>

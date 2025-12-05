@@ -77,8 +77,6 @@ export class IngredientsListComponent implements OnInit {
       id: [''],
       nameFilterType: ['contains'],
       nameValue: [''],
-      vegetarian: [null],
-      vegan: [null],
       sort: ['none'],
       pageSize: [25]
     });
@@ -122,14 +120,6 @@ export class IngredientsListComponent implements OnInit {
       filters.name[nameFilterType as keyof typeof filters.name] = formValue.nameValue.trim();
     }
 
-    if (formValue.vegetarian !== null) {
-      filters.vegetarian = formValue.vegetarian;
-    }
-
-    if (formValue.vegan !== null) {
-      filters.vegan = formValue.vegan;
-    }
-
     if (formValue.sort && formValue.sort !== 'none') {
       const [field, direction] = formValue.sort.split('-');
       if (field === 'name') {
@@ -156,8 +146,6 @@ export class IngredientsListComponent implements OnInit {
       id: '',
       nameFilterType: 'contains',
       nameValue: '',
-      vegetarian: null,
-      vegan: null,
       sort: 'none',
       pageSize: 25
     });

@@ -15,8 +15,6 @@ export interface Ingredient {
   name: string;
   aliases: string[];
   wikiLink: string;
-  vegetarian: boolean;
-  vegan: boolean;
   tags: string[];
   createdBy: User;
 }
@@ -40,8 +38,6 @@ export interface Recipe {
   ingredients: InstructionIngredient[];
   prepTime: number;
   cookTime: number;
-  vegetarian: boolean;
-  vegan: boolean;
   countryOfOrigin?: string;
   public: boolean;
   wikiLink?: string;
@@ -64,8 +60,6 @@ export interface RecipeInput {
   ingredients: RecipeIngredientInput[];
   prepTime: number;
   cookTime: number;
-  vegetarian: boolean;
-  vegan: boolean;
   countryOfOrigin?: string;
   public: boolean;
   wikiLink?: string;
@@ -93,8 +87,6 @@ export interface RecipesFilters {
   name?: StringFilter;
   prepTime?: NumberFilter;
   cookTime?: NumberFilter;
-  vegetarian?: boolean;
-  vegan?: boolean;
   public?: boolean;
   tags?: string[];
   ingredients?: string[];
@@ -125,8 +117,6 @@ export class RecipesService {
       if (filters.name) body.name = filters.name;
       if (filters.prepTime) body.prepTime = filters.prepTime;
       if (filters.cookTime) body.cookTime = filters.cookTime;
-      if (filters.vegetarian !== undefined) body.vegetarian = filters.vegetarian;
-      if (filters.vegan !== undefined) body.vegan = filters.vegan;
       if (filters.public !== undefined) body.public = filters.public;
       if (filters.tags && filters.tags.length > 0) body.tags = filters.tags;
       if (filters.ingredients && filters.ingredients.length > 0) body.ingredients = filters.ingredients;

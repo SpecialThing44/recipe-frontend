@@ -9,8 +9,6 @@ export interface Ingredient {
   name: string;
   aliases: string[];
   wikiLink: string;
-  vegetarian: boolean;
-  vegan: boolean;
   tags: string[];
   createdBy: User;
 }
@@ -19,8 +17,6 @@ export interface IngredientInput {
   name: string;
   aliases: string[];
   wikiLink: string;
-  vegetarian: boolean;
-  vegan: boolean;
   tags: string[];
 }
 
@@ -37,8 +33,6 @@ export interface IngredientsFilters {
   ids?: string[];
   name?: StringFilter;
   aliasesOrName?: string[];
-  vegetarian?: boolean;
-  vegan?: boolean;
   tags?: string[];
   orderBy?: {
     name?: boolean;
@@ -63,8 +57,6 @@ export class IngredientsService {
       if (filters.ids && filters.ids.length > 0) body.ids = filters.ids;
       if (filters.name) body.name = filters.name;
       if (filters.aliasesOrName && filters.aliasesOrName.length > 0) body.aliasesOrName = filters.aliasesOrName;
-      if (filters.vegetarian !== undefined) body.vegetarian = filters.vegetarian;
-      if (filters.vegan !== undefined) body.vegan = filters.vegan;
       if (filters.tags && filters.tags.length > 0) body.tags = filters.tags;
       if (filters.orderBy) body.orderBy = filters.orderBy;
       if (filters.limit) body.limit = filters.limit;

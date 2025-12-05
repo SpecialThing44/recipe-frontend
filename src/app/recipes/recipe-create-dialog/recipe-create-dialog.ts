@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, AbstractControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +20,15 @@ import { startWith, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
 import {getQuillModules} from '../../shared/quill/quill-modules';
+
+function minLengthArray(min: number) {
+  return (c: AbstractControl): {[key: string]: any} | null => {
+    if (c.value.length >= min)
+      return null;
+
+    return { 'minLengthArray': {valid: false, minLength: min}};
+  }
+}
 
 @Component({
   selector: 'app-recipe-create-dialog',
@@ -65,19 +74,10 @@ export class RecipeCreateDialogComponent {
       cookTime: [0, [Validators.required, Validators.min(0)]],
       countryOfOrigin: [''],
       wikiLink: ['', wikipediaUrlValidator],
-      vegan: [false],
-      vegetarian: [false],
       public: [true],
       tags: this.fb.array([]),
-      ingredients: this.fb.array([]),
+      ingredients: this.fb.array([], minLengthArray(1)),
       instructions: ['', Validators.required]
-    });
-
-    // When vegan is checked, automatically check vegetarian
-    this.recipeForm.get('vegan')?.valueChanges.subscribe(isVegan => {
-      if (isVegan) {
-        this.recipeForm.patchValue({ vegetarian: true }, { emitEvent: false });
-      }
     });
 
     // Setup country autocomplete
@@ -176,8 +176,6 @@ export class RecipeCreateDialogComponent {
       ingredients: recipeIngredients,
       prepTime: formValue.prepTime,
       cookTime: formValue.cookTime,
-      vegetarian: formValue.vegetarian,
-      vegan: formValue.vegan,
       countryOfOrigin: countryName || undefined,
       public: formValue.public,
       wikiLink: formValue.wikiLink || undefined,

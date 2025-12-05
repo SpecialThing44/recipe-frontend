@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, AbstractControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +20,15 @@ import { Observable } from 'rxjs';
 import {wikipediaUrlValidator} from '../../shared/validators/wikipedia-url-validator';
 import {getQuillModules} from '../../shared/quill/quill-modules';
 import {availableUnits} from '../../shared/units/available-units';
+
+function minLengthArray(min: number) {
+  return (c: AbstractControl): {[key: string]: any} | null => {
+    if (c.value.length >= min)
+      return null;
+
+    return { 'minLengthArray': {valid: false, minLength: min}};
+  }
+}
 
 @Component({
   selector: 'app-recipe-edit-dialog',
@@ -79,11 +88,9 @@ export class RecipeEditDialogComponent {
       cookTime: [data.recipe.cookTime, [Validators.required, Validators.min(0)]],
       countryOfOrigin: [data.recipe.countryOfOrigin || ''],
       wikiLink: [data.recipe.wikiLink || '', wikipediaUrlValidator],
-      vegan: [data.recipe.vegan],
-      vegetarian: [data.recipe.vegetarian],
       public: [data.recipe.public],
       tags: this.fb.array([]),
-      ingredients: this.fb.array([]),
+      ingredients: this.fb.array([], minLengthArray(1)),
       // Instructions comes as object from backend
       instructions: [instructions, Validators.required]
     });
@@ -110,13 +117,6 @@ export class RecipeEditDialogComponent {
         description: [ing.description || '']
       });
       this.ingredients.push(ingredientGroup);
-    });
-
-    // When vegan is checked, automatically check vegetarian
-    this.recipeForm.get('vegan')?.valueChanges.subscribe(isVegan => {
-      if (isVegan) {
-        this.recipeForm.patchValue({ vegetarian: true }, { emitEvent: false });
-      }
     });
 
     // Setup country autocomplete
@@ -213,8 +213,6 @@ export class RecipeEditDialogComponent {
       ingredients: recipeIngredients,
       prepTime: formValue.prepTime,
       cookTime: formValue.cookTime,
-      vegetarian: formValue.vegetarian,
-      vegan: formValue.vegan,
       countryOfOrigin: countryName || undefined,
       public: formValue.public,
       wikiLink: formValue.wikiLink || undefined,

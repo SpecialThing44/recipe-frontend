@@ -55,8 +55,6 @@
       </mat-form-field>
 
       <div class="checkboxes">
-        <mat-checkbox formControlName="vegan">Vegan</mat-checkbox>
-        <mat-checkbox formControlName="vegetarian">Vegetarian</mat-checkbox>
         <mat-checkbox formControlName="public">Public Recipe</mat-checkbox>
       </div>
     </div>
@@ -64,6 +62,9 @@
     <!-- Tags Section -->
     <app-tags-form [tags]="tags" placeholder="e.g., dessert, quick"></app-tags-form>    <!-- Ingredients Section -->
     <app-recipe-ingredients-form [ingredients]="ingredients"></app-recipe-ingredients-form>
+    <mat-error *ngIf="ingredients.hasError('minLengthArray') && ingredients.touched" style="font-size: 12px; margin-top: -10px; margin-bottom: 10px; display: block;">
+      At least one ingredient is required
+    </mat-error>
 
     <!-- Image Section -->
     <div class="form-section">

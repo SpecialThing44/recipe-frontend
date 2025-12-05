@@ -56,9 +56,7 @@ export class IngredientDialogComponent {
       name: [ingredient?.name || '', Validators.required],
       wikiLink: [ingredient?.wikiLink || '', [Validators.required, wikipediaUrlValidator]],
       aliases: this.fb.array([]),
-      tags: this.fb.array([]),
-      vegan: [ingredient?.vegan || false],
-      vegetarian: [ingredient?.vegetarian || false]
+      tags: this.fb.array([])
     });
 
     if (ingredient) {
@@ -72,13 +70,6 @@ export class IngredientDialogComponent {
         this.tags.push(this.fb.control(tag));
       });
     }
-
-    // When vegan is checked, automatically check vegetarian
-    this.ingredientForm.get('vegan')?.valueChanges.subscribe(isVegan => {
-      if (isVegan) {
-        this.ingredientForm.patchValue({ vegetarian: true }, { emitEvent: false });
-      }
-    });
   }
 
   get aliases(): FormArray {
@@ -101,9 +92,7 @@ export class IngredientDialogComponent {
       name: formValue.name,
       wikiLink: formValue.wikiLink,
       aliases: formValue.aliases.filter((a: string) => a.trim() !== ''),
-      tags: formValue.tags.filter((t: string) => t.trim() !== ''),
-      vegan: formValue.vegan,
-      vegetarian: formValue.vegetarian
+      tags: formValue.tags.filter((t: string) => t.trim() !== '')
     };
 
     if (this.isEditMode && this.data?.ingredient) {
