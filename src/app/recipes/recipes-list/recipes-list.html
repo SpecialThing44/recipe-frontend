@@ -243,13 +243,6 @@
             <span class="info-value recipe-id">{{ recipe.id }}</span>
           </div>
 
-          <div class="dietary-badges">
-            <mat-chip *ngIf="recipe.public" class="dietary-chip">
-              <mat-icon>public</mat-icon>
-              Public
-            </mat-chip>
-          </div>
-
           <div class="tags" *ngIf="recipe.tags.length > 0">
             <mat-chip *ngFor="let tag of recipe.tags">{{ tag }}</mat-chip>
           </div>

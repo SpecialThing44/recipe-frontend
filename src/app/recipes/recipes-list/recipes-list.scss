@@ -136,6 +136,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 450px; // Fixed height for all cards
 
   &:hover {
     transform: translateY(-4px);
@@ -192,9 +195,17 @@
 
   mat-card-content {
     padding: 8px 16px 16px 16px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   .recipe-info {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
     .info-row {
       display: flex;
       align-items: center;
@@ -244,6 +255,9 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      max-height: 60px; // Fixed height for tags (2 rows max)
+      overflow: hidden;
+      margin-top: auto; // Push to bottom of available space
 
       mat-chip {
         font-size: 0.75rem;
@@ -253,6 +267,10 @@
         color: rgba(0, 0, 0, 0.87);
       }
     }
+  }
+
+  mat-card-actions {
+    flex-shrink: 0; // Prevent actions from being compressed
   }
 }
 
