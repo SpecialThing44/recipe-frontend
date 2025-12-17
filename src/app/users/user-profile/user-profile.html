@@ -71,8 +71,17 @@
 
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Country of Origin</mat-label>
-            <input matInput formControlName="countryOfOrigin" placeholder="e.g., USA, Canada, UK">
+            <input 
+              matInput 
+              formControlName="countryOfOrigin" 
+              placeholder="Start typing to search countries"
+              [matAutocomplete]="countryAuto">
             <mat-icon matPrefix>public</mat-icon>
+            <mat-autocomplete #countryAuto="matAutocomplete">
+              <mat-option *ngFor="let country of filteredCountries$ | async" [value]="country.name">
+                {{ country.name }}
+              </mat-option>
+            </mat-autocomplete>
           </mat-form-field>
 
           <div class="user-metadata" *ngIf="user">

@@ -6,7 +6,7 @@
         <p class="subtitle">by {{ recipe.createdBy.name }}</p>
       </div>
       <div class="header-actions">
-        <button *ngIf="isLoggedIn$ | async" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()">
+        <button *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()">
           <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
           {{ isSaved ? 'Saved' : 'Save' }}
         </button>

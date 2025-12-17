@@ -257,7 +257,7 @@
       </mat-card-content>
 
       <mat-card-actions align="end">
-        <button *ngIf="isLoggedIn$ | async" mat-stroked-button [color]="savedRecipeIds.has(recipe.id) ? 'accent' : 'primary'" (click)="toggleSave(recipe, $event)" matTooltip="Save Recipe" class="save-button">
+        <button *ngIf="(isLoggedIn$ | async) && !(canEditRecipe(recipe) | async)" mat-stroked-button [color]="savedRecipeIds.has(recipe.id) ? 'accent' : 'primary'" (click)="toggleSave(recipe, $event)" matTooltip="Save Recipe" class="save-button">
           <mat-icon>{{ savedRecipeIds.has(recipe.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
           Save
         </button>

@@ -9,10 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AuthService, User } from '../../core/auth.service';
 import { UsersService } from '../../core/users.service';
-import { combineLatest, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { CountriesService, Country } from '../../core/countries.service';
+import { combineLatest, Subject, Observable } from 'rxjs';
+import { takeUntil, startWith, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-profile',
@@ -26,7 +28,8 @@ import { takeUntil } from 'rxjs/operators';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatAutocompleteModule
   ],
   templateUrl: './user-profile.html',
   styleUrl: './user-profile.scss'
@@ -39,11 +42,13 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   saving = false;
   avatarFile: File | null = null;
   avatarPreview: string | null = null;
+  filteredCountries$!: Observable<Country[]>;
   private destroy$ = new Subject<void>();
 
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
+    private countriesService: CountriesService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
@@ -53,6 +58,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       countryOfOrigin: ['']
     });
+    
+    // Setup country autocomplete filtering
+    this.filteredCountries$ = this.profileForm.get('countryOfOrigin')!.valueChanges.pipe(
+      startWith(''),
+      map(value => this.countriesService.filterCountries(value || ''))
+    );
   }
 
   ngOnInit(): void {
