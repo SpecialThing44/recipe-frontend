@@ -88,16 +88,11 @@ export class IngredientsListComponent implements OnInit {
     );
     
     this.loadIngredients();
+  }
 
-    this.filterForm.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
-      .subscribe(() => {
-        this.currentPage = 0;
-        this.loadIngredients();
-      });
+  applyFilters(): void {
+    this.currentPage = 0;
+    this.loadIngredients();
   }
 
   loadIngredients(): void {

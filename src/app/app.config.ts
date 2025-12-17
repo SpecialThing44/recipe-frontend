@@ -9,7 +9,8 @@ import { routes } from './app.routes';
 
 export function initializeAuth(authService: AuthService) {
   return () => {
-    // authService.loadCurrentUser(); // Refactoring for OIDC
+    // Call checkAuth to initialize authentication state on app load
+    return (authService as any).checkAuth();
   };
 }
 
@@ -30,6 +31,11 @@ export const appConfig: ApplicationConfig = {
         responseType: 'code',
         silentRenew: true,
         useRefreshToken: true,
+        renewTimeBeforeTokenExpiresInSeconds: 30,
+        ignoreNonceAfterRefresh: true,
+        triggerRefreshWhenIdTokenExpired: false,
+        allowUnsafeReuseRefreshToken: false,
+        autoUserInfo: false,
         logLevel: LogLevel.Debug,
       },
     }),

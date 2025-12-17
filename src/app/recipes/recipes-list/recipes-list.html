@@ -191,7 +191,7 @@
       </div>
 
       <div class="filter-actions">
-        <button mat-raised-button color="primary" type="button" (click)="loadRecipes()">
+        <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
           <mat-icon>search</mat-icon>
           Apply Filters
         </button>
@@ -218,54 +218,17 @@
 
   <!-- Recipes List -->
   <div *ngIf="!loading && !error" class="recipes-grid">
-    <mat-card *ngFor="let recipe of recipes" class="recipe-card" (click)="viewRecipe(recipe.id)">
-      <div class="recipe-image">
-        <img *ngIf="recipe.image?.thumbnail" [src]="recipe.image?.thumbnail" [alt]="recipe.name">
-        <div *ngIf="!recipe.image?.thumbnail" class="recipe-image-placeholder">
-          <mat-icon>restaurant</mat-icon>
-        </div>
-      </div>
-
-      <mat-card-header>
-        <mat-card-title>{{ recipe.name }}</mat-card-title>
-        <mat-card-subtitle>by {{ recipe.createdBy.name }}</mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content>
-        <div class="recipe-info">
-          <div class="info-row">
-            <mat-icon>schedule</mat-icon>
-            <span>Prep: {{ recipe.prepTime }}m | Cook: {{ recipe.cookTime }}m</span>
-          </div>
-
-                    <div class="info-row">
-            <mat-icon>fingerprint</mat-icon>
-            <span class="info-value recipe-id">{{ recipe.id }}</span>
-          </div>
-
-          <div class="tags" *ngIf="recipe.tags.length > 0">
-            <mat-chip *ngFor="let tag of recipe.tags">{{ tag }}</mat-chip>
-          </div>
-        </div>
-      </mat-card-content>
-
-      <mat-card-actions align="end">
-        <button *ngIf="(isLoggedIn$ | async) && !(canEditRecipe(recipe) | async)" mat-stroked-button [color]="savedRecipeIds.has(recipe.id) ? 'accent' : 'primary'" (click)="toggleSave(recipe, $event)" matTooltip="Save Recipe" class="save-button">
-          <mat-icon>{{ savedRecipeIds.has(recipe.id) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-          Save
-        </button>
-        <ng-container *ngIf="canEditRecipe(recipe) | async">
-          <button mat-stroked-button color="primary" (click)="openEditDialog(recipe, $event)">
-            <mat-icon>edit</mat-icon>
-            Edit
-          </button>
-          <button mat-stroked-button color="warn" (click)="deleteRecipe(recipe, $event)">
-            <mat-icon>delete</mat-icon>
-            Delete
-          </button>
-        </ng-container>
-      </mat-card-actions>
-    </mat-card>
+    <app-recipe-card
+      *ngFor="let recipe of recipes"
+      [recipe]="recipe"
+      [canEdit]="(canEditRecipe(recipe) | async) || false"
+      [isSaved]="savedRecipeIds.has(recipe.id)"
+      [isLoggedIn]="(isLoggedIn$ | async) || false"
+      (cardClick)="viewRecipe($event)"
+      (saveClick)="toggleSaveFromCard($event)"
+      (editClick)="openEditDialogFromCard($event)"
+      (deleteClick)="deleteRecipeFromCard($event)">
+    </app-recipe-card>
 
     <div *ngIf="recipes.length === 0" class="empty-state">
       <mat-icon>restaurant_menu</mat-icon>

@@ -22,6 +22,7 @@ import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
 import { RecipeCreateDialogComponent } from '../recipe-create-dialog/recipe-create-dialog';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
+import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
 import { debounceTime, distinctUntilChanged, map, switchMap, startWith } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
@@ -44,7 +45,8 @@ import { Observable, of } from 'rxjs';
     MatDialogModule,
     MatSnackBarModule,
     MatAutocompleteModule,
-    MatTooltipModule
+    MatTooltipModule,
+    RecipeCardComponent
   ],
   templateUrl: './recipes-list.html',
   styleUrl: './recipes-list.scss',
@@ -135,32 +137,6 @@ export class RecipesListComponent implements OnInit {
     });
     
     this.loadRecipes();
-
-    this.filterForm.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged((prev, curr) => {
-          // Ignore changes to input fields for autocomplete
-          return prev.id === curr.id &&
-                 prev.nameFilterType === curr.nameFilterType &&
-                 prev.nameValue === curr.nameValue &&
-                 prev.publicOnly === curr.publicOnly &&
-                 prev.myRecipes === curr.myRecipes &&
-                 prev.savedRecipes === curr.savedRecipes &&
-                 prev.prepTime === curr.prepTime &&
-                 prev.cookTime === curr.cookTime &&
-                 prev.sort === curr.sort &&
-                 prev.pageSize === curr.pageSize &&
-                 JSON.stringify(prev.ingredients) === JSON.stringify(curr.ingredients) &&
-                 JSON.stringify(prev.notIngredients) === JSON.stringify(curr.notIngredients) &&
-                 JSON.stringify(prev.tags) === JSON.stringify(curr.tags);
-        })
-      )
-      .subscribe(() => {
-        this.currentPage = 0;
-        this.loadRecipes();
-      });
-
     this.setupAutocomplete();
   }
 
@@ -248,6 +224,11 @@ export class RecipesListComponent implements OnInit {
     this.filterForm.patchValue({
       tags: currentTags.filter((t: string) => t !== tag)
     });
+  }
+
+  applyFilters(): void {
+    this.currentPage = 0;
+    this.loadRecipes();
   }
 
   loadRecipes(): void {
@@ -469,6 +450,19 @@ export class RecipesListComponent implements OnInit {
         return user.id === recipe.createdBy.id;
       })
     );
+  }
+
+  // Wrapper methods for recipe card component
+  toggleSaveFromCard(recipe: Recipe): void {
+    this.toggleSave(recipe, new Event('click'));
+  }
+
+  openEditDialogFromCard(recipe: Recipe): void {
+    this.openEditDialog(recipe, new Event('click'));
+  }
+
+  deleteRecipeFromCard(recipe: Recipe): void {
+    this.deleteRecipe(recipe, new Event('click'));
   }
 }
 

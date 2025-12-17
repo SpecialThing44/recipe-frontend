@@ -35,37 +35,41 @@ export class AuthService {
   private router = inject(Router);
 
   constructor(private http: HttpClient) {
-    this.checkAuth();
+    // Don't call checkAuth in constructor - let it be called by APP_INITIALIZER
     this.monitorTokenExpiration();
   }
 
   private checkAuth() {
-    this.oidcSecurityService.checkAuth().subscribe({
-      next: (loginResponse: LoginResponse) => {
-        const { isAuthenticated } = loginResponse;
-        if (isAuthenticated) {
-          this.fetchCurrentUser();
-          // If we are on the callback route, navigate to return URL or recipes
-          if (window.location.pathname.includes('callback')) {
-            const returnUrl = sessionStorage.getItem('returnUrl');
-            sessionStorage.removeItem('returnUrl');
-            this.router.navigate([returnUrl || '/recipes']);
+    return new Promise<void>((resolve) => {
+      this.oidcSecurityService.checkAuth().subscribe({
+        next: (loginResponse: LoginResponse) => {
+          const { isAuthenticated } = loginResponse;
+          if (isAuthenticated) {
+            this.fetchCurrentUser();
+            // If we are on the callback route, navigate to return URL or recipes
+            if (window.location.pathname.includes('callback')) {
+              const returnUrl = sessionStorage.getItem('returnUrl');
+              sessionStorage.removeItem('returnUrl');
+              this.router.navigate([returnUrl || '/recipes']);
+            }
+          } else {
+            this.currentUser$.next(null);
+            // If we are on callback but not authenticated, redirect to home
+            if (window.location.pathname.includes('callback')) {
+              this.router.navigate(['/']);
+            }
           }
-        } else {
+          resolve();
+        },
+        error: (err) => {
+          console.error('OIDC checkAuth failed', err);
           this.currentUser$.next(null);
-          // If we are on callback but not authenticated, redirect to home
           if (window.location.pathname.includes('callback')) {
             this.router.navigate(['/']);
           }
+          resolve();
         }
-      },
-      error: (err) => {
-        console.error('OIDC checkAuth failed', err);
-        this.currentUser$.next(null);
-        if (window.location.pathname.includes('callback')) {
-          this.router.navigate(['/']);
-        }
-      }
+      });
     });
   }
 
@@ -98,7 +102,8 @@ export class AuthService {
             this.fetchCurrentUser();
           }
         } else {
-          // Session lost, clear user
+          // Session lost - clear user state
+          console.log('Session lost - user needs to re-authenticate');
           this.currentUser$.next(null);
         }
       });

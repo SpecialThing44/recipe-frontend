@@ -82,16 +82,11 @@ export class UsersListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+  }
 
-    this.filterForm.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged()
-      )
-      .subscribe(() => {
-        this.currentPage = 0;
-        this.loadUsers();
-      });
+  applyFilters(): void {
+    this.currentPage = 0;
+    this.loadUsers();
   }
 
   loadUsers(): void {
