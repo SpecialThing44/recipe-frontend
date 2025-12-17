@@ -36,6 +36,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     this.checkAuth();
+    this.monitorTokenExpiration();
   }
 
   private checkAuth() {
@@ -44,9 +45,11 @@ export class AuthService {
         const { isAuthenticated } = loginResponse;
         if (isAuthenticated) {
           this.fetchCurrentUser();
-          // If we are on the callback route, navigate to home/recipes
+          // If we are on the callback route, navigate to return URL or recipes
           if (window.location.pathname.includes('callback')) {
-            this.router.navigate(['/recipes']);
+            const returnUrl = sessionStorage.getItem('returnUrl');
+            sessionStorage.removeItem('returnUrl');
+            this.router.navigate([returnUrl || '/recipes']);
           }
         } else {
           this.currentUser$.next(null);
@@ -82,6 +85,24 @@ export class AuthService {
 
   loadCurrentUser(): void {
       // This method is kept for compatibility if needed, but checkAuth handles it.
+  }
+
+  private monitorTokenExpiration(): void {
+    // Monitor authentication state and token refresh events
+    this.oidcSecurityService.checkSessionChanged$.subscribe(() => {
+      console.log('Session changed, re-checking authentication...');
+      this.oidcSecurityService.isAuthenticated$.subscribe(({ isAuthenticated }) => {
+        if (isAuthenticated) {
+          // Session refreshed successfully, update user if needed
+          if (!this.currentUser$.value) {
+            this.fetchCurrentUser();
+          }
+        } else {
+          // Session lost, clear user
+          this.currentUser$.next(null);
+        }
+      });
+    });
   }
 
   private fetchCurrentUser(): void {
