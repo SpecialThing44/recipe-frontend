@@ -1,6 +1,6 @@
 .profile-container {
   padding: 2rem;
-  max-width: 800px;
+  max-width: 1400px;
   margin: 0 auto;
 
   .header {
@@ -34,7 +34,15 @@
   }
 
   .profile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Center all content
+
     .profile-card {
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 3rem;
+
       mat-card-header {
         margin-bottom: 1.5rem;
 
@@ -167,6 +175,91 @@
         }
       }
     }
+
+    .recipes-section {
+      width: 100%;
+      max-width: 1400px;
+      margin-bottom: 3rem;
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+
+        h2 {
+          font-size: 1.75rem;
+          font-weight: 500;
+          margin: 0;
+          color: var(--app-primary, #0b3d2e);
+        }
+
+        button {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+      }
+
+      .recipe-scroll-container {
+        overflow-x: auto;
+        overflow-y: hidden;
+        margin: 0 -2rem;
+        padding: 0 2rem;
+
+        &::-webkit-scrollbar {
+          height: 8px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+          border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+          background: #555;
+        }
+
+        .recipe-row {
+          display: flex;
+          gap: 16px;
+          padding-bottom: 8px;
+
+          app-recipe-card {
+            flex: 0 0 280px;
+          }
+        }
+      }
+
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        text-align: center;
+        background: #f5f5f5;
+        border-radius: 8px;
+
+        mat-icon {
+          font-size: 64px;
+          width: 64px;
+          height: 64px;
+          color: rgba(0, 0, 0, 0.38);
+          margin-bottom: 1rem;
+        }
+
+        p {
+          color: rgba(0, 0, 0, 0.6);
+          margin: 0 0 1rem 0;
+        }
+      }
+    }
   }
 }
 
@@ -189,16 +282,18 @@
           }
         }
       }
-    }
-    
-    .user-recipes-section {
-      margin-top: 2rem;
-      
-      .section-title {
-        font-size: 1.5rem;
-        font-weight: 500;
-        margin: 0 0 1.5rem 0;
-        color: #333;
+
+      .recipes-section {
+        .recipe-scroll-container {
+          margin: 0 -1rem;
+          padding: 0 1rem;
+
+          .recipe-row {
+            app-recipe-card {
+              flex: 0 0 240px;
+            }
+          }
+        }
       }
     }
   }

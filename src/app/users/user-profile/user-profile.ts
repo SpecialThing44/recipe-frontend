@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,9 +10,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { RecipesListComponent } from '../../recipes/recipes-list/recipes-list';
+import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
 import { AuthService, User } from '../../core/auth.service';
 import { UsersService } from '../../core/users.service';
+import { RecipesService, Recipe } from '../../core/recipes.service';
 import { CountriesService, Country } from '../../core/countries.service';
 import { combineLatest, Subject, Observable } from 'rxjs';
 import { takeUntil, startWith, map } from 'rxjs/operators';
@@ -23,6 +24,7 @@ import { takeUntil, startWith, map } from 'rxjs/operators';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterLink,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -31,7 +33,7 @@ import { takeUntil, startWith, map } from 'rxjs/operators';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatAutocompleteModule,
-    RecipesListComponent
+    RecipeCardComponent
   ],
   templateUrl: './user-profile.html',
   styleUrl: './user-profile.scss'
@@ -46,12 +48,19 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   avatarPreview: string | null = null;
   filteredCountries$!: Observable<Country[]>;
   private destroy$ = new Subject<void>();
+  
+  userRecipes: Recipe[] = [];
+  savedRecipes: Recipe[] = [];
+  loadingRecipes = false;
+  savedRecipeIds = new Set<string>();
 
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
+    private recipesService: RecipesService,
     private countriesService: CountriesService,
     private route: ActivatedRoute,
+    private router: Router,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
   ) {
@@ -105,6 +114,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
               this.avatarPreview = user.avatar.large;
             }
             this.loading = false;
+            
+            // Load recipes
+            this.loadUserRecipes(user.id!);
+            if (this.isOwnProfile()) {
+              this.loadSavedRecipes();
+            }
             
           },
           error: (err) => {
@@ -238,5 +253,51 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   hasAvatarToDisplay(): boolean {
     return !!this.avatarPreview;
+  }
+  
+  loadUserRecipes(userId: string): void {
+    this.loadingRecipes = true;
+    
+    this.recipesService.listRecipes({
+      belongsToUser: userId,
+      limit: 10,
+      page: 0
+    }).subscribe({
+      next: (recipes: Recipe[]) => {
+        this.userRecipes = recipes || [];
+        this.loadingRecipes = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading user recipes:', err);
+        this.loadingRecipes = false;
+      }
+    });
+  }
+  
+  loadSavedRecipes(): void {
+    if (!this.user?.id) return;
+    
+    this.recipesService.listRecipes({
+      savedByUser: this.user.id,
+      limit: 10,
+      page: 0
+    }).subscribe({
+      next: (recipes: Recipe[]) => {
+        this.savedRecipes = recipes || [];
+        // Extract IDs from saved recipes
+        this.savedRecipeIds = new Set(recipes.map(r => r.id));
+      },
+      error: (err: any) => {
+        console.error('Error loading saved recipes:', err);
+      }
+    });
+  }
+  
+  viewRecipe(recipeId: string): void {
+    this.router.navigate(['/recipes', recipeId]);
+  }
+  
+  canEditRecipe(recipe: Recipe): boolean {
+    return this.currentUser?.id === recipe.createdBy.id;
   }
 }

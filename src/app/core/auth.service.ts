@@ -46,11 +46,11 @@ export class AuthService {
           const { isAuthenticated } = loginResponse;
           if (isAuthenticated) {
             this.fetchCurrentUser();
-            // If we are on the callback route, navigate to return URL or recipes
+            // If we are on the callback route, navigate to return URL or stay on home
             if (window.location.pathname.includes('callback')) {
               const returnUrl = sessionStorage.getItem('returnUrl');
               sessionStorage.removeItem('returnUrl');
-              this.router.navigate([returnUrl || '/recipes']);
+              this.router.navigate([returnUrl || '/']);
             }
           } else {
             this.currentUser$.next(null);
@@ -78,6 +78,11 @@ export class AuthService {
   }
 
   login(): void {
+    // Store current URL before redirecting to login
+    const currentUrl = this.router.url;
+    if (!currentUrl.includes('callback')) {
+      sessionStorage.setItem('returnUrl', currentUrl);
+    }
     this.oidcSecurityService.authorize();
   }
 

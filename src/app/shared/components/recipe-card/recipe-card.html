@@ -1,4 +1,4 @@
-<mat-card class="recipe-card" (click)="onCardClick()">
+<mat-card [class]="'recipe-card ' + (layout === 'scroll' ? 'scroll-layout' : '')" (click)="onCardClick()">
   <div class="recipe-image">
     <img *ngIf="recipe.image?.thumbnail" [src]="recipe.image?.thumbnail" [alt]="recipe.name">
     <div *ngIf="!recipe.image?.thumbnail" class="recipe-image-placeholder">

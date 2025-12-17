@@ -105,6 +105,8 @@ export class RecipesListComponent implements OnInit {
       publicOnly: [null],
       myRecipes: [false],
       savedRecipes: [false],
+      createdByUser: [''],
+      savedByUser: [''],
       prepTime: [null],
       cookTime: [null],
       ingredients: [[]],
@@ -128,11 +130,72 @@ export class RecipesListComponent implements OnInit {
     
     // Handle query parameters for pre-populated filters
     this.route.queryParams.subscribe(params => {
+      const formUpdates: any = {};
+      
+      // User filter parameters
       if (params['myRecipes'] === 'true') {
-        this.filterForm.patchValue({ myRecipes: true }, { emitEvent: false });
+        formUpdates.myRecipes = true;
       }
       if (params['savedRecipes'] === 'true') {
-        this.filterForm.patchValue({ savedRecipes: true }, { emitEvent: false });
+        formUpdates.savedRecipes = true;
+      }
+      if (params['createdByUser']) {
+        formUpdates.createdByUser = params['createdByUser'];
+      }
+      if (params['savedByUser']) {
+        formUpdates.savedByUser = params['savedByUser'];
+      }
+      
+      // Basic filters
+      if (params['id']) {
+        formUpdates.id = params['id'];
+      }
+      if (params['nameValue']) {
+        formUpdates.nameValue = params['nameValue'];
+      }
+      if (params['nameFilterType']) {
+        formUpdates.nameFilterType = params['nameFilterType'];
+      }
+      if (params['publicOnly']) {
+        formUpdates.publicOnly = params['publicOnly'] === 'true';
+      }
+      
+      // Time filters
+      if (params['prepTime']) {
+        formUpdates.prepTime = parseInt(params['prepTime'], 10);
+      }
+      if (params['cookTime']) {
+        formUpdates.cookTime = parseInt(params['cookTime'], 10);
+      }
+      
+      // Sorting
+      if (params['sort']) {
+        formUpdates.sort = params['sort'];
+      }
+      
+      // Page size
+      if (params['pageSize']) {
+        formUpdates.pageSize = parseInt(params['pageSize'], 10);
+      }
+      
+      // Tags (comma-separated)
+      if (params['tags']) {
+        formUpdates.tags = params['tags'].split(',').filter((t: string) => t.trim());
+      }
+      
+      // Ingredients (comma-separated)
+      if (params['ingredients']) {
+        formUpdates.ingredients = params['ingredients'].split(',').filter((i: string) => i.trim());
+      }
+      
+      // Not ingredients (comma-separated)
+      if (params['notIngredients']) {
+        formUpdates.notIngredients = params['notIngredients'].split(',').filter((i: string) => i.trim());
+      }
+      
+      // Apply all updates at once
+      if (Object.keys(formUpdates).length > 0) {
+        this.filterForm.patchValue(formUpdates, { emitEvent: false });
       }
     });
     
@@ -266,6 +329,15 @@ export class RecipesListComponent implements OnInit {
 
     if (formValue.savedRecipes && this.currentUser) {
       filters.savedByUser = this.currentUser.id;
+    }
+
+    // URL parameter overrides for user filters
+    if (formValue.createdByUser) {
+      filters.belongsToUser = formValue.createdByUser;
+    }
+
+    if (formValue.savedByUser) {
+      filters.savedByUser = formValue.savedByUser;
     }
 
     if (formValue.prepTime) {

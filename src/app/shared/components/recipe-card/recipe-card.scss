@@ -14,6 +14,39 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   }
 
+  // Scroll layout specific styles (for horizontal scrolling in dashboard/profile)
+  &.scroll-layout {
+    width: 350px;
+    height: 450px; // Shorter height for scroll layout
+
+    .recipe-image {
+      height: 200px; // Smaller image
+    }
+
+    mat-card-content {
+      padding: 8px 12px 12px 12px;
+    }
+
+    .recipe-info {
+      .info-row {
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+      }
+
+      .tags {
+        max-height: 50px; // Slightly less height for tags in scroll layout
+      }
+    }
+
+    mat-card-title {
+      font-size: 1.1rem;
+    }
+
+    mat-card-subtitle {
+      font-size: 0.8rem;
+    }
+  }
+
   .recipe-image {
     width: 100%;
     height: 200px;

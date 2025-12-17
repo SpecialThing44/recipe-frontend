@@ -118,13 +118,87 @@
     </mat-card>
 
     <!-- User's Recipes Section -->
-    <div class="user-recipes-section" *ngIf="user">
-      <h2 class="section-title">{{ isOwnProfile() ? 'My Recipes' : user.name + '\'s Recipes' }}</h2>
-      <app-recipes-list 
-        [userId]="user.id" 
-        [showUserFilters]="false" 
-        [showHeader]="false">
-      </app-recipes-list>
+    <div class="recipes-section" *ngIf="user">
+      <div class="section-header">
+        <h2>{{ isOwnProfile() ? 'My Recipes' : user.name + '\'s Recipes' }}</h2>
+        <button 
+          *ngIf="userRecipes.length > 0" 
+          mat-raised-button 
+          color="primary"
+          [routerLink]="['/recipes']"
+          [queryParams]="{createdByUser: user.id}">
+          See All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="loadingRecipes" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loadingRecipes && userRecipes.length > 0" class="recipe-scroll-container">
+        <div class="recipe-row">
+          <app-recipe-card
+            *ngFor="let recipe of userRecipes"
+            [recipe]="recipe"
+            [layout]="'scroll'"
+            [canEdit]="canEditRecipe(recipe)"
+            [isSaved]="savedRecipeIds.has(recipe.id)"
+            [isLoggedIn]="!!currentUser"
+            (cardClick)="viewRecipe($event)">
+          </app-recipe-card>
+        </div>
+      </div>
+
+      <div *ngIf="!loadingRecipes && userRecipes.length === 0" class="empty-state">
+        <mat-icon>restaurant_menu</mat-icon>
+        <p>{{ isOwnProfile() ? 'You haven\'t created any recipes yet' : 'This user hasn\'t created any recipes yet' }}</p>
+        <button *ngIf="isOwnProfile()" mat-raised-button color="primary" routerLink="/recipes">
+          Browse Recipes
+        </button>
+      </div>
+    </div>
+
+    <!-- Saved Recipes Section (only show for own profile) -->
+    <div class="recipes-section" *ngIf="user && isOwnProfile()">
+      <div class="section-header">
+        <h2>Saved Recipes</h2>
+        <button 
+          *ngIf="savedRecipes.length > 0" 
+          mat-raised-button 
+          color="primary"
+          [routerLink]="['/recipes']"
+          [queryParams]="{savedByUser: user.id}">
+          See All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="loadingRecipes" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loadingRecipes && savedRecipes.length > 0" class="recipe-scroll-container">
+        <div class="recipe-row">
+          <app-recipe-card
+            *ngFor="let recipe of savedRecipes"
+            [recipe]="recipe"
+            [layout]="'scroll'"
+            [canEdit]="canEditRecipe(recipe)"
+            [isSaved]="true"
+            [isLoggedIn]="true"
+            (cardClick)="viewRecipe($event)">
+          </app-recipe-card>
+        </div>
+      </div>
+
+      <div *ngIf="!loadingRecipes && savedRecipes.length === 0" class="empty-state">
+        <mat-icon>bookmark_border</mat-icon>
+        <p>You haven't saved any recipes yet</p>
+        <button mat-raised-button color="primary" routerLink="/recipes">
+          Browse Recipes
+        </button>
+      </div>
     </div>
   </div>
 </div>
