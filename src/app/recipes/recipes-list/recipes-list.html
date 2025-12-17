@@ -1,5 +1,5 @@
 <div class="recipes-list-container">
-  <div class="header">
+  <div class="header" *ngIf="showHeader">
     <div class="header-content">
       <div>
         <h1>Recipes</h1>
@@ -61,7 +61,7 @@
       </div>
 
       <!-- User Filters (Only for logged in users) -->
-      <div class="filter-row checkbox-row" *ngIf="isLoggedIn$ | async">
+      <div class="filter-row checkbox-row" *ngIf="showUserFilters && (isLoggedIn$ | async)">
         <mat-checkbox formControlName="myRecipes">My Recipes</mat-checkbox>
         <mat-checkbox formControlName="savedRecipes">Saved Recipes</mat-checkbox>
       </div>

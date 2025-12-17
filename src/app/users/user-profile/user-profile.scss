@@ -190,5 +190,16 @@
         }
       }
     }
+    
+    .user-recipes-section {
+      margin-top: 2rem;
+      
+      .section-title {
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin: 0 0 1.5rem 0;
+        color: #333;
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -50,6 +50,10 @@ import { Observable, of } from 'rxjs';
   styleUrl: './recipes-list.scss',
 })
 export class RecipesListComponent implements OnInit {
+  @Input() userId?: string; // If provided, filter recipes by this user
+  @Input() showUserFilters: boolean = true; // Hide "My Recipes" and "Saved Recipes" when false
+  @Input() showHeader: boolean = true; // Hide header when embedded
+  
   recipes: Recipe[] = [];
   loading = false;
   error: string | null = null;
@@ -87,6 +91,7 @@ export class RecipesListComponent implements OnInit {
     private tagsService: TagsService,
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
@@ -118,6 +123,16 @@ export class RecipesListComponent implements OnInit {
         return user !== null;
       })
     );
+    
+    // Handle query parameters for pre-populated filters
+    this.route.queryParams.subscribe(params => {
+      if (params['myRecipes'] === 'true') {
+        this.filterForm.patchValue({ myRecipes: true }, { emitEvent: false });
+      }
+      if (params['savedRecipes'] === 'true') {
+        this.filterForm.patchValue({ savedRecipes: true }, { emitEvent: false });
+      }
+    });
     
     this.loadRecipes();
 
@@ -244,6 +259,11 @@ export class RecipesListComponent implements OnInit {
       limit: formValue.pageSize || this.pageSize,
       page: this.currentPage
     };
+    
+    // If userId is provided as input, filter by that user
+    if (this.userId) {
+      filters.belongsToUser = this.userId;
+    }
 
     if (formValue.id?.trim()) {
       filters.id = formValue.id.trim();

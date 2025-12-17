@@ -116,5 +116,15 @@
         </button>
       </mat-card-actions>
     </mat-card>
+
+    <!-- User's Recipes Section -->
+    <div class="user-recipes-section" *ngIf="user">
+      <h2 class="section-title">{{ isOwnProfile() ? 'My Recipes' : user.name + '\'s Recipes' }}</h2>
+      <app-recipes-list 
+        [userId]="user.id" 
+        [showUserFilters]="false" 
+        [showHeader]="false">
+      </app-recipes-list>
+    </div>
   </div>
 </div>

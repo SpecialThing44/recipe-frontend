@@ -3,7 +3,7 @@
     <div class="header-content">
       <div>
         <h1>{{ recipe.name }}</h1>
-        <p class="subtitle">by {{ recipe.createdBy.name }}</p>
+        <p class="subtitle">by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a></p>
       </div>
       <div class="header-actions">
         <button *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()">

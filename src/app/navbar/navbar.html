@@ -1,5 +1,8 @@
 <mat-toolbar>
-  <span class="brand">Recipe Site</span>
+  <a mat-button routerLink="/dashboard" class="brand-link">
+    <mat-icon>home</mat-icon>
+    <span class="brand">Home</span>
+  </a>
   <span class="spacer"></span>
 
   <ng-container *ngIf="user as user; else anonLinks">
@@ -18,10 +21,6 @@
       <button mat-menu-item [routerLink]="['/users', user.id]">
         <mat-icon>account_circle</mat-icon>
         <span>Account</span>
-      </button>
-      <button mat-menu-item routerLink="/settings">
-        <mat-icon>settings</mat-icon>
-        <span>Settings</span>
       </button>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>

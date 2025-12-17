@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { RecipesListComponent } from '../../recipes/recipes-list/recipes-list';
 import { AuthService, User } from '../../core/auth.service';
 import { UsersService } from '../../core/users.service';
 import { CountriesService, Country } from '../../core/countries.service';
@@ -29,7 +30,8 @@ import { takeUntil, startWith, map } from 'rxjs/operators';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    RecipesListComponent
   ],
   templateUrl: './user-profile.html',
   styleUrl: './user-profile.scss'
