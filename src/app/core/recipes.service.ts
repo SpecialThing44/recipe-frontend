@@ -102,7 +102,7 @@ export interface RecipesFilters {
   providedIn: 'root'
 })
 export class RecipesService {
-  private readonly API_BASE = 'http://localhost:9000';
+  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
 
   constructor(private http: HttpClient) {}
 
