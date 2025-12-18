@@ -30,7 +30,7 @@ export class AuthService {
   loading$ = new BehaviorSubject<boolean>(false);
   error$ = new BehaviorSubject<string | null>(null);
   
-  private readonly API_BASE = 'http://localhost:9000';
+  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
   private oidcSecurityService = inject(OidcSecurityService);
   private router = inject(Router);
 
