@@ -1,1 +1,167 @@
-<p>users-list works!</p>
+<div class="users-list-container">
+  <div class="header">
+    <h1>Users</h1>
+    <p class="subtitle">Browse and filter users</p>
+  </div>
+
+  <!-- Filters Panel -->
+  <mat-expansion-panel class="filters-panel">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon>filter_list</mat-icon>
+        <span>Filters & Sorting</span>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <form [formGroup]="filterForm" class="filters-form">
+      <!-- ID Filter -->
+      <div class="filter-row">
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>User ID</mat-label>
+          <input matInput formControlName="id" placeholder="Enter UUID">
+          <mat-icon matPrefix>fingerprint</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Name Filter -->
+      <div class="filter-row">
+        <mat-form-field appearance="fill" class="filter-type">
+          <mat-label>Name Filter</mat-label>
+          <mat-select formControlName="nameFilterType">
+            <mat-option *ngFor="let type of filterTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Name Value</mat-label>
+          <input matInput formControlName="nameValue" placeholder="Enter name">
+          <mat-icon matPrefix>person</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Email Filter -->
+      <div class="filter-row">
+        <mat-form-field appearance="fill" class="filter-type">
+          <mat-label>Email Filter</mat-label>
+          <mat-select formControlName="emailFilterType">
+            <mat-option *ngFor="let type of filterTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Email Value</mat-label>
+          <input matInput formControlName="emailValue" placeholder="Enter email">
+          <mat-icon matPrefix>email</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Sorting & Page Size -->
+      <div class="filter-row">
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Sort By</mat-label>
+          <mat-select formControlName="sort">
+            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>sort</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Results Per Page</mat-label>
+          <mat-select formControlName="pageSize" (selectionChange)="onPageSizeChange()">
+            <mat-option *ngFor="let size of pageSizes" [value]="size">
+              {{ size }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>view_list</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
+          <mat-icon>search</mat-icon>
+          Apply Filters
+        </button>
+        <button mat-stroked-button type="button" (click)="clearFilters()">
+          <mat-icon>clear</mat-icon>
+          Clear All
+        </button>
+      </div>
+    </form>
+  </mat-expansion-panel>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading users...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadUsers()">Retry</button>
+  </div>
+
+  <!-- Users List -->
+  <div *ngIf="!loading && !error" class="users-grid">
+    <mat-card *ngFor="let user of users" class="user-card" (click)="viewUser(user.id)">
+      <mat-card-header>
+        <div mat-card-avatar class="user-avatar">
+          <img *ngIf="user.avatar?.thumbnail" [src]="user.avatar?.thumbnail" [alt]="user.name + ' avatar'">
+          <mat-icon *ngIf="!user.avatar?.thumbnail">person</mat-icon>
+        </div>
+        <mat-card-title>{{ user.name }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="user-info">
+          <div class="info-row">
+            <mat-icon>fingerprint</mat-icon>
+            <span class="info-label">ID:</span>
+            <span class="info-value">{{ user.id }}</span>
+          </div>
+
+          <div class="info-row" *ngIf="user.countryOfOrigin">
+            <mat-icon>public</mat-icon>
+            <span class="info-label">Country:</span>
+            <span class="info-value">{{ user.countryOfOrigin }}</span>
+          </div>
+
+          <div class="info-row">
+            <mat-icon>schedule</mat-icon>
+            <span class="info-label">Created:</span>
+            <span class="info-value">{{ user.createdOn | date:'short' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="users.length === 0" class="empty-state">
+      <mat-icon>person_off</mat-icon>
+      <h3>No users found</h3>
+      <p>Try adjusting your filters or search criteria</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && users.length > 0" class="pagination">
+    <button mat-raised-button [disabled]="currentPage === 0" (click)="previousPage()">
+      <mat-icon>chevron_left</mat-icon>
+      Previous
+    </button>
+
+    <span class="page-info">
+      Page {{ currentPage + 1 }} • {{ users.length }} results
+    </span>
+
+    <button mat-raised-button [disabled]="users.length < pageSize" (click)="nextPage()">
+      Next
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+</div>

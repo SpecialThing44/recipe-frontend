@@ -1,3 +1,23 @@
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  padding: 0;
+  min-width: auto;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+  
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
 .brand {
   font-weight: 600;
   font-size: 1.125rem;
@@ -18,13 +38,17 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  padding: 0 6px;
-  margin-left: 6px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .active-link {
   background-color: #083024;
-//   color: black;
   border-radius: 6px;
   padding: 6px 10px;
   transition: background-color 160ms linear;
@@ -38,8 +62,6 @@ mat-toolbar {
   padding: 0 16px;
 }
 
-
-/* size the icon inside the account bubble */
 .account-bubble mat-icon {
   font-size: 20px;
   line-height: 20px;

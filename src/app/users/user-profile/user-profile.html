@@ -1,0 +1,204 @@
+<div class="profile-container">
+  <div class="header">
+    <h1>{{ isOwnProfile() ? 'My Profile' : user?.name + '\'s Profile' }}</h1>
+    <p class="subtitle">{{ isOwnProfile() ? 'Manage your account information' : 'View user information' }}</p>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading profile...</p>
+  </div>
+
+  <div *ngIf="!loading && user" class="profile-content">
+    <mat-card class="profile-card">
+      <mat-card-header>
+        <mat-card-title>Profile Information</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Avatar Section -->
+        <div class="avatar-section">
+          <div class="avatar-display">
+            <div *ngIf="hasAvatarToDisplay()" class="avatar-image">
+              <img [src]="getAvatarDisplay()" alt="User avatar">
+            </div>
+            <div *ngIf="!hasAvatarToDisplay()" class="avatar-placeholder">
+              <mat-icon>person</mat-icon>
+            </div>
+          </div>
+          
+          <div class="avatar-controls" *ngIf="isOwnProfile()">
+            <input 
+              type="file" 
+              #fileInput 
+              accept="image/*" 
+              (change)="onAvatarSelected($event)"
+              style="display: none">
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="fileInput.click()"
+              [disabled]="saving">
+              <mat-icon>photo_camera</mat-icon>
+              Change Avatar
+            </button>
+            <p class="avatar-hint">Max 5MB • JPG, PNG, GIF</p>
+          </div>
+        </div>
+
+        <!-- Profile Form -->
+        <form [formGroup]="profileForm" class="profile-form">
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Name</mat-label>
+            <input matInput formControlName="name" placeholder="Your name">
+            <mat-icon matPrefix>person</mat-icon>
+            <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
+              Name is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width" *ngIf="isOwnProfile()">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email" placeholder="your.email@example.com">
+            <mat-icon matPrefix>email</mat-icon>
+            <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+              Email is required
+            </mat-error>
+            <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+              Please enter a valid email
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="fill" class="full-width">
+            <mat-label>Country of Origin</mat-label>
+            <input 
+              matInput 
+              formControlName="countryOfOrigin" 
+              placeholder="Start typing to search countries"
+              [matAutocomplete]="countryAuto">
+            <mat-icon matPrefix>public</mat-icon>
+            <mat-autocomplete #countryAuto="matAutocomplete">
+              <mat-option *ngFor="let country of filteredCountries$ | async" [value]="country.name">
+                {{ country.name }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+
+          <div class="user-metadata" *ngIf="user">
+            <div class="metadata-item">
+              <mat-icon>fingerprint</mat-icon>
+              <span class="label">User ID:</span>
+              <span class="value">{{ user.id }}</span>
+            </div>
+            <div class="metadata-item">
+              <mat-icon>calendar_today</mat-icon>
+              <span class="label">Member Since:</span>
+              <span class="value">{{ user.createdOn | date:'medium' }}</span>
+            </div>
+            <div class="metadata-item">
+              <mat-icon>update</mat-icon>
+              <span class="label">Last Updated:</span>
+              <span class="value">{{ user.updatedOn | date:'medium' }}</span>
+            </div>
+          </div>
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions *ngIf="isOwnProfile()">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="saveProfile()"
+          [disabled]="profileForm.invalid || saving">
+          <mat-spinner *ngIf="saving" diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+          <mat-icon *ngIf="!saving">save</mat-icon>
+          {{ saving ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- User's Recipes Section -->
+    <div class="recipes-section" *ngIf="user">
+      <div class="section-header">
+        <h2>{{ isOwnProfile() ? 'My Recipes' : user.name + '\'s Recipes' }}</h2>
+        <button 
+          *ngIf="userRecipes.length > 0" 
+          mat-raised-button 
+          color="primary"
+          [routerLink]="['/recipes']"
+          [queryParams]="{createdByUser: user.id}">
+          See All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="loadingRecipes" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loadingRecipes && userRecipes.length > 0" class="recipe-scroll-container">
+        <div class="recipe-row">
+          <app-recipe-card
+            *ngFor="let recipe of userRecipes"
+            [recipe]="recipe"
+            [layout]="'scroll'"
+            [canEdit]="canEditRecipe(recipe)"
+            [isSaved]="savedRecipeIds.has(recipe.id)"
+            [isLoggedIn]="!!currentUser"
+            (cardClick)="viewRecipe($event)">
+          </app-recipe-card>
+        </div>
+      </div>
+
+      <div *ngIf="!loadingRecipes && userRecipes.length === 0" class="empty-state">
+        <mat-icon>restaurant_menu</mat-icon>
+        <p>{{ isOwnProfile() ? 'You haven\'t created any recipes yet' : 'This user hasn\'t created any recipes yet' }}</p>
+        <button *ngIf="isOwnProfile()" mat-raised-button color="primary" routerLink="/recipes">
+          Browse Recipes
+        </button>
+      </div>
+    </div>
+
+    <!-- Saved Recipes Section (only show for own profile) -->
+    <div class="recipes-section" *ngIf="user && isOwnProfile()">
+      <div class="section-header">
+        <h2>Saved Recipes</h2>
+        <button 
+          *ngIf="savedRecipes.length > 0" 
+          mat-raised-button 
+          color="primary"
+          [routerLink]="['/recipes']"
+          [queryParams]="{savedByUser: user.id}">
+          See All
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="loadingRecipes" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div *ngIf="!loadingRecipes && savedRecipes.length > 0" class="recipe-scroll-container">
+        <div class="recipe-row">
+          <app-recipe-card
+            *ngFor="let recipe of savedRecipes"
+            [recipe]="recipe"
+            [layout]="'scroll'"
+            [canEdit]="canEditRecipe(recipe)"
+            [isSaved]="true"
+            [isLoggedIn]="true"
+            (cardClick)="viewRecipe($event)">
+          </app-recipe-card>
+        </div>
+      </div>
+
+      <div *ngIf="!loadingRecipes && savedRecipes.length === 0" class="empty-state">
+        <mat-icon>bookmark_border</mat-icon>
+        <p>You haven't saved any recipes yet</p>
+        <button mat-raised-button color="primary" routerLink="/recipes">
+          Browse Recipes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

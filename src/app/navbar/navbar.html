@@ -1,5 +1,8 @@
 <mat-toolbar>
-  <span class="brand">Recipe Site</span>
+  <a mat-button routerLink="/dashboard" class="brand-link">
+    <mat-icon>home</mat-icon>
+    <span class="brand">Home</span>
+  </a>
   <span class="spacer"></span>
 
   <ng-container *ngIf="user as user; else anonLinks">
@@ -9,14 +12,20 @@
 
     <button mat-icon-button [matMenuTriggerFor]="accountMenu" aria-label="Account menu" class="account-button">
       <div class="account-bubble">
-        <mat-icon aria-hidden="false" aria-label="Account">person</mat-icon>
+        <img *ngIf="user.avatar?.thumbnail" [src]="user.avatar.thumbnail" [alt]="user.name + ' avatar'">
+        <mat-icon *ngIf="!user.avatar?.thumbnail" aria-hidden="false" aria-label="Account">person</mat-icon>
       </div>
     </button>
 
     <mat-menu #accountMenu="matMenu">
-      <button mat-menu-item routerLink="/profile">Account</button>
-      <button mat-menu-item routerLink="/settings">Settings</button>
-      <button mat-menu-item (click)="logout()">Logout</button>
+      <button mat-menu-item [routerLink]="['/users', user.id]">
+        <mat-icon>account_circle</mat-icon>
+        <span>Account</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
     </mat-menu>
   </ng-container>
 
@@ -24,7 +33,6 @@
     <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
     <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
     <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
-    <a mat-button routerLink="/login" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Login</a>
-    <a mat-button routerLink="/signup" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Sign Up</a>
+    <button mat-button (click)="login()">Login/Signup</button>
   </ng-template>
 </mat-toolbar>

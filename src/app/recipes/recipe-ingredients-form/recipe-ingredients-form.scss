@@ -1,0 +1,33 @@
+.ingredient-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 2fr auto;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+
+  .ingredient-field {
+    min-width: 0;
+  }
+
+  .amount-field {
+    min-width: 0;
+  }
+
+  .unit-field {
+    min-width: 0;
+  }
+
+  .description-field {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .ingredient-row {
+    grid-template-columns: 1fr;
+
+    button {
+      justify-self: start;
+    }
+  }
+}

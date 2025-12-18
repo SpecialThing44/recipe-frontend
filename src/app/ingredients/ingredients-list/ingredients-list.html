@@ -1,1 +1,173 @@
-<p>ingredients-list works!</p>
+<div class="ingredients-list-container">
+  <div class="header">
+    <div class="header-content">
+      <div>
+        <h1>Ingredients</h1>
+        <p class="subtitle">Browse and manage ingredients</p>
+      </div>
+      <button 
+        *ngIf="isAdmin$ | async" 
+        mat-raised-button 
+        color="primary" 
+        (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Create Ingredient
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Panel -->
+  <mat-expansion-panel class="filters-panel">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon>filter_list</mat-icon>
+        <span>Filters & Sorting</span>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <form [formGroup]="filterForm" class="filters-form">
+      <!-- ID Filter -->
+      <div class="filter-row">
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Ingredient ID</mat-label>
+          <input matInput formControlName="id" placeholder="Enter UUID">
+          <mat-icon matPrefix>fingerprint</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Name Filter -->
+      <div class="filter-row">
+        <mat-form-field appearance="fill" class="filter-type">
+          <mat-label>Name Filter</mat-label>
+          <mat-select formControlName="nameFilterType">
+            <mat-option *ngFor="let type of filterTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Name Value</mat-label>
+          <input matInput formControlName="nameValue" placeholder="Enter ingredient name">
+          <mat-icon matPrefix>restaurant</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <!-- Sorting & Page Size -->
+      <div class="filter-row">
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Sort By</mat-label>
+          <mat-select formControlName="sort">
+            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
+              {{ option.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>sort</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="filter-field">
+          <mat-label>Results Per Page</mat-label>
+          <mat-select formControlName="pageSize" (selectionChange)="onPageSizeChange()">
+            <mat-option *ngFor="let size of pageSizes" [value]="size">
+              {{ size }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>view_list</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button mat-raised-button color="primary" type="button" (click)="applyFilters()">
+          <mat-icon>search</mat-icon>
+          Apply Filters
+        </button>
+        <button mat-stroked-button type="button" (click)="clearFilters()">
+          <mat-icon>clear</mat-icon>
+          Clear All
+        </button>
+      </div>
+    </form>
+  </mat-expansion-panel>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading ingredients...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadIngredients()">Retry</button>
+  </div>
+
+  <!-- Ingredients List -->
+  <div *ngIf="!loading && !error" class="ingredients-grid">
+    <mat-card *ngFor="let ingredient of ingredients" class="ingredient-card">
+      <mat-card-header>
+        <mat-card-title>{{ ingredient.name }}</mat-card-title>
+        <mat-card-subtitle>Created by {{ ingredient.createdBy.name }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="ingredient-info">
+          <div class="info-row">
+            <mat-icon>fingerprint</mat-icon>
+            <span class="info-label">ID:</span>
+            <span class="info-value ingredient-id">{{ ingredient.id }}</span>
+          </div>
+
+          <div class="info-row" *ngIf="ingredient.wikiLink">
+            <mat-icon>link</mat-icon>
+            <span class="info-label">Wiki:</span>
+            <a [href]="ingredient.wikiLink" target="_blank" class="wiki-link">{{ ingredient.wikiLink }}</a>
+          </div>
+
+          <div class="aliases" *ngIf="ingredient.aliases.length > 0">
+            <label>Aliases:</label>
+            <mat-chip *ngFor="let alias of ingredient.aliases" class="alias-chip">{{ alias }}</mat-chip>
+          </div>
+
+          <div class="tags" *ngIf="ingredient.tags.length > 0">
+            <label>Tags:</label>
+            <mat-chip *ngFor="let tag of ingredient.tags" class="tag-chip">{{ tag }}</mat-chip>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions *ngIf="isAdmin$ | async" align="end">
+        <button mat-stroked-button color="primary" (click)="openEditDialog(ingredient)">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+        <button mat-stroked-button color="warn" (click)="deleteIngredient(ingredient)">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <div *ngIf="ingredients.length === 0" class="empty-state">
+      <mat-icon>restaurant</mat-icon>
+      <h3>No ingredients found</h3>
+      <p>Try adjusting your filters or create a new ingredient</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !error && ingredients.length > 0" class="pagination">
+    <button mat-raised-button [disabled]="currentPage === 0" (click)="previousPage()">
+      <mat-icon>chevron_left</mat-icon>
+      Previous
+    </button>
+
+    <span class="page-info">
+      Page {{ currentPage + 1 }} • {{ ingredients.length }} results
+    </span>
+
+    <button mat-raised-button [disabled]="ingredients.length < pageSize" (click)="nextPage()">
+      Next
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+</div>

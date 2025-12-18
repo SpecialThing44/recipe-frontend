@@ -1,0 +1,150 @@
+<div class="recipe-detail-container" *ngIf="recipe && !loading">
+  <div class="recipe-header">
+    <div class="header-content">
+      <div>
+        <h1>{{ recipe.name }}</h1>
+        <p class="subtitle">by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a></p>
+      </div>
+      <div class="header-actions">
+        <button *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()">
+          <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+          {{ isSaved ? 'Saved' : 'Save' }}
+        </button>
+        <ng-container *ngIf="canEdit$ | async">
+          <button mat-raised-button color="primary" (click)="openEditDialog()">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+          <button mat-raised-button color="warn" (click)="deleteRecipe()">
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="recipe-content">
+    <!-- Recipe Image -->
+    <div class="recipe-image-section" *ngIf="recipe.image?.large">
+      <img [src]="recipe.image!.large" [alt]="recipe.name">
+    </div>
+
+    <!-- Recipe Info Cards -->
+    <div class="info-cards">
+      <mat-card class="info-card">
+        <mat-card-content>
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <div class="label">Prep Time</div>
+            <div class="value">{{ recipe.prepTime }} min</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="info-card">
+        <mat-card-content>
+          <mat-icon>timer</mat-icon>
+          <div>
+            <div class="label">Cook Time</div>
+            <div class="value">{{ recipe.cookTime }} min</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="info-card">
+        <mat-card-content>
+          <mat-icon>restaurant</mat-icon>
+          <div>
+            <div class="label">Total Time</div>
+            <div class="value">{{ recipe.prepTime + recipe.cookTime }} min</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Dietary Info & Tags -->
+    <div class="badges-section">
+      <div class="tags" *ngIf="recipe.tags.length > 0">
+        <mat-chip *ngFor="let tag of recipe.tags">{{ tag }}</mat-chip>
+      </div>
+
+      <div class="metadata">
+        <mat-icon>{{ recipe.public ? 'public' : 'lock' }}</mat-icon>
+        <span>{{ recipe.public ? 'Public Recipe' : 'Private Recipe' }}</span>
+      </div>
+
+      <div class="metadata" *ngIf="recipe.countryOfOrigin">
+        <mat-icon>public</mat-icon>
+        <span>{{ recipe.countryOfOrigin }}</span>
+      </div>
+
+      <div class="metadata" *ngIf="recipe.wikiLink">
+        <mat-icon>link</mat-icon>
+        <a [href]="recipe.wikiLink" target="_blank">Wikipedia</a>
+      </div>
+    </div>
+
+    <!-- Ingredients -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>shopping_cart</mat-icon>
+          Ingredients
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ul class="ingredients-list">
+          <li *ngFor="let ingredient of recipe.ingredients">
+            <strong>{{ ingredient.quantity.amount }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
+            {{ ingredient.ingredient.name }}
+            <span *ngIf="ingredient.description" class="ingredient-description">
+              ({{ ingredient.description }})
+            </span>
+          </li>
+        </ul>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Instructions -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>description</mat-icon>
+          Instructions
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <quill-view [content]="instructionsContent" format="object" theme="snow"></quill-view>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recipe Metadata -->
+    <div class="recipe-metadata">
+      <p class="metadata-item">
+        <mat-icon>fingerprint</mat-icon>
+        <span>ID: {{ recipe.id }}</span>
+      </p>
+      <p class="metadata-item">
+        <mat-icon>event</mat-icon>
+        <span>Created: {{ recipe.createdOn | date:'medium' }}</span>
+      </p>
+      <p class="metadata-item">
+        <mat-icon>update</mat-icon>
+        <span>Updated: {{ recipe.updatedOn | date:'medium' }}</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading-container">
+  <mat-spinner diameter="48"></mat-spinner>
+  <p>Loading recipe...</p>
+</div>
+
+<div *ngIf="error && !loading" class="error-container">
+  <mat-icon color="warn">error</mat-icon>
+  <p>{{ error }}</p>
+  <button mat-raised-button color="primary" (click)="loadRecipe()">Retry</button>
+  <button mat-stroked-button routerLink="/recipes">Back to Recipes</button>
+</div>

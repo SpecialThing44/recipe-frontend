@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  recipe-frontend:
+    image: ghcr.io/specialthing44/recipe-frontend:latest
+    ports:
+      - "8080:80"
+    environment:
+      - AUTH_AUTHORITY=https://auth.spencers.cc/application/o/cooking-app-prod/
+      - AUTH_WELLKNOWN_ENDPOINT=https://auth.spencers.cc/application/o/cooking-app-prod/.well-known/openid-configuration
+      - API_BASE_URL=http://api.example.com:9000
+    restart: unless-stopped

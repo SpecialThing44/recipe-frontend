@@ -1,12 +1,25 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, tap, map, retry } from 'rxjs/operators';
+import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
+
+export interface AvatarUrls {
+  thumbnail: string;
+  medium: string;
+  large: string;
+}
 
 export interface User {
   id?: string;
   name?: string;
   email?: string;
+  admin?: boolean;
+  countryOfOrigin?: string;
+  avatar?: AvatarUrls;
+  createdOn?: string;
+  updatedOn?: string;
 }
 
 @Injectable({
@@ -16,74 +29,106 @@ export class AuthService {
   currentUser$ = new BehaviorSubject<User | null>(null);
   loading$ = new BehaviorSubject<boolean>(false);
   error$ = new BehaviorSubject<string | null>(null);
+  
+  private readonly API_BASE = 'http://localhost:9000';
+  private oidcSecurityService = inject(OidcSecurityService);
+  private router = inject(Router);
 
   constructor(private http: HttpClient) {
-    this.loadCurrentUser();
+    // Don't call checkAuth in constructor - let it be called by APP_INITIALIZER
+    this.monitorTokenExpiration();
   }
 
-  private readonly API_BASE = 'http://localhost:9000';
-
-  private handleError(err: HttpErrorResponse) {
-    // Try to extract a helpful message from the response body
-    let message = 'Server error';
-    try {
-      if (err.error) {
-        if (typeof err.error === 'string') {
-          message = err.error;
-        } else if ((err.error as any).message) {
-          message = (err.error as any).message;
-        } else {
-          message = JSON.stringify(err.error);
+  private checkAuth() {
+    return new Promise<void>((resolve) => {
+      this.oidcSecurityService.checkAuth().subscribe({
+        next: (loginResponse: LoginResponse) => {
+          const { isAuthenticated } = loginResponse;
+          if (isAuthenticated) {
+            this.fetchCurrentUser();
+            // If we are on the callback route, navigate to return URL or stay on home
+            if (window.location.pathname.includes('callback')) {
+              const returnUrl = sessionStorage.getItem('returnUrl');
+              sessionStorage.removeItem('returnUrl');
+              this.router.navigate([returnUrl || '/']);
+            }
+          } else {
+            this.currentUser$.next(null);
+            // If we are on callback but not authenticated, redirect to home
+            if (window.location.pathname.includes('callback')) {
+              this.router.navigate(['/']);
+            }
+          }
+          resolve();
+        },
+        error: (err) => {
+          console.error('OIDC checkAuth failed', err);
+          this.currentUser$.next(null);
+          if (window.location.pathname.includes('callback')) {
+            this.router.navigate(['/']);
+          }
+          resolve();
         }
-      } else if (err.statusText) {
-        message = err.statusText;
-      }
-    } catch (e) {
-      message = err.message || 'Server error';
-    }
-
-    this.error$.next(message);
-    return throwError(() => new Error(message));
-  }
-
-  loadCurrentUser(): void {
-    this.http.get<User>(`${this.API_BASE}/user`, { withCredentials: true }).pipe(
-      catchError(() => {
-        this.currentUser$.next(null);
-        return of(null as User | null);
-      })
-    ).subscribe((u: any) => {
-      if (u && Object.keys(u).length) { this.currentUser$.next(u); }
+      });
     });
   }
 
-  signup(input: { name: string; email: string; password: string }): Observable<User> {
-    this.loading$.next(true);
-    this.error$.next(null);
-    return this.http.post<User>(`${this.API_BASE}/signup`, input, { withCredentials: true }).pipe(
-      tap(user => this.currentUser$.next(user)),
-      catchError(err => this.handleError(err)),
-      finalize(() => this.loading$.next(false))
-    );
+  getAccessToken(): Observable<string> {
+    return this.oidcSecurityService.getAccessToken();
   }
 
-  login(input: { email: string; password: string }): Observable<User> {
-    this.loading$.next(true);
-    this.error$.next(null);
-    return this.http.post<User>(`${this.API_BASE}/login`, input, { withCredentials: true }).pipe(
-      tap(user => this.currentUser$.next(user)),
-      catchError(err => this.handleError(err)),
-      finalize(() => this.loading$.next(false))
-    );
+  login(): void {
+    // Store current URL before redirecting to login
+    const currentUrl = this.router.url;
+    if (!currentUrl.includes('callback')) {
+      sessionStorage.setItem('returnUrl', currentUrl);
+    }
+    this.oidcSecurityService.authorize();
   }
 
-  logout(): Observable<void> {
+  logout(): void {
+    this.oidcSecurityService.logoff().subscribe(() => {
+        this.currentUser$.next(null);
+    });
+  }
+
+  loadCurrentUser(): void {
+      // This method is kept for compatibility if needed, but checkAuth handles it.
+  }
+
+  private monitorTokenExpiration(): void {
+    // Monitor authentication state and token refresh events
+    this.oidcSecurityService.checkSessionChanged$.subscribe(() => {
+      console.log('Session changed, re-checking authentication...');
+      this.oidcSecurityService.isAuthenticated$.subscribe(({ isAuthenticated }) => {
+        if (isAuthenticated) {
+          // Session refreshed successfully, update user if needed
+          if (!this.currentUser$.value) {
+            this.fetchCurrentUser();
+          }
+        } else {
+          // Session lost - clear user state
+          console.log('Session lost - user needs to re-authenticate');
+          this.currentUser$.next(null);
+        }
+      });
+    });
+  }
+
+  private fetchCurrentUser(): void {
     this.loading$.next(true);
-    this.error$.next(null);
-    return this.http.post<void>(`${this.API_BASE}/logout`, {}, { withCredentials: true }).pipe(
-      tap(() => this.currentUser$.next(null)),
-      catchError(err => this.handleError(err)),
-      finalize(() => this.loading$.next(false))
-    );
+    // The backend now identifies the user by the token.
+    // We assume GET /user returns the user profile.
+    this.http.get<any>(`${this.API_BASE}/user`).pipe(
+      retry({ count: 3, delay: 500 }),
+      map(response => response?.Body || response),
+      tap(user => this.currentUser$.next(user)),
+      catchError(err => {
+        console.error('Failed to fetch user profile', err);
+        this.error$.next('Failed to fetch user profile');
+        return of(null);
+      }),
+      tap(() => this.loading$.next(false))
+    ).subscribe();
   }
 }

@@ -1,0 +1,50 @@
+.recipe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+  min-width: 700px;
+  max-width: 900px;
+
+  .image-upload {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .file-name {
+      color: rgba(0, 0, 0, 0.6);
+      font-size: 14px;
+    }
+  }
+
+  quill-editor {
+    min-height: 300px;
+
+    ::ng-deep .ql-container {
+      min-height: 250px;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    ::ng-deep .ql-editor {
+      min-height: 250px;
+    }
+  }
+}
+
+@media (max-width: 800px) {
+  .recipe-form {
+    min-width: auto;
+
+    .ingredient-row {
+      grid-template-columns: 1fr;
+
+      button {
+        justify-self: start;
+      }
+    }
+
+    .time-fields {
+      grid-template-columns: 1fr;
+    }
+  }
+}

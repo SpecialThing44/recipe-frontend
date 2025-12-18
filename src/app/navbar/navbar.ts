@@ -25,16 +25,11 @@ export class Navbar implements OnDestroy {
   }
 
   logout() {
-    this.auth.logout().subscribe({
-      next: () => {
-        this.user = null;
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this.user = null;
-        this.router.navigate(['/login']);
-      }
-    });
+    this.auth.logout();
+  }
+
+  login() {
+    this.auth.login();
   }
 
   ngOnDestroy(): void {
