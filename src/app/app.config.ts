@@ -22,8 +22,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideAuth({
       config: {
-        authority: 'https://auth.spencers.cc/application/o/cooking-app-dev/', // Trailing slash to match Authentik Issuer
-        authWellknownEndpointUrl: 'https://auth.spencers.cc/application/o/cooking-app-dev/.well-known/openid-configuration', // Explicit URL to avoid double slash
+        authority: (window as any).ENV?.AUTH_AUTHORITY || 'https://auth.spencers.cc/application/o/cooking-app-dev/',
+        authWellknownEndpointUrl: (window as any).ENV?.AUTH_WELLKNOWN_ENDPOINT || 'https://auth.spencers.cc/application/o/cooking-app-dev/.well-known/openid-configuration',
         redirectUrl: window.location.origin + '/callback',
         // postLogoutRedirectUri: window.location.origin,
         clientId: 'CrlaWqtWtKXSt8vYM6o9caiVGaLx2FxegYbOohOe', // TODO: Replace with your Client ID
