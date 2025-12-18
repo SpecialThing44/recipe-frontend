@@ -101,6 +101,10 @@ export class DashboardComponent implements OnInit {
     return this.currentUser?.id === recipe.createdBy.id;
   }
 
+  login() {
+    this.authService.login();
+  }
+
   createRecipe() {
     const dialogRef = this.dialog.open(RecipeCreateDialogComponent, {
       width: '900px',

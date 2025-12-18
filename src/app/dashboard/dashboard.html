@@ -1,77 +1,96 @@
 <div class="dashboard-container">
-  <div class="dashboard-header">
-    <h1>My Dashboard</h1>
-    <button mat-raised-button color="primary" (click)="createRecipe()">
-      <mat-icon>add</mat-icon>
-      Create Recipe
-    </button>
-  </div>
-
-  <!-- My Recipes Section -->
-  <div class="recipes-section">
-    <div class="section-header">
-      <h2>My Recipes</h2>
-      <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{createdByUser: currentUser?.id}">
-        See All
-        <mat-icon>arrow_forward</mat-icon>
-      </a>
-    </div>
-    
-    <div class="recipes-scroll-container" *ngIf="!loadingMyRecipes">
-      <div class="recipes-scroll">
-        <app-recipe-card
-          *ngFor="let recipe of myRecipes"
-          [recipe]="recipe"
-          [layout]="'scroll'"
-          [canEdit]="true"
-          [isSaved]="savedRecipeIds.has(recipe.id)"
-          (cardClick)="viewRecipe(recipe.id)">
-        </app-recipe-card>
-      </div>
-    </div>
-
-    <div class="loading-container" *ngIf="loadingMyRecipes">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
-
-    <div class="empty-state" *ngIf="!loadingMyRecipes && myRecipes.length === 0">
-      <p>You haven't created any recipes yet.</p>
-      <button mat-raised-button color="primary" (click)="createRecipe()">
-        <mat-icon>add</mat-icon>
-        Create Your First Recipe
+  <!-- Not Logged In View -->
+  <div *ngIf="!currentUser" class="guest-view">
+    <h1>Welcome to Spencers Recipe Website</h1>
+    <p>Please log in to access your personalized dashboard</p>
+    <div class="guest-actions">
+      <button mat-raised-button color="primary" (click)="login()">
+        <mat-icon>login</mat-icon>
+        Log In
+      </button>
+      <button mat-raised-button [routerLink]="['/recipes']">
+        <mat-icon>restaurant_menu</mat-icon>
+        Browse Recipes
       </button>
     </div>
   </div>
 
-  <!-- Saved Recipes Section -->
-  <div class="recipes-section">
-    <div class="section-header">
-      <h2>Saved Recipes</h2>
-      <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{savedByUser: currentUser?.id}">
-        See All
-        <mat-icon>arrow_forward</mat-icon>
-      </a>
+  <!-- Logged In View -->
+  <div *ngIf="currentUser">
+    <div class="dashboard-header">
+      <h1>My Dashboard</h1>
+      <button mat-raised-button color="primary" (click)="createRecipe()">
+        <mat-icon>add</mat-icon>
+        Create Recipe
+      </button>
     </div>
-    
-    <div class="recipes-scroll-container" *ngIf="!loadingSavedRecipes">
-      <div class="recipes-scroll">
-        <app-recipe-card
-          *ngFor="let recipe of savedRecipes"
-          [recipe]="recipe"
-          [layout]="'scroll'"
-          [canEdit]="canEditRecipe(recipe)"
-          [isSaved]="true"
-          (cardClick)="viewRecipe(recipe.id)">
-        </app-recipe-card>
+
+    <!-- My Recipes Section -->
+    <div class="recipes-section">
+      <div class="section-header">
+        <h2>My Recipes</h2>
+        <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{createdByUser: currentUser?.id}">
+          See All
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+      </div>
+      
+      <div class="recipes-scroll-container" *ngIf="!loadingMyRecipes">
+        <div class="recipes-scroll">
+          <app-recipe-card
+            *ngFor="let recipe of myRecipes"
+            [recipe]="recipe"
+            [layout]="'scroll'"
+            [canEdit]="true"
+            [isSaved]="savedRecipeIds.has(recipe.id)"
+            (cardClick)="viewRecipe(recipe.id)">
+          </app-recipe-card>
+        </div>
+      </div>
+
+      <div class="loading-container" *ngIf="loadingMyRecipes">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div class="empty-state" *ngIf="!loadingMyRecipes && myRecipes.length === 0">
+        <p>You haven't created any recipes yet.</p>
+        <button mat-raised-button color="primary" (click)="createRecipe()">
+          <mat-icon>add</mat-icon>
+          Create Your First Recipe
+        </button>
       </div>
     </div>
 
-    <div class="loading-container" *ngIf="loadingSavedRecipes">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <!-- Saved Recipes Section -->
+    <div class="recipes-section">
+      <div class="section-header">
+        <h2>Saved Recipes</h2>
+        <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{savedByUser: currentUser?.id}">
+          See All
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+      </div>
+      
+      <div class="recipes-scroll-container" *ngIf="!loadingSavedRecipes">
+        <div class="recipes-scroll">
+          <app-recipe-card
+            *ngFor="let recipe of savedRecipes"
+            [recipe]="recipe"
+            [layout]="'scroll'"
+            [canEdit]="canEditRecipe(recipe)"
+            [isSaved]="true"
+            (cardClick)="viewRecipe(recipe.id)">
+          </app-recipe-card>
+        </div>
+      </div>
 
-    <div class="empty-state" *ngIf="!loadingSavedRecipes && savedRecipes.length === 0">
-      <p>You haven't saved any recipes yet.</p>
+      <div class="loading-container" *ngIf="loadingSavedRecipes">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div class="empty-state" *ngIf="!loadingSavedRecipes && savedRecipes.length === 0">
+        <p>You haven't saved any recipes yet.</p>
+      </div>
     </div>
   </div>
 </div>

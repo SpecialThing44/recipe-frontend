@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
         authority: 'https://auth.spencers.cc/application/o/cooking-app-dev/', // Trailing slash to match Authentik Issuer
         authWellknownEndpointUrl: 'https://auth.spencers.cc/application/o/cooking-app-dev/.well-known/openid-configuration', // Explicit URL to avoid double slash
         redirectUrl: window.location.origin + '/callback',
-        postLogoutRedirectUri: window.location.origin,
+        // postLogoutRedirectUri: window.location.origin,
         clientId: 'CrlaWqtWtKXSt8vYM6o9caiVGaLx2FxegYbOohOe', // TODO: Replace with your Client ID
         scope: 'openid profile email offline_access',
         responseType: 'code',
