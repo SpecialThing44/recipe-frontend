@@ -61,6 +61,16 @@
           </div>
         </mat-card-content>
       </mat-card>
+
+      <mat-card class="info-card">
+        <mat-card-content>
+          <mat-icon>people</mat-icon>
+          <div>
+            <div class="label">Servings</div>
+            <div class="value">{{ recipe.servings }}</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
 
     <!-- Dietary Info & Tags -->
@@ -92,11 +102,17 @@
           <mat-icon>shopping_cart</mat-icon>
           Ingredients
         </mat-card-title>
+        <div class="servings-adjuster">
+          <mat-form-field appearance="outline" class="servings-input">
+            <mat-label>Servings</mat-label>
+            <input matInput type="number" min="1" [(ngModel)]="displayServings" (ngModelChange)="onServingsChange()">
+          </mat-form-field>
+        </div>
       </mat-card-header>
       <mat-card-content>
         <ul class="ingredients-list">
           <li *ngFor="let ingredient of recipe.ingredients">
-            <strong>{{ ingredient.quantity.amount }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
+            <strong>{{ getScaledAmount(ingredient.quantity.amount) }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
             {{ ingredient.ingredient.name }}
             <span *ngIf="ingredient.description" class="ingredient-description">
               ({{ ingredient.description }})

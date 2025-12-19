@@ -105,6 +105,7 @@ wikiLink: Option[String],
 instructions: String, // Quill Delta JSON format
 instructionImages: Seq[String] = Seq.empty, // URLs of images embedded in instructions
 image: Option[ImageUrls] = None,
+servings: Int,
 createdOn: Instant,
 updatedOn: Instant,
 id: UUID
