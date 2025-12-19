@@ -26,7 +26,7 @@ export const appConfig: ApplicationConfig = {
         authWellknownEndpointUrl: (window as any).ENV?.AUTH_WELLKNOWN_ENDPOINT || 'https://auth.spencers.cc/application/o/cooking-app-dev/.well-known/openid-configuration',
         redirectUrl: window.location.origin + '/callback',
         // postLogoutRedirectUri: window.location.origin,
-        clientId: 'CrlaWqtWtKXSt8vYM6o9caiVGaLx2FxegYbOohOe', // TODO: Replace with your Client ID
+        clientId: (window as any).ENV?.AUTH_CLIENT_ID || 'CrlaWqtWtKXSt8vYM6o9caiVGaLx2FxegYbOohOe',
         scope: 'openid profile email offline_access',
         responseType: 'code',
         silentRenew: true,

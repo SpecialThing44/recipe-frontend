@@ -39,6 +39,7 @@ RUN chmod +x /docker-entrypoint.sh
 ENV AUTH_AUTHORITY=https://auth.spencers.cc/application/o/cooking-app-dev/
 ENV AUTH_WELLKNOWN_ENDPOINT=https://auth.spencers.cc/application/o/cooking-app-dev/.well-known/openid-configuration
 ENV API_BASE_URL=http://localhost:9000
+ENV AUTH_CLIENT_ID=CrlaWqtWtKXSt8vYM6o9caiVGaLx2FxegYbOohOe
 
 # Expose port 80
 EXPOSE 80
