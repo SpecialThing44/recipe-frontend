@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +9,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QuillModule } from 'ngx-quill';
 import { RecipesService, Recipe } from '../../core/recipes.service';
@@ -22,6 +25,7 @@ import { map } from 'rxjs/operators';
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule,
     MatButtonModule,
     MatCardModule,
     MatIconModule,
@@ -29,6 +33,8 @@ import { map } from 'rxjs/operators';
     MatProgressSpinnerModule,
     MatDialogModule,
     MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
     QuillModule
   ],
   templateUrl: './recipe-detail.html',
@@ -42,6 +48,8 @@ export class RecipeDetailComponent implements OnInit {
   isLoggedIn$!: Observable<boolean>;
   isSaved = false;
   instructionsContent: any = null;
+  displayServings: number = 1;
+  scaleFactor: number = 1;
 
   constructor(
     private route: ActivatedRoute,
@@ -83,6 +91,9 @@ export class RecipeDetailComponent implements OnInit {
     this.recipesService.getRecipe(recipeId).subscribe({
       next: (recipe) => {
         this.recipe = recipe;
+        // Initialize servings scaling
+        this.displayServings = recipe.servings;
+        this.scaleFactor = 1;
         // Instructions come from backend as object or string
         try {
           if (typeof recipe.instructions === 'string') {
@@ -194,5 +205,14 @@ export class RecipeDetailComponent implements OnInit {
       return unit;
     }
     return unit?.name || 'piece';
+  }
+
+  onServingsChange(): void {
+    if (!this.recipe) return;
+    this.scaleFactor = this.displayServings / this.recipe.servings;
+  }
+
+  getScaledAmount(amount: number): number {
+    return Math.round(amount * this.scaleFactor * 100) / 100;
   }
 }

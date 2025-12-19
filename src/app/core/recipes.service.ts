@@ -38,6 +38,7 @@ export interface Recipe {
   ingredients: InstructionIngredient[];
   prepTime: number;
   cookTime: number;
+  servings: number;
   countryOfOrigin?: string;
   public: boolean;
   wikiLink?: string;
@@ -60,6 +61,7 @@ export interface RecipeInput {
   ingredients: RecipeIngredientInput[];
   prepTime: number;
   cookTime: number;
+  servings: number;
   countryOfOrigin?: string;
   public: boolean;
   wikiLink?: string;

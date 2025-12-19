@@ -32,6 +32,18 @@
             Cook time is required
           </mat-error>
         </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Servings</mat-label>
+          <input matInput type="number" formControlName="servings" min="1">
+          <mat-icon matPrefix>people</mat-icon>
+          <mat-error *ngIf="recipeForm.get('servings')?.hasError('required')">
+            Servings is required
+          </mat-error>
+          <mat-error *ngIf="recipeForm.get('servings')?.hasError('min')">
+            Must be at least 1
+          </mat-error>
+        </mat-form-field>
       </div>
 
       <mat-form-field appearance="fill" class="full-width">

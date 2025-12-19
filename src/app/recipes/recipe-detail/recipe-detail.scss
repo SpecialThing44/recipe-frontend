@@ -167,6 +167,11 @@
 
   mat-card-header {
     padding: 24px 24px 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
   }
 
   mat-card-title {
@@ -182,6 +187,26 @@
       width: 28px;
       height: 28px;
       color: var(--app-accent, #8b5e3c);
+    }
+  }
+
+  .servings-adjuster {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .servings-input {
+      width: 120px;
+      
+      ::ng-deep {
+        .mat-mdc-form-field-infix {
+          min-height: 40px;
+        }
+        
+        input {
+          text-align: center;
+        }
+      }
     }
   }
 
