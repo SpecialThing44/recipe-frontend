@@ -150,6 +150,23 @@
         <span>Updated: {{ recipe.updatedOn | date:'medium' }}</span>
       </p>
     </div>
+
+    <!-- Recommended Recipes -->
+    <div class="recommended-section" *ngIf="recommendedRecipes.length > 0">
+      <h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 1.5rem; font-weight: 500;">Similar Recipes</h2>
+      <div class="recipes-scroll-container">
+        <div class="recipes-scroll">
+          <app-recipe-card
+            *ngFor="let rec of recommendedRecipes"
+            [recipe]="rec"
+            [layout]="'scroll'"
+            [isSaved]="savedRecipeIds.has(rec.id)"
+            [canEdit]="false"
+            (cardClick)="viewRecipe(rec.id)">
+          </app-recipe-card>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

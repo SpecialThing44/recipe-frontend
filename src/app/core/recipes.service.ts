@@ -81,6 +81,20 @@ export interface NumberFilter {
   lessOrEqual?: number;
 }
 
+export interface SimilarityFilter {
+  alpha: number;
+  beta: number;
+  gamma: number;
+  minScore: number;
+}
+
+export const DEFAULT_ANALYTICAL_FILTER: SimilarityFilter = {
+  alpha: 0.5,
+  beta: 0.5,
+  gamma: 0.5,
+  minScore: 0.0
+};
+
 export interface RecipesFilters {
   id?: string;
   ids?: string[];
@@ -93,6 +107,11 @@ export interface RecipesFilters {
   tags?: string[];
   ingredients?: string[];
   notIngredients?: string[];
+  analyzedUser?: string;
+  analyzedRecipe?: string;
+  ingredientSimilarity?: SimilarityFilter;
+  coSaveSimilarity?: SimilarityFilter;
+  tagSimilarity?: SimilarityFilter;
   orderBy?: {
     name?: boolean;
   };
@@ -123,6 +142,11 @@ export class RecipesService {
       if (filters.tags && filters.tags.length > 0) body.tags = filters.tags;
       if (filters.ingredients && filters.ingredients.length > 0) body.ingredients = filters.ingredients;
       if (filters.notIngredients && filters.notIngredients.length > 0) body.notIngredients = filters.notIngredients;
+      if (filters.analyzedUser) body.analyzedUser = filters.analyzedUser;
+      if (filters.analyzedRecipe) body.analyzedRecipe = filters.analyzedRecipe;
+      if (filters.ingredientSimilarity) body.ingredientSimilarity = filters.ingredientSimilarity;
+      if (filters.coSaveSimilarity) body.coSaveSimilarity = filters.coSaveSimilarity;
+      if (filters.tagSimilarity) body.tagSimilarity = filters.tagSimilarity;
       if (filters.orderBy) body.orderBy = filters.orderBy;
       if (filters.limit) body.limit = filters.limit;
       if (filters.page !== undefined) body.page = filters.page;

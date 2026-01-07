@@ -13,7 +13,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { QuillModule } from 'ngx-quill';
-import { RecipesService, Recipe } from '../../core/recipes.service';
+import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
+import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
 import { AuthService } from '../../core/auth.service';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
 import { Observable } from 'rxjs';
@@ -35,7 +36,8 @@ import { map } from 'rxjs/operators';
     MatSnackBarModule,
     MatFormFieldModule,
     MatInputModule,
-    QuillModule
+    QuillModule,
+    RecipeCardComponent
   ],
   templateUrl: './recipe-detail.html',
   styleUrl: './recipe-detail.scss',
@@ -50,6 +52,10 @@ export class RecipeDetailComponent implements OnInit {
   instructionsContent: any = null;
   displayServings: number = 1;
   scaleFactor: number = 1;
+
+  recommendedRecipes: Recipe[] = [];
+  loadingRecommendedRecipes = false;
+  savedRecipeIds = new Set<string>();
 
   constructor(
     private route: ActivatedRoute,
@@ -79,6 +85,57 @@ export class RecipeDetailComponent implements OnInit {
     this.isLoggedIn$ = this.authService.currentUser$.pipe(
       map(user => user !== null)
     );
+
+    // Load saved recipes for "isSaved" status in recommendations
+    this.authService.currentUser$.subscribe(user => {
+      if (user) {
+        this.recipesService.listRecipes({
+          savedByUser: user.id,
+          limit: 100 // Load more to cover more cases
+        }).subscribe(recipes => {
+            if (recipes) {
+                this.savedRecipeIds = new Set(recipes.map(r => r.id));
+            }
+        });
+      }
+    });
+
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id) {
+          // If the ID changed, reload everything
+          if (this.recipe?.id !== id) {
+             this.loadRecipe(id);
+             this.loadRecommendedRecipes(id);
+          }
+      } else {
+        this.error = 'No recipe ID provided';
+      }
+    });
+  }
+
+  loadRecommendedRecipes(recipeId: string) {
+    this.loadingRecommendedRecipes = true;
+    this.recipesService.listRecipes({
+      analyzedRecipe: recipeId,
+      ingredientSimilarity: DEFAULT_ANALYTICAL_FILTER,
+      coSaveSimilarity: DEFAULT_ANALYTICAL_FILTER,
+      tagSimilarity: DEFAULT_ANALYTICAL_FILTER,
+      limit: 5
+    }).subscribe({
+      next: (recipes) => {
+        this.recommendedRecipes = recipes || [];
+        this.loadingRecommendedRecipes = false;
+      },
+      error: (err) => {
+        console.error('Error loading recommendations:', err);
+        this.loadingRecommendedRecipes = false;
+      }
+    });
+  }
+
+  viewRecipe(recipeId: string) {
+    this.router.navigate(['/recipes', recipeId]);
   }
 
   loadRecipe(id?: string): void {

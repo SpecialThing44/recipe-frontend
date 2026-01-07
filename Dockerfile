@@ -8,7 +8,7 @@ COPY package.json ./
 COPY yarn.lock ./
 
 # Install dependencies
-RUN corepack enable && yarn install --frozen-lockfile
+RUN corepack enable && yarn install --frozen-lockfile --network-timeout 100000
 
 # Copy source files
 COPY . .
