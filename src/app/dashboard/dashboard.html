@@ -43,7 +43,9 @@
             [layout]="'scroll'"
             [canEdit]="true"
             [isSaved]="savedRecipeIds.has(recipe.id)"
-            (cardClick)="viewRecipe(recipe.id)">
+            (cardClick)="viewRecipe(recipe.id)"
+            (editClick)="editRecipe(recipe)"
+            (deleteClick)="deleteRecipe(recipe)">
           </app-recipe-card>
         </div>
       </div>
@@ -79,7 +81,9 @@
             [layout]="'scroll'"
             [canEdit]="canEditRecipe(recipe)"
             [isSaved]="true"
-            (cardClick)="viewRecipe(recipe.id)">
+            (cardClick)="viewRecipe(recipe.id)"
+            (editClick)="editRecipe(recipe)"
+            (deleteClick)="deleteRecipe(recipe)">
           </app-recipe-card>
         </div>
       </div>
@@ -90,6 +94,36 @@
 
       <div class="empty-state" *ngIf="!loadingSavedRecipes && savedRecipes.length === 0">
         <p>You haven't saved any recipes yet.</p>
+      </div>
+    </div>
+
+    <!-- Recommended Recipes Section -->
+    <div class="recipes-section">
+      <div class="section-header">
+        <h2>Recommended for You</h2>
+      </div>
+      
+      <div class="recipes-scroll-container" *ngIf="!loadingRecommendedRecipes">
+        <div class="recipes-scroll">
+          <app-recipe-card
+            *ngFor="let recipe of recommendedRecipes"
+            [recipe]="recipe"
+            [layout]="'scroll'"
+            [canEdit]="canEditRecipe(recipe)"
+            [isSaved]="savedRecipeIds.has(recipe.id)"
+            (cardClick)="viewRecipe(recipe.id)"
+            (editClick)="editRecipe(recipe)"
+            (deleteClick)="deleteRecipe(recipe)">
+          </app-recipe-card>
+        </div>
+      </div>
+
+      <div class="loading-container" *ngIf="loadingRecommendedRecipes">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <div class="empty-state" *ngIf="!loadingRecommendedRecipes && recommendedRecipes.length === 0">
+        <p>No recommendations available at this time.</p>
       </div>
     </div>
   </div>

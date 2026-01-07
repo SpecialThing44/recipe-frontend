@@ -8,8 +8,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RecipeCardComponent } from '../shared/components/recipe-card/recipe-card';
 import { RecipeCreateDialogComponent } from '../recipes/recipe-create-dialog/recipe-create-dialog';
+import { RecipeEditDialogComponent } from '../recipes/recipe-edit-dialog/recipe-edit-dialog';
 import { AuthService, User } from '../core/auth.service';
-import { RecipesService, Recipe } from '../core/recipes.service';
+import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../core/recipes.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,7 +23,8 @@ import { RecipesService, Recipe } from '../core/recipes.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    RecipeCardComponent
+    RecipeCardComponent,
+    RecipeEditDialogComponent
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
@@ -31,8 +33,10 @@ export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
   myRecipes: Recipe[] = [];
   savedRecipes: Recipe[] = [];
+  recommendedRecipes: Recipe[] = [];
   loadingMyRecipes = false;
   loadingSavedRecipes = false;
+  loadingRecommendedRecipes = false;
   savedRecipeIds = new Set<string>();
 
   constructor(
@@ -42,12 +46,42 @@ export class DashboardComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
+  editRecipe(recipe: Recipe) {
+    const dialogRef = this.dialog.open(RecipeEditDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: { recipe }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadMyRecipes();
+      }
+    });
+  }
+
+  deleteRecipe(recipe: Recipe) {
+    if (confirm(`Are you sure you want to delete "${recipe.name}"?`)) {
+      this.recipesService.deleteRecipe(recipe.id).subscribe({
+        next: () => {
+          this.loadMyRecipes();
+        },
+        error: (err: any) => {
+          console.error('Error deleting recipe:', err);
+        }
+      });
+    }
+  }
+
+  
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       if (user) {
         this.loadMyRecipes();
         this.loadSavedRecipes();
+        this.loadRecommendedRecipes();
       }
     });
   }
@@ -89,6 +123,29 @@ export class DashboardComponent implements OnInit {
       error: (err: any) => {
         console.error('Error loading saved recipes:', err);
         this.loadingSavedRecipes = false;
+      }
+    });
+  }
+
+  loadRecommendedRecipes() {
+    if (!this.currentUser?.id) return;
+    
+    this.loadingRecommendedRecipes = true;
+    this.recipesService.listRecipes({
+      analyzedUser: this.currentUser.id,
+      ingredientSimilarity: DEFAULT_ANALYTICAL_FILTER,
+      coSaveSimilarity: DEFAULT_ANALYTICAL_FILTER,
+      tagSimilarity: DEFAULT_ANALYTICAL_FILTER,
+      limit: 10,
+      page: 0
+    }).subscribe({
+      next: (recipes: Recipe[]) => {
+        this.recommendedRecipes = recipes || [];
+        this.loadingRecommendedRecipes = false;
+      },
+      error: (err: any) => {
+        console.error('Error loading recommended recipes:', err);
+        this.loadingRecommendedRecipes = false;
       }
     });
   }

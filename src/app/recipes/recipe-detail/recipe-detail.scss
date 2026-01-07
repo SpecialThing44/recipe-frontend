@@ -331,3 +331,38 @@
     margin: 8px;
   }
 }
+
+.recommended-section {
+  margin-top: 48px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding-top: 24px;
+
+  .recipes-scroll-container {
+    overflow-x: auto;
+    padding-bottom: 16px;
+
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+
+      &:hover {
+        background: #555;
+      }
+    }
+  }
+
+  .recipes-scroll {
+    display: flex;
+    gap: 16px;
+    width: fit-content;
+  }
+}
