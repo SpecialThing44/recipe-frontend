@@ -5,8 +5,12 @@
           <mat-icon class="green">add</mat-icon>
         </button>
       </div>
-      <div>
-        <div *ngFor="let ingredient of ingredients.controls; let i = index" [formGroup]="getAsFormGroup(ingredient)" class="ingredient-row">
+      <div cdkDropList (cdkDropListDropped)="drop($event)">
+        <div *ngFor="let ingredient of ingredients.controls; let i = index" [formGroup]="getAsFormGroup(ingredient)" class="ingredient-row" cdkDrag>
+          <div class="drag-handle-container">
+            <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
+          </div>
+
           <mat-form-field appearance="fill" class="ingredient-field">
             <mat-label>Ingredient</mat-label>
             <input
@@ -19,8 +23,8 @@
                 {{ suggestion.name }}
               </mat-option>
             </mat-autocomplete>
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientId')?.hasError('required')">
-              Ingredient is required
+            <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientName')?.invalid">
+              Please select a valid ingredient
             </mat-error>
           </mat-form-field>
 
@@ -49,9 +53,15 @@
             <input matInput formControlName="description" placeholder="e.g., chopped">
           </mat-form-field>
 
-          <button mat-icon-button type="button" (click)="removeIngredient(i)">
-            <mat-icon class="green">delete</mat-icon>
-          </button>
+          <div class="action-buttons">
+            <button mat-icon-button type="button" (click)="addIngredient(i)" matTooltip="Insert ingredient below">
+              <mat-icon class="green">add</mat-icon>
+            </button>
+
+            <button mat-icon-button type="button" (click)="removeIngredient(i)">
+              <mat-icon class="green">delete</mat-icon>
+            </button>
+          </div>
         </div>
       </div>
     </div>
