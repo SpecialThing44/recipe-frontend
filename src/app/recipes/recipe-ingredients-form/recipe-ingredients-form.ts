@@ -52,7 +52,7 @@ export class RecipeIngredientsFormComponent implements OnInit {
 
   addIngredient(index: number = -1): void {
     const ingredientGroup = this.fb.group({
-      ingredientName: [''],
+      ingredientName: ['', Validators.required],
       ingredientId: ['', Validators.required],
       amount: [0, [Validators.required, Validators.min(0)]],
       unit: ['', Validators.required],
@@ -103,17 +103,25 @@ drop(event: CdkDragDrop<string[]>) {
   onIngredientSelected(index: number, event: MatAutocompleteSelectedEvent): void {
     const ingredient = event.option.value as Ingredient;
     const ingredientGroup = this.ingredients.at(index) as FormGroup;
+    
+    // Set ID first
     ingredientGroup.patchValue({
-      ingredientId: ingredient.id,
-      ingredientName: ingredient.name
+      ingredientId: ingredient.id
     });
+    
+    // Set name without emitting event to prevent clearing the ID in the valueChanges subscription
+    const nameControl = ingredientGroup.get('ingredientName');
+    nameControl?.setValue(ingredient.name, { emitEvent: false });
+    // Clear any errors (like requireMatch) now that we have a valid selection
+    nameControl?.setErrors(null);
   }
 
   private setupAutocomplete(index: number): void {
     const ingredientGroup = this.ingredients.at(index) as FormGroup;
     const ingredientNameControl = ingredientGroup.get('ingredientName');
+    const ingredientIdControl = ingredientGroup.get('ingredientId');
 
-    if (ingredientNameControl) {
+    if (ingredientNameControl && ingredientIdControl) {
       this.ingredientSuggestions[index] = ingredientNameControl.valueChanges.pipe(
         startWith(ingredientNameControl.value || ''),
         debounceTime(300),
@@ -128,6 +136,14 @@ drop(event: CdkDragDrop<string[]>) {
           });
         })
       );
+
+      // Invalidate selection when user types
+      ingredientNameControl.valueChanges.subscribe(value => {
+        ingredientIdControl.setValue(null);
+        if (value && typeof value === 'string' && value.trim().length > 0) {
+          ingredientNameControl.setErrors({ requireMatch: true });
+        }
+      });
     }
   }
 

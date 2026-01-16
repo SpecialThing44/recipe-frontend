@@ -23,8 +23,8 @@
                 {{ suggestion.name }}
               </mat-option>
             </mat-autocomplete>
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientId')?.hasError('required')">
-              Ingredient is required
+            <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientName')?.invalid">
+              Please select a valid ingredient
             </mat-error>
           </mat-form-field>
 
