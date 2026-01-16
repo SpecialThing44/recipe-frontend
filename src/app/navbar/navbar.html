@@ -5,34 +5,71 @@
   </a>
   <span class="spacer"></span>
 
-  <ng-container *ngIf="user as user; else anonLinks">
-    <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
-    <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
-    <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
+  <!-- Desktop Menu -->
+  <div class="desktop-menu">
+    <ng-container *ngIf="user as user; else anonLinks">
+      <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
+      <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
+      <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
 
-    <button mat-icon-button [matMenuTriggerFor]="accountMenu" aria-label="Account menu" class="account-button">
-      <div class="account-bubble">
-        <img *ngIf="user.avatar?.thumbnail" [src]="user.avatar.thumbnail" [alt]="user.name + ' avatar'">
-        <mat-icon *ngIf="!user.avatar?.thumbnail" aria-hidden="false" aria-label="Account">person</mat-icon>
-      </div>
-    </button>
+      <button mat-icon-button [matMenuTriggerFor]="accountMenu" aria-label="Account menu" class="account-button">
+        <div class="account-bubble">
+          <img *ngIf="user.avatar?.thumbnail" [src]="user.avatar.thumbnail" [alt]="user.name + ' avatar'">
+          <mat-icon *ngIf="!user.avatar?.thumbnail" aria-hidden="false" aria-label="Account">person</mat-icon>
+        </div>
+      </button>
 
-    <mat-menu #accountMenu="matMenu">
+      <mat-menu #accountMenu="matMenu">
+        <button mat-menu-item [routerLink]="['/users', user.id]">
+          <mat-icon>account_circle</mat-icon>
+          <span>Account</span>
+        </button>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </ng-container>
+
+    <ng-template #anonLinks>
+      <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
+      <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
+      <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
+      <button mat-button (click)="login()">Login/Signup</button>
+    </ng-template>
+  </div>
+
+  <!-- Mobile Menu -->
+  <button mat-icon-button [matMenuTriggerFor]="mobileMenu" class="mobile-menu-trigger">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <mat-menu #mobileMenu="matMenu">
+    <a mat-menu-item routerLink="/recipes" routerLinkActive="mobile-active-link">Recipes</a>
+    <a mat-menu-item routerLink="/ingredients" routerLinkActive="mobile-active-link">Ingredients</a>
+    <a mat-menu-item routerLink="/users" routerLinkActive="mobile-active-link">Users</a>
+
+    <mat-divider></mat-divider>
+
+    <ng-container *ngIf="user as user; else anonMobile">
       <button mat-menu-item [routerLink]="['/users', user.id]">
-        <mat-icon>account_circle</mat-icon>
-        <span>Account</span>
+        <div class="account-bubble-mini">
+           <img *ngIf="user.avatar?.thumbnail" [src]="user.avatar.thumbnail" [alt]="user.name + ' avatar'">
+            <mat-icon *ngIf="!user.avatar?.thumbnail" aria-hidden="false" aria-label="Account">person</mat-icon>
+        </div>
+        <span>Account ({{user.name}})</span>
       </button>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>Logout</span>
       </button>
-    </mat-menu>
-  </ng-container>
+    </ng-container>
 
-  <ng-template #anonLinks>
-    <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
-    <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
-    <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
-    <button mat-button (click)="login()">Login/Signup</button>
-  </ng-template>
+    <ng-template #anonMobile>
+      <button mat-menu-item (click)="login()">
+        <mat-icon>login</mat-icon>
+        <span>Login/Signup</span>
+      </button>
+    </ng-template>
+  </mat-menu>
 </mat-toolbar>
