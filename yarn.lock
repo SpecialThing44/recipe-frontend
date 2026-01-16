@@ -167,6 +167,13 @@
     ora "8.2.0"
     rxjs "7.8.2"
 
+"@angular/animations@20.3.11":
+  version "20.3.11"
+  resolved "https://registry.yarnpkg.com/@angular/animations/-/animations-20.3.11.tgz#de01b21b0625530b4c4c073bcf1416bdd712f72f"
+  integrity sha512-7ysqAUE3PRmrOC1JZYYzI6eabgzkWnUPTsohcliOh7gxJdIcA3h+oJS/GiBrzpzGIkIH806reJbP916jbCcWxQ==
+  dependencies:
+    tslib "^2.3.0"
+
 "@angular/build@^20.3.10":
   version "20.3.10"
   resolved "https://registry.yarnpkg.com/@angular/build/-/build-20.3.10.tgz#cbf6da726f92678000eff964224e4a2ce007f07e"
