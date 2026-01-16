@@ -55,7 +55,7 @@
 }
 
 mat-toolbar {
-  background-color: var(#beb1ab);
+  background-color: #beb1ab;
   color: rgb(31, 31, 31);
   display: flex;
   align-items: center;
@@ -65,4 +65,64 @@ mat-toolbar {
 .account-bubble mat-icon {
   font-size: 20px;
   line-height: 20px;
+}
+
+/* Responsive Styles */
+.desktop-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-menu-trigger {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-menu {
+    display: none;
+  }
+
+  .mobile-menu-trigger {
+    display: inline-flex;
+  }
+}
+
+.mobile-active-link {
+  background-color: #d1dfdb;
+  border-radius: 6px;
+  padding: 6px 10px;
+  transition: background-color 160ms linear;
+}
+
+.account-bubble-mini {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--md-sys-color-primary, #0d6812);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-right: 12px;
+  vertical-align: middle;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+  }
+}
+
+::ng-deep .mobile-active-link {
+  background-color: #2e7d32; /* Brighter green than desktop */
+  color: white;
 }
