@@ -8,5 +8,6 @@ export const availableUnits = [
   { value: 'gram', label: 'Gram' },
   { value: 'kilogram', label: 'Kilogram' },
   { value: 'ounce', label: 'Ounce' },
-  { value: 'pound', label: 'Pound' }
+  { value: 'pound', label: 'Pound' },
+  { value: 'other', label: 'Other' }
 ];

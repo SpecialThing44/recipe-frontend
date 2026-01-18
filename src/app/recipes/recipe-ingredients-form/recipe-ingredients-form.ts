@@ -8,11 +8,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
 import { availableUnits } from '../../shared/units/available-units';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog';
 
 @Component({
   selector: 'app-recipe-ingredients-form',
@@ -27,7 +29,8 @@ import { availableUnits } from '../../shared/units/available-units';
     MatSelectModule,
     MatTooltipModule,
     DragDropModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatDialogModule
   ],
   templateUrl: './recipe-ingredients-form.html',
   styleUrl: './recipe-ingredients-form.scss'
@@ -40,7 +43,8 @@ export class RecipeIngredientsFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private ingredientsService: IngredientsService
+    private ingredientsService: IngredientsService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -70,8 +74,20 @@ export class RecipeIngredientsFormComponent implements OnInit {
   }
 
   removeIngredient(index: number): void {
-    this.ingredients.removeAt(index);
-    this.ingredientSuggestions.splice(index, 1);
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        title: 'Remove Ingredient',
+        message: 'Are you sure you want to remove this ingredient?',
+        confirmText: 'Remove'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.ingredients.removeAt(index);
+        this.ingredientSuggestions.splice(index, 1);
+      }
+    });
   }
 drop(event: CdkDragDrop<string[]>) {
     const previousIndex = event.previousIndex;
@@ -131,7 +147,7 @@ drop(event: CdkDragDrop<string[]>) {
             return of([]);
           }
           return this.ingredientsService.listIngredients({
-            name: { contains: value.trim() },
+            aliasesOrName: [value.trim()],
             limit: 10
           });
         })
