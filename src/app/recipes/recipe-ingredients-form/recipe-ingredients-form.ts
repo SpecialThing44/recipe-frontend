@@ -140,7 +140,7 @@ drop(event: CdkDragDrop<string[]>) {
     if (ingredientNameControl && ingredientIdControl) {
       this.ingredientSuggestions[index] = ingredientNameControl.valueChanges.pipe(
         startWith(ingredientNameControl.value || ''),
-        debounceTime(300),
+        debounceTime(100),
         distinctUntilChanged(),
         switchMap(value => {
           if (!value || typeof value !== 'string' || value.trim().length === 0) {

@@ -206,7 +206,7 @@ export class RecipesListComponent implements OnInit {
   setupAutocomplete(): void {
     this.ingredientSuggestions = this.filterForm.get('ingredientInput')!.valueChanges.pipe(
       startWith(''),
-      debounceTime(300),
+      debounceTime(100),
       distinctUntilChanged(),
       switchMap(value => {
         if (typeof value !== 'string' || !value.trim()) return of([]);
@@ -224,7 +224,7 @@ export class RecipesListComponent implements OnInit {
 
     this.notIngredientSuggestions = this.filterForm.get('notIngredientInput')!.valueChanges.pipe(
       startWith(''),
-      debounceTime(300),
+      debounceTime(100),
       distinctUntilChanged(),
       switchMap(value => {
         if (typeof value !== 'string' || !value.trim()) return of([]);
@@ -242,7 +242,7 @@ export class RecipesListComponent implements OnInit {
 
     this.tagSuggestions = this.filterForm.get('tagInput')!.valueChanges.pipe(
       startWith(''),
-      debounceTime(300),
+      debounceTime(100),
       distinctUntilChanged(),
       switchMap(value => {
         if (typeof value !== 'string' || !value.trim()) return of([]);
