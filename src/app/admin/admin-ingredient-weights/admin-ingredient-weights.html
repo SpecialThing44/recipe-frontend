@@ -2,6 +2,10 @@
   <div class="page-header">
     <h1>Admin: Ingredient Weights</h1>
     <p>Queue maintenance jobs and inspect job status for ingredient-weight processing.</p>
+    <button mat-stroked-button type="button" class="settings-button" (click)="goToSettings()">
+      <mat-icon>settings</mat-icon>
+      Ingredient Weight Settings
+    </button>
   </div>
 
   <mat-card *ngIf="!currentUser" class="state-card">

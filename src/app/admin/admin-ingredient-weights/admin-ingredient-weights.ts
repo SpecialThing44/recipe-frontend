@@ -76,6 +76,10 @@ export class AdminIngredientWeightsComponent implements OnInit, OnDestroy {
     this.authService.login();
   }
 
+  goToSettings(): void {
+    this.router.navigate(['/admin/ingredient-weights/settings']);
+  }
+
   processEvents(): void {
     if (!this.isAdmin) {
       return;

@@ -23,6 +23,10 @@ export interface IngredientWeightActiveJobsResponse {
   jobIds: string[];
 }
 
+export interface IngredientWeightSettingsResponse {
+  meanRawPenaltyFactor: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -63,6 +67,25 @@ export class AdminService {
   activeIngredientWeightJobIds(): Observable<IngredientWeightActiveJobsResponse> {
     return this.http.get<IngredientWeightActiveJobsResponse>(
       `${this.API_BASE}/admin/ingredient-weights/jobs/active`,
+      { withCredentials: true }
+    ).pipe(
+      map((response: any) => response?.Body || response)
+    );
+  }
+
+  ingredientWeightSettings(): Observable<IngredientWeightSettingsResponse> {
+    return this.http.get<IngredientWeightSettingsResponse>(
+      `${this.API_BASE}/admin/ingredient-weights/settings`,
+      { withCredentials: true }
+    ).pipe(
+      map((response: any) => response?.Body || response)
+    );
+  }
+
+  updateIngredientWeightSettings(meanRawPenaltyFactor: number): Observable<IngredientWeightSettingsResponse> {
+    return this.http.put<IngredientWeightSettingsResponse>(
+      `${this.API_BASE}/admin/ingredient-weights/settings`,
+      { meanRawPenaltyFactor },
       { withCredentials: true }
     ).pipe(
       map((response: any) => response?.Body || response)
