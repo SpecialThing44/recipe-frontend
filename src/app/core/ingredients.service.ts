@@ -99,4 +99,27 @@ export class IngredientsService {
       withCredentials: true
     });
   }
+
+  listSubstitutes(id: string): Observable<Ingredient[]> {
+    return this.http.get<any>(`${this.API_BASE}/ingredients/${id}/substitutes`, {
+      withCredentials: true
+    }).pipe(
+      map((response: any) => response?.Body || [])
+    );
+  }
+
+  addSubstitute(id: string, substituteId: string): Observable<void> {
+    return this.http.post<void>(
+      `${this.API_BASE}/ingredients/${id}/substitutes/${substituteId}`,
+      {},
+      { withCredentials: true }
+    );
+  }
+
+  removeSubstitute(id: string, substituteId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.API_BASE}/ingredients/${id}/substitutes/${substituteId}`,
+      { withCredentials: true }
+    );
+  }
 }

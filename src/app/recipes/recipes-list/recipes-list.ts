@@ -213,7 +213,12 @@ export class RecipesListComponent implements OnInit {
         return this.ingredientsService.listIngredients({
           name: { contains: value.trim() },
           limit: 10
-        });
+        }).pipe(
+          map(results => {
+            const selectedIngredients = new Set<string>(this.filterForm.get('ingredients')?.value || []);
+            return results.filter(result => !selectedIngredients.has(result.name));
+          })
+        );
       })
     );
 
@@ -226,7 +231,12 @@ export class RecipesListComponent implements OnInit {
         return this.ingredientsService.listIngredients({
           name: { contains: value.trim() },
           limit: 10
-        });
+        }).pipe(
+          map(results => {
+            const selectedIngredients = new Set<string>(this.filterForm.get('notIngredients')?.value || []);
+            return results.filter(result => !selectedIngredients.has(result.name));
+          })
+        );
       })
     );
 
@@ -239,7 +249,12 @@ export class RecipesListComponent implements OnInit {
         return this.tagsService.listTags({
           name: { contains: value.trim() },
           limit: 10
-        });
+        }).pipe(
+          map(results => {
+            const selectedTags = new Set<string>(this.filterForm.get('tags')?.value || []);
+            return results.filter(result => !selectedTags.has(result));
+          })
+        );
       })
     );
   }
@@ -248,7 +263,11 @@ export class RecipesListComponent implements OnInit {
     this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
-  addIngredient(event: MatAutocompleteSelectedEvent, type: 'ingredients' | 'notIngredients'): void {
+  addIngredient(
+    event: MatAutocompleteSelectedEvent,
+    type: 'ingredients' | 'notIngredients',
+    inputElement?: HTMLInputElement
+  ): void {
     const ingredient = event.option.value;
     const currentIngredients = this.filterForm.get(type)?.value || [];
     
@@ -257,9 +276,9 @@ export class RecipesListComponent implements OnInit {
         [type]: [...currentIngredients, ingredient.name]
       });
     }
-    
+
     const inputControlName = type === 'ingredients' ? 'ingredientInput' : 'notIngredientInput';
-    this.filterForm.get(inputControlName)?.setValue('');
+    this.clearAutocompleteInput(inputControlName, inputElement);
   }
 
   removeIngredient(ingredient: string, type: 'ingredients' | 'notIngredients'): void {
@@ -269,7 +288,7 @@ export class RecipesListComponent implements OnInit {
     });
   }
 
-  addTag(event: MatAutocompleteSelectedEvent): void {
+  addTag(event: MatAutocompleteSelectedEvent, inputElement?: HTMLInputElement): void {
     const tag = event.option.value;
     const currentTags = this.filterForm.get('tags')?.value || [];
     
@@ -278,8 +297,26 @@ export class RecipesListComponent implements OnInit {
         tags: [...currentTags, tag]
       });
     }
-    
-    this.filterForm.get('tagInput')?.setValue('');
+
+    this.clearAutocompleteInput('tagInput', inputElement);
+  }
+
+  private clearAutocompleteInput(
+    controlName: 'ingredientInput' | 'notIngredientInput' | 'tagInput',
+    inputElement?: HTMLInputElement
+  ): void {
+    this.filterForm.get(controlName)?.setValue('');
+    if (inputElement) {
+      inputElement.value = '';
+    }
+
+    // Defer one tick so Material autocomplete cannot overwrite the cleared value.
+    setTimeout(() => {
+      this.filterForm.get(controlName)?.setValue('');
+      if (inputElement) {
+        inputElement.value = '';
+      }
+    });
   }
 
   removeTag(tag: string): void {

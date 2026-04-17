@@ -105,10 +105,11 @@
               <input 
                 placeholder="Add ingredient..."
                 formControlName="ingredientInput"
+                #ingredientInputEl
                 [matChipInputFor]="ingredientList"
                 [matAutocomplete]="autoIngredient">
             </mat-chip-grid>
-            <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="addIngredient($event, 'ingredients')">
+            <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="addIngredient($event, 'ingredients', ingredientInputEl)">
               <mat-option *ngFor="let suggestion of ingredientSuggestions | async" [value]="suggestion">
                 {{ suggestion.name }}
               </mat-option>
@@ -130,10 +131,11 @@
               <input 
                 placeholder="Exclude ingredient..."
                 formControlName="notIngredientInput"
+                #notIngredientInputEl
                 [matChipInputFor]="notIngredientList"
                 [matAutocomplete]="autoNotIngredient">
             </mat-chip-grid>
-            <mat-autocomplete #autoNotIngredient="matAutocomplete" (optionSelected)="addIngredient($event, 'notIngredients')">
+            <mat-autocomplete #autoNotIngredient="matAutocomplete" (optionSelected)="addIngredient($event, 'notIngredients', notIngredientInputEl)">
               <mat-option *ngFor="let suggestion of notIngredientSuggestions | async" [value]="suggestion">
                 {{ suggestion.name }}
               </mat-option>
@@ -155,10 +157,11 @@
               <input 
                 placeholder="Add tag..."
                 formControlName="tagInput"
+                #tagInputEl
                 [matChipInputFor]="tagList"
                 [matAutocomplete]="autoTag">
             </mat-chip-grid>
-            <mat-autocomplete #autoTag="matAutocomplete" (optionSelected)="addTag($event)">
+            <mat-autocomplete #autoTag="matAutocomplete" (optionSelected)="addTag($event, tagInputEl)">
               <mat-option *ngFor="let suggestion of tagSuggestions | async" [value]="suggestion">
                 {{ suggestion }}
               </mat-option>
