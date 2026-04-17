@@ -1,0 +1,106 @@
+.admin-ingredient-weights-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+
+  .page-header {
+    margin-bottom: 20px;
+
+    h1 {
+      margin: 0;
+    }
+
+    p {
+      margin-top: 8px;
+      color: #616161;
+    }
+  }
+
+  .state-card {
+    margin-bottom: 16px;
+  }
+
+  .message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+
+    &.success {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    &.error {
+      background: #ffebee;
+      color: #b71c1c;
+    }
+  }
+
+  .actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .active-jobs {
+      margin-top: 12px;
+
+      p {
+        margin: 0 0 6px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+    }
+
+    .empty-active-jobs {
+      margin: 12px 0 0;
+      color: #616161;
+    }
+  }
+
+  .status-card {
+    .status-form {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .job-id-field {
+      width: 100%;
+    }
+
+    .status-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .job-status-grid {
+      margin-top: 10px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .stats-json {
+      margin-top: 14px;
+
+      h3 {
+        margin: 0 0 8px;
+      }
+
+      pre {
+        margin: 0;
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 8px;
+        overflow-x: auto;
+      }
+    }
+  }
+}

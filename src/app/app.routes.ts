@@ -7,6 +7,7 @@ import {UserProfileComponent} from './users/user-profile/user-profile';
 import {CallbackComponent} from './callback/callback.component';
 import {NotFoundComponent} from './not-found/not-found';
 import {DashboardComponent} from './dashboard/dashboard';
+import {AdminIngredientWeightsComponent} from './admin/admin-ingredient-weights/admin-ingredient-weights';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -14,6 +15,7 @@ export const routes: Routes = [
   { path: 'recipes', component: RecipesListComponent },
   { path: 'recipes/:id', component: RecipeDetailComponent },
   { path: 'ingredients', component: IngredientsListComponent },
+  { path: 'admin/ingredient-weights', component: AdminIngredientWeightsComponent },
   { path: 'users', component: UsersListComponent },
   { path: 'users/:id', component: UserProfileComponent },
   { path: 'callback', component: CallbackComponent },

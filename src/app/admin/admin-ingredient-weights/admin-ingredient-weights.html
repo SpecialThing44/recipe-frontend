@@ -1,0 +1,134 @@
+<div class="admin-ingredient-weights-page">
+  <div class="page-header">
+    <h1>Admin: Ingredient Weights</h1>
+    <p>Queue maintenance jobs and inspect job status for ingredient-weight processing.</p>
+  </div>
+
+  <mat-card *ngIf="!currentUser" class="state-card">
+    <mat-card-content>
+      <p>You must be signed in to access admin tools.</p>
+      <button mat-raised-button color="primary" (click)="login()">Login</button>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="currentUser && !isAdmin" class="state-card">
+    <mat-card-content>
+      <p>Admin privileges are required.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <ng-container *ngIf="currentUser && isAdmin">
+    <div class="message success" *ngIf="successMessage">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <div class="message error" *ngIf="errorMessage">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <div class="actions-grid">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Process Pending Events</mat-card-title>
+          <mat-card-subtitle>POST /admin/ingredient-weights/process-events</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Queues a background job that processes pending ingredient-weight events.</p>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-raised-button color="primary" (click)="processEvents()" [disabled]="processLoading || rebuildLoading">
+            <mat-icon>play_arrow</mat-icon>
+            {{ processLoading ? 'Queueing...' : 'Queue Process Job' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Rebuild Ingredient Weights</mat-card-title>
+          <mat-card-subtitle>POST /admin/ingredient-weights/rebuild</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Queues a full rebuild for ingredient-weight data across recipes.</p>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-raised-button color="warn" (click)="rebuildWeights()" [disabled]="rebuildLoading || processLoading">
+            <mat-icon>sync</mat-icon>
+            {{ rebuildLoading ? 'Queueing...' : 'Queue Rebuild Job' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Active Jobs</mat-card-title>
+          <mat-card-subtitle>GET /admin/ingredient-weights/jobs/active</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Loads all currently queued or running ingredient-weight jobs.</p>
+
+          <div class="active-jobs" *ngIf="activeJobIds.length > 0">
+            <p><strong>Active Job IDs:</strong></p>
+            <ul>
+              <li *ngFor="let jobId of activeJobIds">{{ jobId }}</li>
+            </ul>
+          </div>
+
+          <p *ngIf="!activeJobsLoading && activeJobIds.length === 0" class="empty-active-jobs">
+            No active jobs loaded yet.
+          </p>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-raised-button color="accent" (click)="loadActiveJobs()" [disabled]="activeJobsLoading">
+            <mat-icon>list</mat-icon>
+            {{ activeJobsLoading ? 'Loading...' : 'Load Active Jobs' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+
+    <mat-card class="status-card">
+      <mat-card-header>
+        <mat-card-title>Job Status</mat-card-title>
+        <mat-card-subtitle>GET /admin/ingredient-weights/jobs/:jobId</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="status-form">
+          <mat-form-field appearance="fill" class="job-id-field">
+            <mat-label>Job ID</mat-label>
+            <input matInput [formControl]="jobIdControl" placeholder="Paste a queued job ID">
+          </mat-form-field>
+
+          <div class="status-actions">
+            <button mat-raised-button color="primary" (click)="loadJobStatus()" [disabled]="statusLoading">
+              <mat-icon>search</mat-icon>
+              {{ statusLoading ? 'Loading...' : 'Check Status' }}
+            </button>
+
+            <button mat-stroked-button type="button" (click)="useLastJobId()" [disabled]="!lastQueuedJobId || statusLoading">
+              <mat-icon>history</mat-icon>
+              Use Last Job
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="jobStatus" class="job-status-grid">
+          <div><strong>Job ID:</strong> {{ jobStatus.jobId }}</div>
+          <div><strong>Status:</strong> {{ jobStatus.status }}</div>
+          <div><strong>Processed Events:</strong> {{ jobStatus.processedEvents }}</div>
+          <div><strong>Created At:</strong> {{ jobStatus.createdAt || 'n/a' }}</div>
+          <div><strong>Started At:</strong> {{ jobStatus.startedAt || 'n/a' }}</div>
+          <div><strong>Finished At:</strong> {{ jobStatus.finishedAt || 'n/a' }}</div>
+          <div><strong>Error:</strong> {{ jobStatus.error || 'none' }}</div>
+        </div>
+
+        <div *ngIf="parsedStatsJson !== null" class="stats-json">
+          <h3>statsJson</h3>
+          <pre>{{ parsedStatsJson | json }}</pre>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+</div>
