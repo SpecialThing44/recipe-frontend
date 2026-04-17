@@ -57,7 +57,7 @@ export class TagsFormComponent implements OnInit {
   private setupAutocomplete(index: number, control: FormControl): void {
     this.tagSuggestions[index] = control.valueChanges.pipe(
       startWith(control.value || ''),
-      debounceTime(300),
+      debounceTime(100),
       distinctUntilChanged(),
       switchMap((value: any) => {
         if (!value || (typeof value === 'string' && value.trim().length === 0)) {
