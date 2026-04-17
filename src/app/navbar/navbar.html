@@ -11,6 +11,7 @@
       <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
       <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
       <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
+      <a *ngIf="user.admin" mat-button routerLink="/admin/ingredient-weights" routerLinkActive="active-link">Admin</a>
 
       <button mat-icon-button [matMenuTriggerFor]="accountMenu" aria-label="Account menu" class="account-button">
         <div class="account-bubble">
@@ -48,6 +49,7 @@
     <a mat-menu-item routerLink="/recipes" routerLinkActive="mobile-active-link">Recipes</a>
     <a mat-menu-item routerLink="/ingredients" routerLinkActive="mobile-active-link">Ingredients</a>
     <a mat-menu-item routerLink="/users" routerLinkActive="mobile-active-link">Users</a>
+    <a *ngIf="user?.admin" mat-menu-item routerLink="/admin/ingredient-weights" routerLinkActive="mobile-active-link">Admin</a>
 
     <mat-divider></mat-divider>
 

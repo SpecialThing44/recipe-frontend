@@ -1,0 +1,63 @@
+<div class="admin-ingredient-weight-settings-page">
+  <div class="page-header">
+    <h1>Admin: Ingredient Weight Settings</h1>
+    <p>Update the k constant used by ingredient-weight scoring.</p>
+  </div>
+
+  <mat-card *ngIf="!currentUser" class="state-card">
+    <mat-card-content>
+      <p>You must be signed in to access admin tools.</p>
+      <button mat-raised-button color="primary" (click)="login()">Login</button>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="currentUser && !isAdmin" class="state-card">
+    <mat-card-content>
+      <p>Admin privileges are required.</p>
+    </mat-card-content>
+  </mat-card>
+
+  <ng-container *ngIf="currentUser && isAdmin">
+    <div class="message success" *ngIf="successMessage">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <div class="message error" *ngIf="errorMessage">
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>k Constant</mat-card-title>
+        <mat-card-subtitle>GET /admin/ingredient-weights/settings and PUT /admin/ingredient-weights/settings</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-form-field appearance="fill" class="k-field">
+          <mat-label>k (meanRawPenaltyFactor)</mat-label>
+          <input matInput type="number" [formControl]="meanRawPenaltyFactorControl" step="0.01">
+          <mat-error *ngIf="meanRawPenaltyFactorControl.invalid">k is required</mat-error>
+        </mat-form-field>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-stroked-button type="button" (click)="backToJobs()">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Jobs
+        </button>
+
+        <button mat-stroked-button type="button" (click)="loadSettings()" [disabled]="isLoading || isSaving">
+          <mat-icon>refresh</mat-icon>
+          {{ isLoading ? 'Loading...' : 'Reload' }}
+        </button>
+
+        <button mat-raised-button color="primary" type="button" (click)="saveSettings()" [disabled]="isSaving || isLoading || meanRawPenaltyFactorControl.invalid">
+          <mat-icon>save</mat-icon>
+          {{ isSaving ? 'Saving...' : 'Save k' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </ng-container>
+</div>
