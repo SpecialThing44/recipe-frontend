@@ -7,8 +7,119 @@
   max-width: 600px;
 }
 
+.substitutes-section {
+  margin-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 12px;
+
+  .substitutes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  .substitutes-loading,
+  .substitutes-empty {
+    margin: 10px 0;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.9rem;
+  }
+
+  .substitutes-list {
+    margin-top: 8px;
+
+    .substitute-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 4px 0;
+    }
+
+    .substitute-chip {
+      margin-right: 8px;
+      margin-bottom: 8px;
+      background-color: #fff0d9;
+      color: #7a4f27;
+    }
+  }
+}
+
+.manual-substitute-section {
+  margin-top: 16px;
+
+  h4 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .candidate-search-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+
+    .candidate-search-field {
+      flex: 1;
+    }
+  }
+
+  .candidate-results {
+    margin-top: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 8px;
+
+    .candidate-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      }
+    }
+
+    .candidate-details {
+      min-width: 0;
+    }
+
+    .candidate-name {
+      font-size: 0.95rem;
+      color: rgba(0, 0, 0, 0.9);
+    }
+
+    .candidate-link {
+      font-size: 0.75rem;
+      color: rgba(0, 0, 0, 0.55);
+      word-break: break-all;
+    }
+  }
+}
+
+.create-mode-note {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.55);
+}
+
 @media (max-width: 600px) {
   .ingredient-form {
     min-width: auto;
+  }
+
+  .manual-substitute-section {
+    .candidate-search-row {
+      flex-direction: column;
+    }
   }
 }

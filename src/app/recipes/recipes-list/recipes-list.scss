@@ -211,3 +211,27 @@
   margin-bottom: 16px;
   border: 1px solid rgba(0,0,0,0.05);
 }
+
+.advanced-filters {
+  .mat-mdc-chip-row {
+    .mat-mdc-chip-remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
+      padding: 0;
+      margin-left: 4px;
+      background: transparent;
+    }
+
+    .mat-mdc-chip-remove .mat-icon {
+      color: rgba(0, 0, 0, 0.7);
+      opacity: 1;
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      // line-height: 18px;
+    }
+  }
+}

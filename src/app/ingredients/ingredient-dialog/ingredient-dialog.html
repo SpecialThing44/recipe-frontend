@@ -25,6 +25,81 @@
     <app-aliases-form [aliases]="aliases"></app-aliases-form>
 
     <app-tags-form [tags]="tags" placeholder="e.g., fruit, vegetable"></app-tags-form>
+
+    <div class="substitutes-section" *ngIf="isEditMode">
+      <div class="substitutes-header">
+        <h3>Substitutes</h3>
+        <button mat-stroked-button type="button" (click)="loadSubstitutes()">
+          <mat-icon>sync</mat-icon>
+          Refresh
+        </button>
+      </div>
+
+      <div class="substitutes-loading" *ngIf="loadingSubstitutes">
+        <span>Loading substitutes...</span>
+      </div>
+
+      <div class="substitutes-list" *ngIf="!loadingSubstitutes && substitutes.length > 0">
+        <div class="substitute-row" *ngFor="let substitute of substitutes">
+          <mat-chip class="substitute-chip">
+            {{ substitute.name }}
+          </mat-chip>
+          <button
+            *ngIf="isAdmin$ | async"
+            mat-stroked-button
+            color="warn"
+            type="button"
+            [disabled]="removingSubstituteId === substitute.id"
+            (click)="removeSubstitute(substitute)">
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <p class="substitutes-empty" *ngIf="!loadingSubstitutes && substitutes.length === 0">
+        No substitutes registered yet.
+      </p>
+
+      <div class="manual-substitute-section" *ngIf="isAdmin$ | async">
+        <h4>Add Substitute Manually</h4>
+        <div class="candidate-search-row">
+          <mat-form-field appearance="fill" class="candidate-search-field">
+            <mat-label>Search by ingredient name or alias</mat-label>
+            <input matInput [formControl]="candidateSearchControl" placeholder="e.g., bread flour">
+          </mat-form-field>
+
+          <button mat-raised-button type="button" (click)="searchSubstituteCandidates()">
+            <mat-icon>search</mat-icon>
+            Search
+          </button>
+        </div>
+
+        <div class="substitutes-loading" *ngIf="loadingCandidates">
+          <span>Searching ingredients...</span>
+        </div>
+
+        <div class="candidate-results" *ngIf="!loadingCandidates && candidateResults.length > 0">
+          <div class="candidate-row" *ngFor="let candidate of candidateResults">
+            <div class="candidate-details">
+              <div class="candidate-name">{{ candidate.name }}</div>
+              <div class="candidate-link" *ngIf="candidate.wikiLink">{{ candidate.wikiLink }}</div>
+            </div>
+            <button
+              mat-stroked-button
+              color="primary"
+              type="button"
+              [disabled]="addingSubstitute"
+              (click)="addSubstitute(candidate)">
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="create-mode-note" *ngIf="!isEditMode">
+      Substitutes can be managed after creating the ingredient.
+    </p>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
