@@ -68,13 +68,6 @@ export class RecipeDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const recipeId = this.route.snapshot.paramMap.get('id');
-    if (recipeId) {
-      this.loadRecipe(recipeId);
-    } else {
-      this.error = 'No recipe ID provided';
-    }
-
     this.canEdit$ = this.authService.currentUser$.pipe(
       map(user => {
         if (!user || !this.recipe) return false;
@@ -95,8 +88,14 @@ export class RecipeDetailComponent implements OnInit {
         }).subscribe(recipes => {
             if (recipes) {
                 this.savedRecipeIds = new Set(recipes.map(r => r.id));
+                if (this.recipe) {
+                  this.isSaved = this.savedRecipeIds.has(this.recipe.id);
+                }
             }
         });
+      } else {
+        this.savedRecipeIds.clear();
+        this.isSaved = false;
       }
     });
 
@@ -148,6 +147,7 @@ export class RecipeDetailComponent implements OnInit {
     this.recipesService.getRecipe(recipeId).subscribe({
       next: (recipe) => {
         this.recipe = recipe;
+        this.isSaved = this.savedRecipeIds.has(recipe.id);
         // Initialize servings scaling
         this.displayServings = recipe.servings;
         this.scaleFactor = 1;
@@ -173,18 +173,6 @@ export class RecipeDetailComponent implements OnInit {
             return user.id === this.recipe.createdBy.id;
           })
         );
-
-        // Check if recipe is saved by current user
-        this.authService.currentUser$.subscribe(user => {
-          if (user && this.recipe) {
-            this.recipesService.listRecipes({
-              ids: [this.recipe.id],
-              savedByUser: user.id
-            }).subscribe(savedRecipes => {
-              this.isSaved = savedRecipes.length > 0;
-            });
-          }
-        });
       },
       error: (err) => {
         console.error('Error loading recipe:', err);
