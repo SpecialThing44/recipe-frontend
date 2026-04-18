@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -40,7 +39,6 @@ import { Observable, of } from 'rxjs';
     MatCardModule,
     MatIconModule,
     MatChipsModule,
-    MatProgressSpinnerModule,
     MatExpansionModule,
     MatCheckboxModule,
     MatDialogModule,

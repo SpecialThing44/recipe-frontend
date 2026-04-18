@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
@@ -29,7 +28,6 @@ import { map } from 'rxjs/operators';
     MatCardModule,
     MatIconModule,
     MatChipsModule,
-    MatProgressSpinnerModule,
     MatDialogModule,
     MatSnackBarModule,
     MatFormFieldModule,

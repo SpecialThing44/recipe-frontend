@@ -207,9 +207,19 @@
   </mat-expansion-panel>
 
   <!-- Loading State -->
-  <div *ngIf="loading" class="loading-container">
-    <mat-spinner diameter="48"></mat-spinner>
-    <p>Loading recipes...</p>
+  <div *ngIf="loading" class="recipes-skeleton-grid" aria-hidden="true">
+    <div class="recipe-skeleton-card" *ngFor="let _ of [1, 2, 3, 4, 5, 6]">
+      <div class="skeleton-block skeleton-image"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-block skeleton-title"></div>
+        <div class="skeleton-block skeleton-subtitle"></div>
+        <div class="skeleton-block skeleton-meta"></div>
+        <div class="skeleton-block skeleton-meta short"></div>
+      </div>
+      <div class="skeleton-actions">
+        <div class="skeleton-block skeleton-button"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Error State -->

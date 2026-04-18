@@ -152,10 +152,22 @@
     </div>
 
     <!-- Recommended Recipes -->
-    <div class="recommended-section" *ngIf="recommendedRecipes.length > 0">
-      <h2 style="margin-top: 32px; margin-bottom: 16px; font-size: 1.5rem; font-weight: 500;">Similar Recipes</h2>
+    <div class="recommended-section" *ngIf="loadingRecommendedRecipes || recommendedRecipes.length > 0">
+      <h2 class="recommended-title">Similar Recipes</h2>
+
+      <div class="recommended-skeleton" *ngIf="loadingRecommendedRecipes" aria-hidden="true">
+        <div class="recommended-skeleton-card" *ngFor="let _ of [1, 2, 3]">
+          <div class="recommended-skeleton-block image"></div>
+          <div class="recommended-skeleton-content">
+            <div class="recommended-skeleton-block title"></div>
+            <div class="recommended-skeleton-block subtitle"></div>
+            <div class="recommended-skeleton-block meta"></div>
+          </div>
+        </div>
+      </div>
+
       <div class="recipes-scroll-container">
-        <div class="recipes-scroll">
+        <div class="recipes-scroll" *ngIf="!loadingRecommendedRecipes">
           <app-recipe-card
             *ngFor="let rec of recommendedRecipes"
             [recipe]="rec"
@@ -170,9 +182,25 @@
   </div>
 </div>
 
-<div *ngIf="loading" class="loading-container">
-  <mat-spinner diameter="48"></mat-spinner>
-  <p>Loading recipe...</p>
+<div *ngIf="loading" class="recipe-detail-skeleton" aria-hidden="true">
+  <div class="skeleton-block skeleton-heading"></div>
+  <div class="skeleton-block skeleton-subheading"></div>
+
+  <div class="detail-skeleton-info-cards">
+    <div class="skeleton-card" *ngFor="let _ of [1, 2, 3, 4]">
+      <div class="skeleton-block skeleton-icon"></div>
+      <div class="skeleton-card-copy">
+        <div class="skeleton-block skeleton-label"></div>
+        <div class="skeleton-block skeleton-value"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="skeleton-block skeleton-section-title"></div>
+  <div class="skeleton-block skeleton-line" *ngFor="let _ of [1, 2, 3, 4, 5]"></div>
+
+  <div class="skeleton-block skeleton-section-title"></div>
+  <div class="skeleton-block skeleton-paragraph" *ngFor="let _ of [1, 2, 3, 4]"></div>
 </div>
 
 <div *ngIf="error && !loading" class="error-container">
