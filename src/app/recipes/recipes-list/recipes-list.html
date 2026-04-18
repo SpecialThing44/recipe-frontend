@@ -53,13 +53,6 @@
         </mat-form-field>
       </div>
 
-      <!-- Dietary Filters -->
-      <div class="filter-row checkbox-row">
-        <mat-checkbox formControlName="publicOnly" [indeterminate]="filterForm.get('publicOnly')?.value === null">
-          Public Only
-        </mat-checkbox>
-      </div>
-
       <!-- User Filters (Only for logged in users) -->
       <div class="filter-row checkbox-row" *ngIf="showUserFilters && (isLoggedIn$ | async)">
         <mat-checkbox formControlName="myRecipes">My Recipes</mat-checkbox>
@@ -207,9 +200,19 @@
   </mat-expansion-panel>
 
   <!-- Loading State -->
-  <div *ngIf="loading" class="loading-container">
-    <mat-spinner diameter="48"></mat-spinner>
-    <p>Loading recipes...</p>
+  <div *ngIf="loading" class="recipes-skeleton-grid" aria-hidden="true">
+    <div class="recipe-skeleton-card" *ngFor="let _ of [1, 2, 3, 4, 5, 6]">
+      <div class="skeleton-block skeleton-image"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-block skeleton-title"></div>
+        <div class="skeleton-block skeleton-subtitle"></div>
+        <div class="skeleton-block skeleton-meta"></div>
+        <div class="skeleton-block skeleton-meta short"></div>
+      </div>
+      <div class="skeleton-actions">
+        <div class="skeleton-block skeleton-button"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Error State -->
@@ -227,6 +230,9 @@
       [canEdit]="(canEditRecipe(recipe) | async) || false"
       [isSaved]="savedRecipeIds.has(recipe.id)"
       [isLoggedIn]="(isLoggedIn$ | async) || false"
+      (mouseenter)="prefetchRecipeDetail(recipe.id)"
+      (focusin)="prefetchRecipeDetail(recipe.id)"
+      (touchstart)="prefetchRecipeDetail(recipe.id)"
       (cardClick)="viewRecipe($event)"
       (saveClick)="toggleSaveFromCard($event)"
       (editClick)="openEditDialogFromCard($event)"

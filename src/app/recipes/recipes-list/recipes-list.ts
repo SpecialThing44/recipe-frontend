@@ -9,7 +9,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -20,6 +19,7 @@ import { RecipesService, Recipe, RecipesFilters } from '../../core/recipes.servi
 import { AuthService } from '../../core/auth.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
+import { RoutePrefetchService } from '../../core/route-prefetch.service';
 import { RecipeCreateDialogComponent } from '../recipe-create-dialog/recipe-create-dialog';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
@@ -39,7 +39,6 @@ import { Observable, of } from 'rxjs';
     MatCardModule,
     MatIconModule,
     MatChipsModule,
-    MatProgressSpinnerModule,
     MatExpansionModule,
     MatCheckboxModule,
     MatDialogModule,
@@ -95,6 +94,7 @@ export class RecipesListComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
+    private routePrefetchService: RoutePrefetchService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {
@@ -102,7 +102,6 @@ export class RecipesListComponent implements OnInit {
       id: [''],
       nameFilterType: ['contains'],
       nameValue: [''],
-      publicOnly: [null],
       myRecipes: [false],
       savedRecipes: [false],
       createdByUser: [''],
@@ -155,9 +154,6 @@ export class RecipesListComponent implements OnInit {
       }
       if (params['nameFilterType']) {
         formUpdates.nameFilterType = params['nameFilterType'];
-      }
-      if (params['publicOnly']) {
-        formUpdates.publicOnly = params['publicOnly'] === 'true';
       }
       
       // Time filters
@@ -356,10 +352,6 @@ export class RecipesListComponent implements OnInit {
       filters.name[nameFilterType as keyof typeof filters.name] = formValue.nameValue.trim();
     }
 
-    if (formValue.publicOnly !== null) {
-      filters.public = formValue.publicOnly;
-    }
-
     if (formValue.myRecipes && this.currentUser) {
       filters.belongsToUser = this.currentUser.id;
     }
@@ -408,6 +400,7 @@ export class RecipesListComponent implements OnInit {
       next: (recipes) => {
         this.recipes = recipes;
         this.loading = false;
+        this.prefetchVisibleRecipeDetails(recipes);
         
         // Check saved status for loaded recipes if user is logged in
         if (this.currentUser && recipes.length > 0) {
@@ -436,7 +429,6 @@ export class RecipesListComponent implements OnInit {
       id: '',
       nameFilterType: 'contains',
       nameValue: '',
-      publicOnly: null,
       myRecipes: false,
       savedRecipes: false,
       prepTime: null,
@@ -476,6 +468,17 @@ export class RecipesListComponent implements OnInit {
 
   viewRecipe(recipeId: string): void {
     this.router.navigate(['/recipes', recipeId]);
+  }
+
+  prefetchRecipeDetail(recipeId: string): void {
+    this.routePrefetchService.prefetchPath(`/recipes/${recipeId}`);
+  }
+
+  private prefetchVisibleRecipeDetails(recipes: Recipe[]): void {
+    const likelyRecipePaths = recipes
+      .slice(0, 8)
+      .map(recipe => `/recipes/${recipe.id}`);
+    this.routePrefetchService.scheduleIdlePrefetch(likelyRecipePaths);
   }
 
   openCreateDialog(): void {

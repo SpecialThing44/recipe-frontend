@@ -23,8 +23,7 @@ import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../core/recip
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    RecipeCardComponent,
-    RecipeEditDialogComponent
+    RecipeCardComponent
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
