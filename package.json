@@ -33,6 +33,8 @@
     "@angular/material": "20.2.13",
     "@angular/platform-browser": "20.3.11",
     "@angular/router": "20.3.11",
+    "@fontsource/material-icons": "^5.2.7",
+    "@fontsource/roboto": "^5.2.10",
     "angular-auth-oidc-client": "^21.0.0",
     "ngx-quill": "^30.0.1",
     "quill": "^2.0.3",

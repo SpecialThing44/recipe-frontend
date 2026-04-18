@@ -742,6 +742,16 @@
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.25.9.tgz#585624dc829cfb6e7c0aa6c3ca7d7e6daa87e34f"
   integrity sha512-PPOl1mi6lpLNQxnGoyAfschAodRFYXJ+9fs6WHXz7CSWKbOqiMZsubC+BQsVKuul+3vKLuwTHsS2c2y9EoKwxQ==
 
+"@fontsource/material-icons@^5.2.7":
+  version "5.2.7"
+  resolved "https://registry.yarnpkg.com/@fontsource/material-icons/-/material-icons-5.2.7.tgz#d408ee5677fca128c058c9ab77af0808a2179693"
+  integrity sha512-crPmK0L34lPGmS5GSGLasKpRGQzl95SxMsLM+QhBHPgR9uxSsyI5CUTb0cgoMpjtR+Bf1bC9QOe6pavoybbBwg==
+
+"@fontsource/roboto@^5.2.10":
+  version "5.2.10"
+  resolved "https://registry.yarnpkg.com/@fontsource/roboto/-/roboto-5.2.10.tgz#b985d34de475913b41d0fb57e2dcd0b16ab9ecb5"
+  integrity sha512-8HlA5FtSfz//oFSr2eL7GFXAiE7eIkcGOtx7tjsLKq+as702x9+GU7K95iDeWFapHC4M2hv9RrpXKRTGGBI8Zg==
+
 "@inquirer/ansi@^1.0.2":
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/@inquirer/ansi/-/ansi-1.0.2.tgz#674a4c4d81ad460695cb2a1fc69d78cd187f337e"
