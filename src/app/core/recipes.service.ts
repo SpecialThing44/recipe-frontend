@@ -33,7 +33,6 @@ export interface InstructionIngredient {
 export interface Recipe {
   id: string;
   name: string;
-  public?: boolean;
   createdBy: User;
   tags: string[];
   ingredients: InstructionIngredient[];
@@ -57,7 +56,6 @@ export interface RecipeIngredientInput {
 
 export interface RecipeInput {
   name: string;
-  public?: boolean;
   tags: string[];
   ingredients: RecipeIngredientInput[];
   prepTime: number;
