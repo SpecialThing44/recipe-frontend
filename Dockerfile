@@ -35,12 +35,6 @@ COPY src/env.template.js /usr/share/nginx/html/env.template.js
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-# Set default environment variables
-ENV AUTH_AUTHORITY=https://auth.spencers.cc/application/o/cooking-app-dev/
-ENV AUTH_WELLKNOWN_ENDPOINT=https://auth.spencers.cc/application/o/cooking-app-dev/.well-known/openid-configuration
-ENV API_BASE_URL=http://localhost:9000
-ENV AUTH_CLIENT_ID=CrlaWqtWtKXSt8vYM6o9caiVGaLx2FxegYbOohOe
-
 # Expose port 80
 EXPOSE 80
 
