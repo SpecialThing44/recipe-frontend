@@ -82,7 +82,7 @@ h1 {
 }
 
 .servings-input {
-  width: 120px;
+  width: 80px;
 }
 
 .servings-input input {
@@ -96,8 +96,26 @@ h1 {
 }
 
 .ingredients-list li {
-  padding: 4px 0;
+  padding: 6px 0;
+  line-height: 1.55;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.badges-section .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badges-section .metadata {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badges-section {
+  column-gap: 7px;
+  row-gap: 10px;
 }
 
 .ingredients-list li:last-child {
@@ -118,6 +136,30 @@ h1 {
   background: #fff;
   border-radius: 8px;
   padding: 16px;
+}
+
+.recipe-metadata {
+  align-items: center;
+  column-gap: 20px;
+  row-gap: 10px;
+}
+
+.recipe-metadata .metadata-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.recipe-metadata .metadata-item mat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 .error-container {
