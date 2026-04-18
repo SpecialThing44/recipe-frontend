@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, DoCheck } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,6 +29,7 @@ export class TagsFormComponent implements OnInit {
   @Input() placeholder: string = 'e.g., dessert, quick';
 
   tagSuggestions: Observable<string[]>[] = [];
+  private readonly autocompleteByControl = new WeakMap<AbstractControl, Observable<string[]>>();
 
   constructor(
     private fb: FormBuilder,
@@ -36,17 +37,17 @@ export class TagsFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Initialize suggestions for existing controls
-    this.tags.controls.forEach((control, index) => {
-      this.setupAutocomplete(index, control as FormControl);
-    });
+    this.ensureAutocompleteInitialized();
+  }
+
+  ngDoCheck(): void {
+    this.ensureAutocompleteInitialized();
   }
 
   addTag(): void {
-    const index = this.tags.length;
     const tagControl = this.fb.control('');
     this.tags.push(tagControl);
-    this.setupAutocomplete(index, tagControl);
+    this.ensureAutocompleteInitialized();
   }
 
   removeTag(index: number): void {
@@ -54,8 +55,8 @@ export class TagsFormComponent implements OnInit {
     this.tagSuggestions.splice(index, 1);
   }
 
-  private setupAutocomplete(index: number, control: FormControl): void {
-    this.tagSuggestions[index] = control.valueChanges.pipe(
+  private setupAutocomplete(control: FormControl): Observable<string[]> {
+    return control.valueChanges.pipe(
       startWith(control.value || ''),
       debounceTime(100),
       distinctUntilChanged(),
@@ -70,6 +71,23 @@ export class TagsFormComponent implements OnInit {
         });
       })
     );
+  }
+
+  private ensureAutocompleteInitialized(): void {
+    if (!this.tags) {
+      return;
+    }
+
+    this.tagSuggestions = this.tags.controls.map((control) => {
+      const existing = this.autocompleteByControl.get(control);
+      if (existing) {
+        return existing;
+      }
+
+      const created = this.setupAutocomplete(control as FormControl);
+      this.autocompleteByControl.set(control, created);
+      return created;
+    });
   }
 
   getAsFormControl(control: any): FormControl {

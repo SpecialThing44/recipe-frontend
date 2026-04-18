@@ -12,7 +12,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
 import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
 import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
-import { RecipesService, Recipe, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
+import { AiParsedIngredient, AiRecipeParseResponse, RecipesService, Recipe, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
 import { CountriesService, Country } from '../../core/countries.service';
 import { startWith, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -52,6 +52,11 @@ function minLengthArray(min: number) {
 export class RecipeEditDialogComponent {
   recipeForm: FormGroup;
   saving = false;
+  aiChecking = true;
+  aiAvailable = false;
+  aiParsing = false;
+  aiParseText = '';
+  aiUnavailableMessage = 'AI assist is unavailable right now because compute is expensive.';
   countrySuggestions!: Observable<Country[]>;
   selectedImage: File | null = null;
   quillEditor: any;
@@ -125,6 +130,17 @@ export class RecipeEditDialogComponent {
         return this.countriesService.filterCountries(searchTerm);
       })
     );
+
+    this.recipesService.checkAiHealth().subscribe({
+      next: (isHealthy) => {
+        this.aiAvailable = isHealthy;
+        this.aiChecking = false;
+      },
+      error: () => {
+        this.aiAvailable = false;
+        this.aiChecking = false;
+      }
+    });
   }
 
   get tags(): FormArray {
@@ -176,6 +192,91 @@ export class RecipeEditDialogComponent {
     if (file) {
       this.selectedImage = file;
     }
+  }
+
+  parseWithAi(): void {
+    if (!this.aiAvailable || this.aiChecking || this.aiParsing) {
+      return;
+    }
+
+    if (!this.aiParseText.trim()) {
+      this.snackBar.open('Provide recipe text for AI parsing first', 'Close', { duration: 3000 });
+      return;
+    }
+
+    this.aiParsing = true;
+    this.recipesService.parseRecipeWithAi(this.aiParseText).subscribe({
+      next: (parsed) => {
+        this.applyAiParsedRecipe(parsed);
+        this.snackBar.open('AI parsed recipe and updated the form', 'Close', { duration: 3000 });
+        this.aiParsing = false;
+      },
+      error: () => {
+        this.snackBar.open('AI parsing failed', 'Close', { duration: 3000 });
+        this.aiParsing = false;
+      }
+    });
+  }
+
+  private applyAiParsedRecipe(parsed: AiRecipeParseResponse): void {
+    this.recipeForm.patchValue({
+      name: parsed.name || this.recipeForm.get('name')?.value,
+      prepTime: parsed.prepTime ?? this.recipeForm.get('prepTime')?.value,
+      cookTime: parsed.cookTime ?? this.recipeForm.get('cookTime')?.value,
+      servings: parsed.servings ?? this.recipeForm.get('servings')?.value,
+      instructions: this.textToDelta(parsed.instructions || '')
+    });
+
+    this.tags.clear();
+    (parsed.tags || []).forEach((tag) => {
+      if (tag && tag.trim()) {
+        this.tags.push(this.fb.control(tag.trim()));
+      }
+    });
+
+    this.ingredients.clear();
+    (parsed.ingredients || []).forEach((ingredient) => {
+      this.ingredients.push(this.createIngredientGroupFromAi(ingredient));
+    });
+
+    if (this.ingredients.length === 0) {
+      this.ingredients.markAsTouched();
+    }
+
+    if (this.quillEditor) {
+      this.quillEditor.setContents(this.textToDelta(parsed.instructions || ''));
+    }
+  }
+
+  private createIngredientGroupFromAi(ingredient: AiParsedIngredient): FormGroup {
+    const unit = this.normalizeUnit(ingredient.quantity?.unit);
+    const amount = ingredient.quantity?.amount && ingredient.quantity.amount > 0 ? ingredient.quantity.amount : 1;
+    const unknownIngredientDescription = `AI could not match ingredient: ${ingredient.rawText || 'unknown'}`;
+    const knownIngredient = !!ingredient.ingredientId;
+
+    return this.fb.group({
+      ingredientName: [knownIngredient ? (ingredient.ingredientName || '') : '', Validators.required],
+      ingredientId: [knownIngredient ? ingredient.ingredientId : '', Validators.required],
+      amount: [amount, [Validators.required, Validators.min(0)]],
+      unit: [unit, Validators.required],
+      description: [
+        knownIngredient
+          ? (ingredient.description || '')
+          : (ingredient.description || unknownIngredientDescription)
+      ]
+    });
+  }
+
+  private normalizeUnit(unit?: string): string {
+    const normalized = (unit || '').toLowerCase();
+    return availableUnits.some((u) => u.value === normalized) ? normalized : 'piece';
+  }
+
+  private textToDelta(text: string): any {
+    const content = text || '';
+    return {
+      ops: [{ insert: content.endsWith('\n') ? content : `${content}\n` }]
+    };
   }
 
   onSubmit(): void {
