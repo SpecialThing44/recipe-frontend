@@ -1,6 +1,33 @@
 <h2 mat-dialog-title>Create New Recipe</h2>
 <mat-dialog-content>
   <form [formGroup]="recipeForm" class="recipe-form">
+    <div class="form-section ai-parse-section">
+      <h3>AI Parse</h3>
+      <p class="ai-help">Paste recipe text and let AI prefill this form for review.</p>
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Recipe Text For AI</mat-label>
+        <textarea
+          matInput
+          rows="5"
+          placeholder="Paste recipe description, blog excerpt, or notes"
+          [value]="aiParseText"
+          (input)="aiParseText = $any($event.target).value"></textarea>
+      </mat-form-field>
+      <div class="ai-actions">
+        <button
+          mat-raised-button
+          color="accent"
+          type="button"
+          (click)="parseWithAi()"
+          [disabled]="aiChecking || !aiAvailable || aiParsing">
+          <mat-icon>auto_awesome</mat-icon>
+          {{ aiParsing ? 'Parsing...' : 'Parse With AI' }}
+        </button>
+        <span *ngIf="aiChecking" class="ai-status">Checking AI availability...</span>
+        <span *ngIf="!aiChecking && !aiAvailable" class="ai-status">{{ aiUnavailableMessage }}</span>
+      </div>
+    </div>
+
     <!-- Basic Info Section -->
     <div class="form-section">
       <h3>Basic Information</h3>

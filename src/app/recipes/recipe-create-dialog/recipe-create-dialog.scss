@@ -29,6 +29,26 @@
       min-height: 250px;
     }
   }
+
+  .ai-parse-section {
+    .ai-help {
+      margin: 0 0 8px;
+      color: rgba(0, 0, 0, 0.7);
+      font-size: 14px;
+    }
+
+    .ai-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ai-status {
+      font-size: 13px;
+      color: rgba(0, 0, 0, 0.7);
+    }
+  }
 }
 
 @media (max-width: 800px) {

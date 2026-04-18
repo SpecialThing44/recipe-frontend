@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { User } from './users.service';
 
 export interface ImageUrls {
@@ -64,6 +65,29 @@ export interface RecipeInput {
   countryOfOrigin?: string;
   wikiLink?: string;
   instructions: string; // Quill Delta JSON string
+}
+
+export interface AiParsedQuantity {
+  amount: number;
+  unit: string;
+}
+
+export interface AiParsedIngredient {
+  rawText: string;
+  ingredientId?: string;
+  ingredientName?: string;
+  quantity: AiParsedQuantity;
+  description?: string;
+}
+
+export interface AiRecipeParseResponse {
+  name: string;
+  instructions: string;
+  prepTime?: number;
+  cookTime?: number;
+  servings?: number;
+  tags: string[];
+  ingredients: AiParsedIngredient[];
 }
 
 export interface StringFilter {
@@ -215,6 +239,23 @@ export class RecipesService {
     return this.http.delete<void>(`${this.API_BASE}/recipes/${id}`, {
       withCredentials: true
     });
+  }
+
+  checkAiHealth(): Observable<boolean> {
+    return this.http.get<any>(`${this.API_BASE}/ai/health`, {
+      withCredentials: true
+    }).pipe(
+      map(() => true),
+      catchError(() => of(false))
+    );
+  }
+
+  parseRecipeWithAi(text: string): Observable<AiRecipeParseResponse> {
+    return this.http.post<any>(`${this.API_BASE}/recipes/parse`, { text }, {
+      withCredentials: true
+    }).pipe(
+      map((response: any) => response?.Body || response)
+    );
   }
 }
 

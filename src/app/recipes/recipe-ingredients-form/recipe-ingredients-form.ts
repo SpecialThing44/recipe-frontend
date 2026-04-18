@@ -1,6 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, DoCheck } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -40,6 +40,8 @@ export class RecipeIngredientsFormComponent implements OnInit {
 
   ingredientSuggestions: Observable<Ingredient[]>[] = [];
   readonly availableUnits = availableUnits;
+  private readonly autocompleteByControl = new WeakMap<AbstractControl, Observable<Ingredient[]>>();
+  private readonly invalidateSelectionBound = new WeakSet<AbstractControl>();
 
   constructor(
     private fb: FormBuilder,
@@ -48,10 +50,11 @@ export class RecipeIngredientsFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Initialize suggestions for existing controls
-    this.ingredients.controls.forEach((control, index) => {
-      this.setupAutocomplete(index);
-    });
+    this.ensureAutocompleteInitialized();
+  }
+
+  ngDoCheck(): void {
+    this.ensureAutocompleteInitialized();
   }
 
   addIngredient(index: number = -1): void {
@@ -65,11 +68,11 @@ export class RecipeIngredientsFormComponent implements OnInit {
 
     if (index === -1) {
       this.ingredients.push(ingredientGroup);
-      this.setupAutocomplete(this.ingredients.length - 1);
+      this.ensureAutocompleteInitialized();
     } else {
       this.ingredients.insert(index + 1, ingredientGroup);
       this.ingredientSuggestions.splice(index + 1, 0, of([]));
-      this.setupAutocomplete(index + 1);
+      this.ensureAutocompleteInitialized();
     }
   }
 
@@ -132,13 +135,12 @@ drop(event: CdkDragDrop<string[]>) {
     nameControl?.setErrors(null);
   }
 
-  private setupAutocomplete(index: number): void {
-    const ingredientGroup = this.ingredients.at(index) as FormGroup;
+  private setupAutocomplete(ingredientGroup: FormGroup): Observable<Ingredient[]> {
     const ingredientNameControl = ingredientGroup.get('ingredientName');
     const ingredientIdControl = ingredientGroup.get('ingredientId');
 
     if (ingredientNameControl && ingredientIdControl) {
-      this.ingredientSuggestions[index] = ingredientNameControl.valueChanges.pipe(
+      const suggestions = ingredientNameControl.valueChanges.pipe(
         startWith(ingredientNameControl.value || ''),
         debounceTime(100),
         distinctUntilChanged(),
@@ -153,14 +155,38 @@ drop(event: CdkDragDrop<string[]>) {
         })
       );
 
-      // Invalidate selection when user types
-      ingredientNameControl.valueChanges.subscribe(value => {
-        ingredientIdControl.setValue(null);
-        if (value && typeof value === 'string' && value.trim().length > 0) {
-          ingredientNameControl.setErrors({ requireMatch: true });
-        }
-      });
+      if (!this.invalidateSelectionBound.has(ingredientNameControl)) {
+        // Invalidate selection when user types
+        ingredientNameControl.valueChanges.subscribe(value => {
+          ingredientIdControl.setValue(null);
+          if (value && typeof value === 'string' && value.trim().length > 0) {
+            ingredientNameControl.setErrors({ requireMatch: true });
+          }
+        });
+        this.invalidateSelectionBound.add(ingredientNameControl);
+      }
+
+      return suggestions;
     }
+
+    return of([]);
+  }
+
+  private ensureAutocompleteInitialized(): void {
+    if (!this.ingredients) {
+      return;
+    }
+
+    this.ingredientSuggestions = this.ingredients.controls.map((control) => {
+      const existing = this.autocompleteByControl.get(control);
+      if (existing) {
+        return existing;
+      }
+
+      const created = this.setupAutocomplete(control as FormGroup);
+      this.autocompleteByControl.set(control, created);
+      return created;
+    });
   }
 
   getAsFormGroup(control: any): FormGroup {
