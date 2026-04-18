@@ -1,5 +1,5 @@
 <mat-toolbar>
-  <a mat-button routerLink="/dashboard" class="brand-link">
+  <a mat-button routerLink="/dashboard" class="brand-link" (mouseenter)="prefetch('/dashboard')" (focus)="prefetch('/dashboard')">
     <mat-icon>home</mat-icon>
     <span class="brand">Home</span>
   </a>
@@ -8,10 +8,10 @@
   <!-- Desktop Menu -->
   <div class="desktop-menu">
     <ng-container *ngIf="user as user; else anonLinks">
-      <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
-      <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
-      <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
-      <a *ngIf="user.admin" mat-button routerLink="/admin/ingredient-weights" routerLinkActive="active-link">Admin</a>
+      <a mat-button routerLink="/recipes" routerLinkActive="active-link" (mouseenter)="prefetch('/recipes')" (focus)="prefetch('/recipes')">Recipes</a>
+      <a mat-button routerLink="/ingredients" routerLinkActive="active-link" (mouseenter)="prefetch('/ingredients')" (focus)="prefetch('/ingredients')">Ingredients</a>
+      <a mat-button routerLink="/users" routerLinkActive="active-link" (mouseenter)="prefetch('/users')" (focus)="prefetch('/users')">Users</a>
+      <a *ngIf="user.admin" mat-button routerLink="/admin/ingredient-weights" routerLinkActive="active-link" (mouseenter)="prefetch('/admin/ingredient-weights')" (focus)="prefetch('/admin/ingredient-weights')">Admin</a>
 
       <button mat-icon-button [matMenuTriggerFor]="accountMenu" aria-label="Account menu" class="account-button">
         <div class="account-bubble">
@@ -33,9 +33,9 @@
     </ng-container>
 
     <ng-template #anonLinks>
-      <a mat-button routerLink="/recipes" routerLinkActive="active-link">Recipes</a>
-      <a mat-button routerLink="/ingredients" routerLinkActive="active-link">Ingredients</a>
-      <a mat-button routerLink="/users" routerLinkActive="active-link">Users</a>
+      <a mat-button routerLink="/recipes" routerLinkActive="active-link" (mouseenter)="prefetch('/recipes')" (focus)="prefetch('/recipes')">Recipes</a>
+      <a mat-button routerLink="/ingredients" routerLinkActive="active-link" (mouseenter)="prefetch('/ingredients')" (focus)="prefetch('/ingredients')">Ingredients</a>
+      <a mat-button routerLink="/users" routerLinkActive="active-link" (mouseenter)="prefetch('/users')" (focus)="prefetch('/users')">Users</a>
       <button mat-button (click)="login()">Login/Signup</button>
     </ng-template>
   </div>
@@ -46,10 +46,10 @@
   </button>
 
   <mat-menu #mobileMenu="matMenu">
-    <a mat-menu-item routerLink="/recipes" routerLinkActive="mobile-active-link">Recipes</a>
-    <a mat-menu-item routerLink="/ingredients" routerLinkActive="mobile-active-link">Ingredients</a>
-    <a mat-menu-item routerLink="/users" routerLinkActive="mobile-active-link">Users</a>
-    <a *ngIf="user?.admin" mat-menu-item routerLink="/admin/ingredient-weights" routerLinkActive="mobile-active-link">Admin</a>
+    <a mat-menu-item routerLink="/recipes" routerLinkActive="mobile-active-link" (mouseenter)="prefetch('/recipes')" (focus)="prefetch('/recipes')">Recipes</a>
+    <a mat-menu-item routerLink="/ingredients" routerLinkActive="mobile-active-link" (mouseenter)="prefetch('/ingredients')" (focus)="prefetch('/ingredients')">Ingredients</a>
+    <a mat-menu-item routerLink="/users" routerLinkActive="mobile-active-link" (mouseenter)="prefetch('/users')" (focus)="prefetch('/users')">Users</a>
+    <a *ngIf="user?.admin" mat-menu-item routerLink="/admin/ingredient-weights" routerLinkActive="mobile-active-link" (mouseenter)="prefetch('/admin/ingredient-weights')" (focus)="prefetch('/admin/ingredient-weights')">Admin</a>
 
     <mat-divider></mat-divider>
 

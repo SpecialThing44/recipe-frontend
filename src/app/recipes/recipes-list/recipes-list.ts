@@ -20,6 +20,7 @@ import { RecipesService, Recipe, RecipesFilters } from '../../core/recipes.servi
 import { AuthService } from '../../core/auth.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
+import { RoutePrefetchService } from '../../core/route-prefetch.service';
 import { RecipeCreateDialogComponent } from '../recipe-create-dialog/recipe-create-dialog';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
@@ -95,6 +96,7 @@ export class RecipesListComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
+    private routePrefetchService: RoutePrefetchService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {
@@ -408,6 +410,7 @@ export class RecipesListComponent implements OnInit {
       next: (recipes) => {
         this.recipes = recipes;
         this.loading = false;
+        this.prefetchVisibleRecipeDetails(recipes);
         
         // Check saved status for loaded recipes if user is logged in
         if (this.currentUser && recipes.length > 0) {
@@ -476,6 +479,17 @@ export class RecipesListComponent implements OnInit {
 
   viewRecipe(recipeId: string): void {
     this.router.navigate(['/recipes', recipeId]);
+  }
+
+  prefetchRecipeDetail(recipeId: string): void {
+    this.routePrefetchService.prefetchPath(`/recipes/${recipeId}`);
+  }
+
+  private prefetchVisibleRecipeDetails(recipes: Recipe[]): void {
+    const likelyRecipePaths = recipes
+      .slice(0, 8)
+      .map(recipe => `/recipes/${recipe.id}`);
+    this.routePrefetchService.scheduleIdlePrefetch(likelyRecipePaths);
   }
 
   openCreateDialog(): void {
