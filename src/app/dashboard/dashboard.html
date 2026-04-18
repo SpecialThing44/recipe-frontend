@@ -29,7 +29,7 @@
     <div class="recipes-section">
       <div class="section-header">
         <h2>My Recipes</h2>
-        <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{createdByUser: currentUser?.id}">
+        <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{createdByUser: currentUser.id}">
           See All
           <mat-icon>arrow_forward</mat-icon>
         </a>
@@ -67,7 +67,7 @@
     <div class="recipes-section">
       <div class="section-header">
         <h2>Saved Recipes</h2>
-        <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{savedByUser: currentUser?.id}">
+        <a mat-raised-button color="primary" [routerLink]="['/recipes']" [queryParams]="{savedByUser: currentUser.id}">
           See All
           <mat-icon>arrow_forward</mat-icon>
         </a>

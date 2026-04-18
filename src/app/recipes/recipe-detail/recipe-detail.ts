@@ -11,8 +11,6 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { QuillModule } from 'ngx-quill';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
 import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
 import { AuthService } from '../../core/auth.service';
@@ -36,7 +34,6 @@ import { map } from 'rxjs/operators';
     MatSnackBarModule,
     MatFormFieldModule,
     MatInputModule,
-    QuillModule,
     RecipeCardComponent
   ],
   templateUrl: './recipe-detail.html',
@@ -49,7 +46,7 @@ export class RecipeDetailComponent implements OnInit {
   canEdit$!: Observable<boolean>;
   isLoggedIn$!: Observable<boolean>;
   isSaved = false;
-  instructionsContent: any = null;
+  instructionsHtml = '';
   displayServings: number = 1;
   scaleFactor: number = 1;
 
@@ -63,8 +60,7 @@ export class RecipeDetailComponent implements OnInit {
     private recipesService: RecipesService,
     private authService: AuthService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private sanitizer: DomSanitizer
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -151,19 +147,7 @@ export class RecipeDetailComponent implements OnInit {
         // Initialize servings scaling
         this.displayServings = recipe.servings;
         this.scaleFactor = 1;
-        // Instructions come from backend as object or string
-        try {
-          if (typeof recipe.instructions === 'string') {
-            // Sanitize string to handle control characters
-            const sanitizedInstructions = recipe.instructions.replace(/\n/g, '\\n');
-            this.instructionsContent = JSON.parse(sanitizedInstructions);
-          } else {
-            this.instructionsContent = recipe.instructions;
-          }
-        } catch (e) {
-          console.error('Error parsing instructions:', e);
-          this.instructionsContent = recipe.instructions;
-        }
+        this.instructionsHtml = this.toInstructionsHtml(recipe.instructions);
         this.loading = false;
 
         // Re-evaluate canEdit$ after recipe is loaded
@@ -259,5 +243,71 @@ export class RecipeDetailComponent implements OnInit {
 
   getScaledAmount(amount: number): number {
     return Math.round(amount * this.scaleFactor * 100) / 100;
+  }
+
+  private toInstructionsHtml(instructions: unknown): string {
+    const parsed = this.parseInstructions(instructions);
+
+    if (!parsed || !Array.isArray(parsed.ops)) {
+      return `<p>${this.escapeHtml(String(instructions ?? ''))}</p>`;
+    }
+
+    const blocks: string[] = [];
+    let lineBuffer = '';
+
+    const flushLine = () => {
+      const line = lineBuffer.trim();
+      blocks.push(line ? `<p>${line}</p>` : '<p><br></p>');
+      lineBuffer = '';
+    };
+
+    for (const op of parsed.ops) {
+      const insert = op?.insert;
+      if (typeof insert === 'string') {
+        const parts = insert.split('\n');
+        for (let i = 0; i < parts.length; i += 1) {
+          lineBuffer += this.escapeHtml(parts[i]);
+          if (i < parts.length - 1) {
+            flushLine();
+          }
+        }
+      } else if (insert && typeof insert.image === 'string') {
+        const imageUrl = this.escapeAttribute(insert.image);
+        if (lineBuffer.trim()) {
+          flushLine();
+        }
+        blocks.push(`<p><img src="${imageUrl}" alt="Instruction image" loading="lazy"></p>`);
+      }
+    }
+
+    if (lineBuffer.trim()) {
+      flushLine();
+    }
+
+    return blocks.join('');
+  }
+
+  private parseInstructions(instructions: unknown): any {
+    if (typeof instructions === 'string') {
+      try {
+        return JSON.parse(instructions.replace(/\n/g, '\\n'));
+      } catch {
+        return null;
+      }
+    }
+    return instructions;
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  private escapeAttribute(value: string): string {
+    return value.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 }

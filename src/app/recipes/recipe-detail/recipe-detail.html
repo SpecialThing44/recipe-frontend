@@ -131,7 +131,7 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <quill-view [content]="instructionsContent" format="object" theme="snow"></quill-view>
+        <div class="instructions-content" [innerHTML]="instructionsHtml"></div>
       </mat-card-content>
     </mat-card>
 
