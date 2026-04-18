@@ -79,13 +79,8 @@
         <mat-chip *ngFor="let tag of recipe.tags">{{ tag }}</mat-chip>
       </div>
 
-      <div class="metadata">
-        <mat-icon>{{ recipe.public ? 'public' : 'lock' }}</mat-icon>
-        <span>{{ recipe.public ? 'Public Recipe' : 'Private Recipe' }}</span>
-      </div>
-
       <div class="metadata" *ngIf="recipe.countryOfOrigin">
-        <mat-icon>public</mat-icon>
+        <mat-icon>flag</mat-icon>
         <span>{{ recipe.countryOfOrigin }}</span>
       </div>
 
