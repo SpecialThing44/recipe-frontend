@@ -102,7 +102,6 @@ export class RecipesListComponent implements OnInit {
       id: [''],
       nameFilterType: ['contains'],
       nameValue: [''],
-      publicOnly: [null],
       myRecipes: [false],
       savedRecipes: [false],
       createdByUser: [''],
@@ -155,9 +154,6 @@ export class RecipesListComponent implements OnInit {
       }
       if (params['nameFilterType']) {
         formUpdates.nameFilterType = params['nameFilterType'];
-      }
-      if (params['publicOnly']) {
-        formUpdates.publicOnly = params['publicOnly'] === 'true';
       }
       
       // Time filters
@@ -356,10 +352,6 @@ export class RecipesListComponent implements OnInit {
       filters.name[nameFilterType as keyof typeof filters.name] = formValue.nameValue.trim();
     }
 
-    if (formValue.publicOnly !== null) {
-      filters.public = formValue.publicOnly;
-    }
-
     if (formValue.myRecipes && this.currentUser) {
       filters.belongsToUser = this.currentUser.id;
     }
@@ -437,7 +429,6 @@ export class RecipesListComponent implements OnInit {
       id: '',
       nameFilterType: 'contains',
       nameValue: '',
-      publicOnly: null,
       myRecipes: false,
       savedRecipes: false,
       prepTime: null,

@@ -5,7 +5,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
@@ -40,7 +39,6 @@ function minLengthArray(min: number) {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatCheckboxModule,
     MatDialogModule,
     MatSelectModule,
     MatAutocompleteModule,
@@ -89,7 +87,6 @@ export class RecipeEditDialogComponent {
       servings: [data.recipe.servings || 1, [Validators.required, Validators.min(1)]],
       countryOfOrigin: [data.recipe.countryOfOrigin || ''],
       wikiLink: [data.recipe.wikiLink || '', wikipediaUrlValidator],
-      public: [data.recipe.public],
       tags: this.fb.array([]),
       ingredients: this.fb.array([], minLengthArray(1)),
       // Instructions comes as object from backend
@@ -216,7 +213,6 @@ export class RecipeEditDialogComponent {
       cookTime: formValue.cookTime,
       servings: formValue.servings,
       countryOfOrigin: countryName || undefined,
-      public: formValue.public,
       wikiLink: formValue.wikiLink || undefined,
       instructions: instructionsJson
     };

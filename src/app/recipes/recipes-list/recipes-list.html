@@ -53,13 +53,6 @@
         </mat-form-field>
       </div>
 
-      <!-- Dietary Filters -->
-      <div class="filter-row checkbox-row">
-        <mat-checkbox formControlName="publicOnly" [indeterminate]="filterForm.get('publicOnly')?.value === null">
-          Public Only
-        </mat-checkbox>
-      </div>
-
       <!-- User Filters (Only for logged in users) -->
       <div class="filter-row checkbox-row" *ngIf="showUserFilters && (isLoggedIn$ | async)">
         <mat-checkbox formControlName="myRecipes">My Recipes</mat-checkbox>

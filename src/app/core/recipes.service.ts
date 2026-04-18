@@ -40,7 +40,6 @@ export interface Recipe {
   cookTime: number;
   servings: number;
   countryOfOrigin?: string;
-  public: boolean;
   wikiLink?: string;
   instructions: any; // Quill Delta object from backend
   instructionImages: string[];
@@ -63,7 +62,6 @@ export interface RecipeInput {
   cookTime: number;
   servings: number;
   countryOfOrigin?: string;
-  public: boolean;
   wikiLink?: string;
   instructions: string; // Quill Delta JSON string
 }
@@ -103,7 +101,6 @@ export interface RecipesFilters {
   name?: StringFilter;
   prepTime?: NumberFilter;
   cookTime?: NumberFilter;
-  public?: boolean;
   tags?: string[];
   ingredients?: string[];
   notIngredients?: string[];
@@ -138,7 +135,6 @@ export class RecipesService {
       if (filters.name) body.name = filters.name;
       if (filters.prepTime) body.prepTime = filters.prepTime;
       if (filters.cookTime) body.cookTime = filters.cookTime;
-      if (filters.public !== undefined) body.public = filters.public;
       if (filters.tags && filters.tags.length > 0) body.tags = filters.tags;
       if (filters.ingredients && filters.ingredients.length > 0) body.ingredients = filters.ingredients;
       if (filters.notIngredients && filters.notIngredients.length > 0) body.notIngredients = filters.notIngredients;
