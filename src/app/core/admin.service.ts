@@ -81,14 +81,4 @@ export class AdminService {
       map((response: any) => response?.Body || response)
     );
   }
-
-  updateIngredientWeightSettings(meanRawPenaltyFactor: number): Observable<IngredientWeightSettingsResponse> {
-    return this.http.put<IngredientWeightSettingsResponse>(
-      `${this.API_BASE}/admin/ingredient-weights/settings`,
-      { meanRawPenaltyFactor },
-      { withCredentials: true }
-    ).pipe(
-      map((response: any) => response?.Body || response)
-    );
-  }
 }

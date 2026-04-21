@@ -1,14 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription, finalize } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { AuthService, User } from '../../core/auth.service';
 import { AdminService } from '../../core/admin.service';
 
@@ -17,12 +14,9 @@ import { AdminService } from '../../core/admin.service';
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule
+    MatIconModule
   ],
   templateUrl: './admin-ingredient-weight-settings.html',
   styleUrl: './admin-ingredient-weight-settings.scss'
@@ -32,14 +26,10 @@ export class AdminIngredientWeightSettingsComponent implements OnInit, OnDestroy
   isAdmin = false;
 
   isLoading = false;
-  isSaving = false;
+  meanRawPenaltyFactor: number | null = null;
 
   successMessage: string | null = null;
   errorMessage: string | null = null;
-
-  readonly meanRawPenaltyFactorControl = new FormControl<number | null>(null, {
-    validators: [Validators.required]
-  });
 
   private authSub?: Subscription;
 
@@ -91,41 +81,11 @@ export class AdminIngredientWeightSettingsComponent implements OnInit, OnDestroy
       })
     ).subscribe({
       next: response => {
-        this.meanRawPenaltyFactorControl.setValue(response.meanRawPenaltyFactor);
-        this.successMessage = 'Loaded current k constant';
+        this.meanRawPenaltyFactor = response.meanRawPenaltyFactor;
+        this.successMessage = 'Loaded current k constant from application config';
       },
       error: err => {
         this.errorMessage = this.extractError(err, 'Failed to load settings');
-      }
-    });
-  }
-
-  saveSettings(): void {
-    if (!this.isAdmin || this.isSaving) {
-      return;
-    }
-
-    const k = this.meanRawPenaltyFactorControl.value;
-    if (k === null || Number.isNaN(k)) {
-      this.errorMessage = 'Enter a valid value for k';
-      this.successMessage = null;
-      return;
-    }
-
-    this.clearMessages();
-    this.isSaving = true;
-
-    this.adminService.updateIngredientWeightSettings(k).pipe(
-      finalize(() => {
-        this.isSaving = false;
-      })
-    ).subscribe({
-      next: response => {
-        this.meanRawPenaltyFactorControl.setValue(response.meanRawPenaltyFactor);
-        this.successMessage = `Saved k constant: ${response.meanRawPenaltyFactor}`;
-      },
-      error: err => {
-        this.errorMessage = this.extractError(err, 'Failed to save settings');
       }
     });
   }
