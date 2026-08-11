@@ -98,7 +98,7 @@
     <app-tags-form [tags]="tags" placeholder="e.g., dessert, quick"></app-tags-form>
 
     <!-- Ingredients Section -->
-    <app-recipe-ingredients-form [ingredients]="ingredients"></app-recipe-ingredients-form>
+      <app-recipe-ingredients-form [ingredients]="ingredients" [currentRecipeId]="recipeId"></app-recipe-ingredients-form>
     <mat-error *ngIf="ingredients.hasError('minLengthArray') && ingredients.touched" style="font-size: 12px; margin-top: -10px; margin-bottom: 10px; display: block;">
       At least one ingredient is required
     </mat-error>

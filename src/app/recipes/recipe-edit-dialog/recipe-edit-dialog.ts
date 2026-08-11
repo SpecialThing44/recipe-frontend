@@ -12,7 +12,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
 import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
 import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
-import { AiParsedIngredient, AiRecipeParseResponse, RecipesService, Recipe, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
+import { AiParsedIngredient, AiRecipeParseResponse, RecipesService, Recipe, RecipeInput, RecipeIngredientInput, RecipeComponentInput } from '../../core/recipes.service';
 import { CountriesService, Country } from '../../core/countries.service';
 import { startWith, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -113,13 +113,29 @@ export class RecipeEditDialogComponent {
         : (ing.quantity.unit as any).name?.toLowerCase() || 'piece';
 
       const ingredientGroup = this.fb.group({
+        kind: ['ingredient', Validators.required],
         ingredientName: [ing.ingredient.name],
         ingredientId: [ing.ingredient.id, Validators.required],
-        amount: [ing.quantity.amount, [Validators.required, Validators.min(0)]],
+        recipeId: [''],
+        amount: [ing.quantity.amount, [Validators.required, Validators.min(Number.EPSILON)]],
         unit: [unitValue, Validators.required],
         description: [ing.description || '']
       });
       this.ingredients.push(ingredientGroup);
+    });
+    (data.recipe.recipeIngredients || []).forEach(component => {
+      const unitValue = typeof component.quantity.unit === 'string'
+        ? component.quantity.unit.toLowerCase()
+        : (component.quantity.unit as any).name?.toLowerCase() || 'piece';
+      this.ingredients.push(this.fb.group({
+        kind: ['recipe', Validators.required],
+        ingredientName: [component.recipe.name, Validators.required],
+        ingredientId: [''],
+        recipeId: [component.recipe.id, Validators.required],
+        amount: [component.quantity.amount, [Validators.required, Validators.min(Number.EPSILON)]],
+        unit: [unitValue, Validators.required],
+        description: [component.description || '']
+      }));
     });
 
     // Setup country autocomplete
@@ -255,9 +271,11 @@ export class RecipeEditDialogComponent {
     const knownIngredient = !!ingredient.ingredientId;
 
     return this.fb.group({
+      kind: ['ingredient', Validators.required],
       ingredientName: [knownIngredient ? (ingredient.ingredientName || '') : '', Validators.required],
       ingredientId: [knownIngredient ? ingredient.ingredientId : '', Validators.required],
-      amount: [amount, [Validators.required, Validators.min(0)]],
+      recipeId: [''],
+      amount: [amount, [Validators.required, Validators.min(Number.EPSILON)]],
       unit: [unit, Validators.required],
       description: [
         knownIngredient
@@ -289,7 +307,9 @@ export class RecipeEditDialogComponent {
     const formValue = this.recipeForm.value;
 
     // Build ingredients array
-    const recipeIngredients: RecipeIngredientInput[] = formValue.ingredients.map((ing: any) => ({
+    const recipeIngredients: RecipeIngredientInput[] = formValue.ingredients
+      .filter((item: any) => item.kind !== 'recipe')
+      .map((ing: any) => ({
       ingredientId: ing.ingredientId,
       quantity: {
         amount: ing.amount,
@@ -297,6 +317,13 @@ export class RecipeEditDialogComponent {
       },
       description: ing.description || undefined
     }));
+    const recipeComponents: RecipeComponentInput[] = formValue.ingredients
+      .filter((item: any) => item.kind === 'recipe')
+      .map((item: any) => ({
+        recipeId: item.recipeId,
+        quantity: { amount: item.amount, unit: item.unit },
+        description: item.description || undefined
+      }));
 
     // Get instructions as Quill Delta object and stringify for backend
     const delta = this.quillEditor?.getContents();
@@ -310,6 +337,7 @@ export class RecipeEditDialogComponent {
       name: formValue.name,
       tags: formValue.tags.filter((t: string) => t.trim() !== ''),
       ingredients: recipeIngredients,
+      recipeIngredients: recipeComponents,
       prepTime: formValue.prepTime,
       cookTime: formValue.cookTime,
       servings: formValue.servings,

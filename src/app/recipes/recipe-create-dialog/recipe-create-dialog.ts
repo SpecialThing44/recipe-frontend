@@ -12,7 +12,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { QuillModule } from 'ngx-quill';
 import { RecipeIngredientsFormComponent } from '../recipe-ingredients-form/recipe-ingredients-form';
 import { TagsFormComponent } from '../../shared/components/tags-form/tags-form';
-import { AiParsedIngredient, AiRecipeParseResponse, RecipesService, RecipeInput, RecipeIngredientInput } from '../../core/recipes.service';
+import { AiParsedIngredient, AiRecipeParseResponse, RecipesService, RecipeInput, RecipeIngredientInput, RecipeComponentInput } from '../../core/recipes.service';
 
 import { CountriesService, Country } from '../../core/countries.service';
 import { startWith, map } from 'rxjs/operators';
@@ -219,9 +219,11 @@ export class RecipeCreateDialogComponent {
     const knownIngredient = !!ingredient.ingredientId;
 
     return this.fb.group({
+      kind: ['ingredient', Validators.required],
       ingredientName: [knownIngredient ? (ingredient.ingredientName || '') : '', Validators.required],
       ingredientId: [knownIngredient ? ingredient.ingredientId : '', Validators.required],
-      amount: [amount, [Validators.required, Validators.min(0)]],
+      recipeId: [''],
+      amount: [amount, [Validators.required, Validators.min(Number.EPSILON)]],
       unit: [unit, Validators.required],
       description: [
         knownIngredient
@@ -253,7 +255,9 @@ export class RecipeCreateDialogComponent {
     const formValue = this.recipeForm.value;
 
     // Build ingredients array
-    const recipeIngredients: RecipeIngredientInput[] = formValue.ingredients.map((ing: any) => ({
+    const recipeIngredients: RecipeIngredientInput[] = formValue.ingredients
+      .filter((item: any) => item.kind !== 'recipe')
+      .map((ing: any) => ({
       ingredientId: ing.ingredientId,
       quantity: {
         amount: ing.amount,
@@ -261,6 +265,13 @@ export class RecipeCreateDialogComponent {
       },
       description: ing.description || undefined
     }));
+    const recipeComponents: RecipeComponentInput[] = formValue.ingredients
+      .filter((item: any) => item.kind === 'recipe')
+      .map((item: any) => ({
+        recipeId: item.recipeId,
+        quantity: { amount: item.amount, unit: item.unit },
+        description: item.description || undefined
+      }));
 
     // Get instructions as Quill Delta object and stringify for backend
     const delta = this.quillEditor?.getContents();
@@ -274,9 +285,11 @@ export class RecipeCreateDialogComponent {
       name: formValue.name,
       tags: formValue.tags.filter((t: string) => t.trim() !== ''),
       ingredients: recipeIngredients,
+      recipeIngredients: recipeComponents,
       prepTime: formValue.prepTime,
       cookTime: formValue.cookTime,
       servings: formValue.servings,
+      public: true,
       countryOfOrigin: countryName || undefined,
       wikiLink: formValue.wikiLink || undefined,
       instructions: instructionsJson

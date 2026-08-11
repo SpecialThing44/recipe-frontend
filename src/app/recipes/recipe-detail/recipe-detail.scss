@@ -85,6 +85,12 @@ h1 {
   width: 80px;
 }
 
+.ingredients-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .servings-input input {
   text-align: center;
 }
@@ -99,6 +105,10 @@ h1 {
   padding: 6px 0;
   line-height: 1.55;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.ingredients-list li > strong {
+  margin-right: 4px;
 }
 
 .badges-section .tags {
@@ -125,6 +135,21 @@ h1 {
 .instructions-content {
   font-size: 1rem;
   line-height: 1.7;
+}
+
+.sub-recipes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sub-recipes h2,
+.sub-recipe-card h3 {
+  color: var(--app-primary, #0b3d2e);
+}
+
+.sub-recipe-card mat-card-content > h3:not(:first-child) {
+  margin-top: 24px;
 }
 
 .instructions-content :is(p, ul, ol) {

@@ -11,12 +11,18 @@
             <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
           </div>
 
-          <mat-form-field appearance="fill" class="ingredient-field">
-            <mat-label>Ingredient</mat-label>
+          <button mat-icon-button type="button" class="kind-toggle" (click)="toggleKind(i)"
+                  [matTooltip]="getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Switch to ingredient' : 'Switch to recipe'"
+                  [attr.aria-label]="getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Switch to ingredient' : 'Switch to recipe'">
+            <mat-icon>{{ getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'menu_book' : 'restaurant' }}</mat-icon>
+          </button>
+
+          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="ingredient-field">
+            <mat-label>{{ getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Recipe' : 'Ingredient' }}</mat-label>
             <input
               matInput
               formControlName="ingredientName"
-              placeholder="Search ingredient..."
+              [placeholder]="getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Search recipes...' : 'Search ingredients...'"
               [matAutocomplete]="autoIngredient">
             <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="onIngredientSelected(i, $event)">
               <mat-option *ngFor="let suggestion of ingredientSuggestions[i] | async" [value]="suggestion">
@@ -28,18 +34,21 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" class="amount-field">
+          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="amount-field">
             <mat-label>Amount</mat-label>
-            <input matInput type="number" formControlName="amount" min="0" step="0.1">
+            <input matInput type="number" formControlName="amount" [min]="minimumQuantity" step="0.1">
             <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('required')">
               Required
             </mat-error>
+            <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('min')">
+              Must be greater than 0
+            </mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" class="unit-field">
+          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="unit-field">
             <mat-label>Unit</mat-label>
             <mat-select formControlName="unit">
-              <mat-option *ngFor="let unit of availableUnits" [value]="unit.value">
+              <mat-option *ngFor="let unit of unitsFor(getAsFormGroup(ingredient))" [value]="unit.value">
                 {{ unit.label }}
               </mat-option>
             </mat-select>
@@ -48,7 +57,7 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" class="description-field">
+          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="description-field">
             <mat-label>Description (Optional)</mat-label>
             <input matInput formControlName="description" placeholder="e.g., chopped">
           </mat-form-field>

@@ -11,3 +11,8 @@ export const availableUnits = [
   { value: 'pound', label: 'Pound' },
   { value: 'other', label: 'Other' }
 ];
+
+export const availableRecipeUnits = [
+  { value: 'serving', label: 'Serving' },
+  ...availableUnits
+];

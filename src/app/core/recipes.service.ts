@@ -31,15 +31,23 @@ export interface InstructionIngredient {
   description?: string;
 }
 
+export interface InstructionRecipe {
+  recipe: Pick<Recipe, 'id' | 'name'>;
+  quantity: Quantity;
+  description?: string;
+}
+
 export interface Recipe {
   id: string;
   name: string;
   createdBy: User;
   tags: string[];
   ingredients: InstructionIngredient[];
+  recipeIngredients: InstructionRecipe[];
   prepTime: number;
   cookTime: number;
   servings: number;
+  public: boolean;
   countryOfOrigin?: string;
   wikiLink?: string;
   instructions: any; // Quill Delta object from backend
@@ -55,13 +63,21 @@ export interface RecipeIngredientInput {
   description?: string;
 }
 
+export interface RecipeComponentInput {
+  recipeId: string;
+  quantity: Quantity;
+  description?: string;
+}
+
 export interface RecipeInput {
   name: string;
   tags: string[];
   ingredients: RecipeIngredientInput[];
+  recipeIngredients: RecipeComponentInput[];
   prepTime: number;
   cookTime: number;
   servings: number;
+  public: boolean;
   countryOfOrigin?: string;
   wikiLink?: string;
   instructions: string; // Quill Delta JSON string
@@ -258,4 +274,3 @@ export class RecipesService {
     );
   }
 }
-

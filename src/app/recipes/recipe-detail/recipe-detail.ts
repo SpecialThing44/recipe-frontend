@@ -11,11 +11,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
-import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
+import { RecipesService, Recipe, InstructionRecipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
 import { AuthService } from '../../core/auth.service';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { formatQuantityAmount } from '../../shared/utils/quantity-format';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -47,6 +48,8 @@ export class RecipeDetailComponent implements OnInit {
   instructionsHtml = '';
   displayServings: number = 1;
   scaleFactor: number = 1;
+  subRecipes: Array<{ component: InstructionRecipe; recipe: Recipe; instructionsHtml: string }> = [];
+  loadingSubRecipes = false;
 
   recommendedRecipes: Recipe[] = [];
   loadingRecommendedRecipes = false;
@@ -146,6 +149,7 @@ export class RecipeDetailComponent implements OnInit {
         this.displayServings = recipe.servings;
         this.scaleFactor = 1;
         this.instructionsHtml = this.toInstructionsHtml(recipe.instructions);
+        this.loadSubRecipes(recipe);
         this.loading = false;
 
         // Re-evaluate canEdit$ after recipe is loaded
@@ -162,6 +166,34 @@ export class RecipeDetailComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  private loadSubRecipes(recipe: Recipe): void {
+    this.subRecipes = [];
+    const components = recipe.recipeIngredients || [];
+    this.loadingSubRecipes = components.length > 0;
+    if (components.length === 0) return;
+
+    forkJoin(components.map(component => this.recipesService.getRecipe(component.recipe.id))).subscribe({
+      next: recipes => {
+        this.subRecipes = recipes.map((subRecipe, index) => ({
+          component: components[index],
+          recipe: subRecipe,
+          instructionsHtml: this.toInstructionsHtml(subRecipe.instructions)
+        }));
+        this.loadingSubRecipes = false;
+      },
+      error: err => {
+        console.error('Error loading recipe ingredients:', err);
+        this.loadingSubRecipes = false;
+      }
+    });
+  }
+
+  printRecipe(): void {
+    if (!this.loadingSubRecipes) {
+      window.print();
+    }
   }
 
   openEditDialog(): void {
@@ -239,8 +271,63 @@ export class RecipeDetailComponent implements OnInit {
     this.scaleFactor = this.displayServings / this.recipe.servings;
   }
 
-  getScaledAmount(amount: number): number {
-    return Math.round(amount * this.scaleFactor * 100) / 100;
+  getFormattedScaledAmount(amount: number, unit: any): string {
+    return formatQuantityAmount(
+      amount * this.scaleFactor,
+      this.getUnitName(unit)
+    );
+  }
+
+  getFormattedSubRecipeScaledAmount(
+    entry: { component: InstructionRecipe; recipe: Recipe },
+    amount: number,
+    unit: any
+  ): string {
+    const componentUnit = this.getUnitName(entry.component.quantity.unit);
+    const servingScale = componentUnit === 'serving'
+      ? entry.component.quantity.amount / entry.recipe.servings
+      : 1;
+    return formatQuantityAmount(
+      amount * servingScale * this.scaleFactor,
+      this.getUnitName(unit)
+    );
+  }
+
+  async copyIngredientsCsv(): Promise<void> {
+    if (!this.recipe) return;
+
+    const rows = [
+      ['Type', 'Name', 'Amount', 'Unit', 'Description'],
+      ...this.recipe.ingredients.map(ingredient => [
+        'Ingredient',
+        ingredient.ingredient.name,
+        this.getFormattedScaledAmount(ingredient.quantity.amount, ingredient.quantity.unit),
+        this.getUnitName(ingredient.quantity.unit),
+        ingredient.description || ''
+      ]),
+      ...(this.recipe.recipeIngredients || []).map(component => [
+        'Recipe',
+        component.recipe.name,
+        this.getFormattedScaledAmount(component.quantity.amount, component.quantity.unit),
+        this.getUnitName(component.quantity.unit),
+        component.description || ''
+      ])
+    ];
+    const csv = rows
+      .map(row => row.map(value => this.escapeCsvValue(value)).join(','))
+      .join('\r\n');
+
+    try {
+      await navigator.clipboard.writeText(csv);
+      this.snackBar.open('Ingredients copied as CSV', 'Close', { duration: 3000 });
+    } catch {
+      this.snackBar.open('Failed to copy ingredients', 'Close', { duration: 3000 });
+    }
+  }
+
+  private escapeCsvValue(value: string | number): string {
+    const text = String(value);
+    return `"${text.replace(/"/g, '""')}"`;
   }
 
   private toInstructionsHtml(instructions: unknown): string {

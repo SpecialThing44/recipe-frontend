@@ -6,6 +6,10 @@
         <p class="subtitle">by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a></p>
       </div>
       <div class="header-actions">
+        <button mat-raised-button type="button" (click)="printRecipe()" [disabled]="loadingSubRecipes">
+          <mat-icon>print</mat-icon>
+          Print
+        </button>
         <button *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()">
           <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
           {{ isSaved ? 'Saved' : 'Save' }}
@@ -67,7 +71,7 @@
           <mat-icon>people</mat-icon>
           <div>
             <div class="label">Servings</div>
-            <div class="value">{{ recipe.servings }}</div>
+            <div class="value">{{ displayServings }}</div>
           </div>
         </mat-card-content>
       </mat-card>
@@ -97,7 +101,11 @@
           <mat-icon>shopping_cart</mat-icon>
           Ingredients
         </mat-card-title>
-        <div class="servings-adjuster">
+        <div class="ingredients-actions">
+          <button mat-stroked-button type="button" (click)="copyIngredientsCsv()">
+            <mat-icon>content_copy</mat-icon>
+            Copy CSV
+          </button>
           <mat-form-field appearance="outline" class="servings-input">
             <mat-label>Servings</mat-label>
             <input matInput type="number" min="1" [(ngModel)]="displayServings" (ngModelChange)="onServingsChange()">
@@ -107,10 +115,17 @@
       <mat-card-content>
         <ul class="ingredients-list">
           <li *ngFor="let ingredient of recipe.ingredients">
-            <strong>{{ getScaledAmount(ingredient.quantity.amount) }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
+            <strong>{{ getFormattedScaledAmount(ingredient.quantity.amount, ingredient.quantity.unit) }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
             {{ ingredient.ingredient.name }}
             <span *ngIf="ingredient.description" class="ingredient-description">
               ({{ ingredient.description }})
+            </span>
+          </li>
+          <li *ngFor="let component of recipe.recipeIngredients">
+            <strong>{{ getFormattedScaledAmount(component.quantity.amount, component.quantity.unit) }} {{ getUnitName(component.quantity.unit) }}</strong>
+            <a [routerLink]="['/recipes', component.recipe.id]">{{ component.recipe.name }}</a>
+            <span *ngIf="component.description" class="ingredient-description">
+              ({{ component.description }})
             </span>
           </li>
         </ul>
@@ -129,6 +144,37 @@
         <div class="instructions-content" [innerHTML]="instructionsHtml"></div>
       </mat-card-content>
     </mat-card>
+
+    <section class="sub-recipes" *ngIf="subRecipes.length > 0">
+      <h2>Recipes used in this recipe</h2>
+      <mat-card class="section-card sub-recipe-card" *ngFor="let entry of subRecipes">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>menu_book</mat-icon>
+            <a [routerLink]="['/recipes', entry.recipe.id]">{{ entry.recipe.name }}</a>
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <h3>Ingredients</h3>
+          <ul class="ingredients-list">
+            <li *ngFor="let ingredient of entry.recipe.ingredients">
+              <strong>{{ getFormattedSubRecipeScaledAmount(entry, ingredient.quantity.amount, ingredient.quantity.unit) }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
+              {{ ingredient.ingredient.name }}
+              <span *ngIf="ingredient.description" class="ingredient-description">({{ ingredient.description }})</span>
+            </li>
+            <li *ngFor="let component of entry.recipe.recipeIngredients">
+              <strong>{{ getFormattedSubRecipeScaledAmount(entry, component.quantity.amount, component.quantity.unit) }} {{ getUnitName(component.quantity.unit) }}</strong>
+              <a [routerLink]="['/recipes', component.recipe.id]">{{ component.recipe.name }}</a>
+            </li>
+          </ul>
+          <h3>Instructions</h3>
+          <div class="instructions-content" [innerHTML]="entry.instructionsHtml"></div>
+          <a mat-stroked-button color="primary" [routerLink]="['/recipes', entry.recipe.id]">
+            Open {{ entry.recipe.name }}
+          </a>
+        </mat-card-content>
+      </mat-card>
+    </section>
 
     <!-- Recipe Metadata -->
     <div class="recipe-metadata">
