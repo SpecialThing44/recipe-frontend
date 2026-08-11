@@ -6,9 +6,10 @@ WORKDIR /app
 # Copy package files
 COPY package.json ./
 COPY yarn.lock ./
+COPY .yarnrc.yml ./
 
 # Install dependencies
-RUN corepack enable && yarn install --frozen-lockfile --network-timeout 100000
+RUN corepack enable && yarn install --immutable
 
 # Copy source files
 COPY . .
