@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +11,15 @@ import { Recipe } from '../../../core/recipes.service';
 @Component({
   selector: 'app-recipe-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule, MatChipsModule, MatTooltipModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    MatChipsModule,
+    MatTooltipModule
+  ],
   templateUrl: './recipe-card.html',
   styleUrl: './recipe-card.scss'
 })
@@ -21,14 +30,9 @@ export class RecipeCardComponent {
   @Input() isSaved: boolean = false;
   @Input() isLoggedIn: boolean = false;
   
-  @Output() cardClick = new EventEmitter<string>();
   @Output() saveClick = new EventEmitter<Recipe>();
   @Output() editClick = new EventEmitter<Recipe>();
   @Output() deleteClick = new EventEmitter<Recipe>();
-
-  onCardClick(): void {
-    this.cardClick.emit(this.recipe.id);
-  }
 
   onSaveClick(event: Event): void {
     event.stopPropagation();

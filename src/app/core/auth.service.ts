@@ -34,12 +34,9 @@ export class AuthService {
   private oidcSecurityService = inject(OidcSecurityService);
   private router = inject(Router);
 
-  constructor(private http: HttpClient) {
-    // Don't call checkAuth in constructor - let it be called by APP_INITIALIZER
-    this.monitorTokenExpiration();
-  }
+  constructor(private http: HttpClient) {}
 
-  private checkAuth() {
+  checkAuth(): Promise<void> {
     return new Promise<void>((resolve) => {
       this.oidcSecurityService.checkAuth().subscribe({
         next: (loginResponse: LoginResponse) => {
@@ -94,25 +91,6 @@ export class AuthService {
 
   loadCurrentUser(): void {
       // This method is kept for compatibility if needed, but checkAuth handles it.
-  }
-
-  private monitorTokenExpiration(): void {
-    // Monitor authentication state and token refresh events
-    this.oidcSecurityService.checkSessionChanged$.subscribe(() => {
-      console.log('Session changed, re-checking authentication...');
-      this.oidcSecurityService.isAuthenticated$.subscribe(({ isAuthenticated }) => {
-        if (isAuthenticated) {
-          // Session refreshed successfully, update user if needed
-          if (!this.currentUser$.value) {
-            this.fetchCurrentUser();
-          }
-        } else {
-          // Session lost - clear user state
-          console.log('Session lost - user needs to re-authenticate');
-          this.currentUser$.next(null);
-        }
-      });
-    });
   }
 
   private fetchCurrentUser(): void {

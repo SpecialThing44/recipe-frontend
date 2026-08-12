@@ -130,10 +130,6 @@ export class RecipeDetailComponent implements OnInit {
     });
   }
 
-  viewRecipe(recipeId: string) {
-    this.router.navigate(['/recipes', recipeId]);
-  }
-
   loadRecipe(id?: string): void {
     const recipeId = id || this.route.snapshot.paramMap.get('id');
     if (!recipeId) return;

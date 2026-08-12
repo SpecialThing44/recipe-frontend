@@ -28,13 +28,16 @@ function authConfig() {
 }
 
 async function getAuthProviders(): Promise<Array<Provider | EnvironmentProviders>> {
-  const [{ provideAuth, LogLevel }, { AuthService }] = await Promise.all([
+  const [
+    { provideAuth, LogLevel, AbstractSecurityStorage, DefaultLocalStorageService },
+    { AuthService }
+  ] = await Promise.all([
     import('angular-auth-oidc-client'),
     import('./app/core/auth.service')
   ]);
 
-  const initializeAuth = (authService: any) => {
-    return () => (authService as any).checkAuth();
+  const initializeAuth = (authService: { checkAuth(): Promise<void> }) => {
+    return () => authService.checkAuth();
   };
 
   return [
@@ -44,6 +47,10 @@ async function getAuthProviders(): Promise<Array<Provider | EnvironmentProviders
         logLevel: LogLevel.Debug
       }
     }),
+    {
+      provide: AbstractSecurityStorage,
+      useClass: DefaultLocalStorageService
+    },
     {
       provide: APP_INITIALIZER,
       useFactory: initializeAuth,

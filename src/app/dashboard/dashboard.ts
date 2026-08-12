@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,7 +41,6 @@ export class DashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private recipesService: RecipesService,
-    private router: Router,
     private dialog: MatDialog
   ) {}
 
@@ -147,10 +146,6 @@ export class DashboardComponent implements OnInit {
         this.loadingRecommendedRecipes = false;
       }
     });
-  }
-
-  viewRecipe(recipeId: string) {
-    this.router.navigate(['/recipes', recipeId]);
   }
 
   canEditRecipe(recipe: Recipe): boolean {

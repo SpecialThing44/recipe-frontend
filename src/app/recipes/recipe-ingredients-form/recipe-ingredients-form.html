@@ -17,7 +17,7 @@
             <mat-icon>{{ getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'menu_book' : 'restaurant' }}</mat-icon>
           </button>
 
-          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="ingredient-field">
+          <mat-form-field appearance="fill" subscriptSizing="fixed" class="ingredient-field">
             <mat-label>{{ getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Recipe' : 'Ingredient' }}</mat-label>
             <input
               matInput
@@ -29,23 +29,21 @@
                 {{ suggestion.name }}
               </mat-option>
             </mat-autocomplete>
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientName')?.invalid">
-              Please select a valid ingredient
+            <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientName')?.invalid">Select a valid ingredient
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="amount-field">
+          <mat-form-field appearance="fill" subscriptSizing="fixed" class="amount-field">
             <mat-label>Amount</mat-label>
             <input matInput type="number" formControlName="amount" [min]="minimumQuantity" step="0.1">
             <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('required')">
               Required
             </mat-error>
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('min')">
-              Must be greater than 0
+            <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('min')">Must be positive
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="unit-field">
+          <mat-form-field appearance="fill" subscriptSizing="fixed" class="unit-field">
             <mat-label>Unit</mat-label>
             <mat-select formControlName="unit">
               <mat-option *ngFor="let unit of unitsFor(getAsFormGroup(ingredient))" [value]="unit.value">
@@ -57,7 +55,7 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="fill" subscriptSizing="dynamic" class="description-field">
+          <mat-form-field appearance="fill" subscriptSizing="fixed" class="description-field">
             <mat-label>Description (Optional)</mat-label>
             <input matInput formControlName="description" placeholder="e.g., chopped">
           </mat-form-field>

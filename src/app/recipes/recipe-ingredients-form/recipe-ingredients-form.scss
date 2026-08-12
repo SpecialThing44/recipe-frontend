@@ -1,13 +1,17 @@
 .ingredient-row {
   display: grid;
-  grid-template-columns: 32px 40px minmax(180px, 2fr) minmax(90px, 1fr) minmax(130px, 1.5fr) minmax(180px, 2fr) 36px;
-  gap: 10px;
+  grid-template-columns: 32px 40px minmax(170px, 1.6fr) minmax(110px, 1.5fr) minmax(120px, 1.1fr) minmax(180px, 2.2fr) 36px;
+  gap: 5px;
   align-items: center;
   margin-bottom: 12px;
-  padding: 12px;
+  padding: 20px 8px 4px 8px;
   border: 1px solid rgba(11, 61, 46, 0.14);
   border-radius: 10px;
   background: rgba(11, 61, 46, 0.045);
+
+  mat-form-field {
+    align-self: start;
+  }
 
   &:last-child {
     margin-bottom: 0;
@@ -64,7 +68,6 @@
       width: 32px;
       height: 32px;
       line-height: 32px;
-      
       display: flex;
       align-items: center;
       justify-content: center;
@@ -75,6 +78,24 @@
         height: 20px;
         line-height: 20px;
       }
+    }
+  }
+}
+
+@media (min-width: 801px) {
+  .ingredient-row {
+    .drag-handle-container {
+      align-self: start;
+      height: 56px;
+    }
+
+    .kind-toggle {
+      align-self: start;
+      margin-top: 8px;
+    }
+
+    .action-buttons {
+      align-self: start;
     }
   }
 }
@@ -117,7 +138,7 @@
   background: #f4f7f5;
   padding: 12px;
   display: grid;
-  grid-template-columns: 32px 40px minmax(180px, 2fr) minmax(90px, 1fr) minmax(130px, 1.5fr) minmax(180px, 2fr) 36px;
+  grid-template-columns: 32px 40px minmax(170px, 1.6fr) minmax(110px, 1.5fr) minmax(120px, 1.1fr) minmax(180px, 2.2fr) 36px;
   gap: 10px;
   align-items: center;
 }

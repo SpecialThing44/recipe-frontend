@@ -43,7 +43,6 @@
             [layout]="'scroll'"
             [canEdit]="true"
             [isSaved]="savedRecipeIds.has(recipe.id)"
-            (cardClick)="viewRecipe(recipe.id)"
             (editClick)="editRecipe(recipe)"
             (deleteClick)="deleteRecipe(recipe)">
           </app-recipe-card>
@@ -81,7 +80,6 @@
             [layout]="'scroll'"
             [canEdit]="canEditRecipe(recipe)"
             [isSaved]="true"
-            (cardClick)="viewRecipe(recipe.id)"
             (editClick)="editRecipe(recipe)"
             (deleteClick)="deleteRecipe(recipe)">
           </app-recipe-card>
@@ -111,7 +109,6 @@
             [layout]="'scroll'"
             [canEdit]="canEditRecipe(recipe)"
             [isSaved]="savedRecipeIds.has(recipe.id)"
-            (cardClick)="viewRecipe(recipe.id)"
             (editClick)="editRecipe(recipe)"
             (deleteClick)="deleteRecipe(recipe)">
           </app-recipe-card>

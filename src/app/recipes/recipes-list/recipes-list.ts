@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -91,7 +91,6 @@ export class RecipesListComponent implements OnInit {
     private ingredientsService: IngredientsService,
     private tagsService: TagsService,
     private fb: FormBuilder,
-    private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
     private routePrefetchService: RoutePrefetchService,
@@ -466,10 +465,6 @@ export class RecipesListComponent implements OnInit {
     this.loadRecipes();
   }
 
-  viewRecipe(recipeId: string): void {
-    this.router.navigate(['/recipes', recipeId]);
-  }
-
   prefetchRecipeDetail(recipeId: string): void {
     this.routePrefetchService.prefetchPath(`/recipes/${recipeId}`);
   }
@@ -577,4 +572,3 @@ export class RecipesListComponent implements OnInit {
     this.deleteRecipe(recipe, new Event('click'));
   }
 }
-

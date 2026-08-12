@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -60,7 +60,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private recipesService: RecipesService,
     private countriesService: CountriesService,
     private route: ActivatedRoute,
-    private router: Router,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
   ) {
@@ -291,10 +290,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         console.error('Error loading saved recipes:', err);
       }
     });
-  }
-  
-  viewRecipe(recipeId: string): void {
-    this.router.navigate(['/recipes', recipeId]);
   }
   
   canEditRecipe(recipe: Recipe): boolean {
