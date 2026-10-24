@@ -14,10 +14,12 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', () => {
+  it('provides a skip link to the main page content', () => {
     const fixture = TestBed.createComponent(App);
+    spyOn(fixture.componentInstance, 'ngOnInit').and.resolveTo();
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, recipe-frontend');
+    expect(compiled.querySelector('.skip-link')?.getAttribute('href')).toBe('#main-content');
+    expect(compiled.querySelector('main#main-content router-outlet')).not.toBeNull();
   });
 });
