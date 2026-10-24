@@ -16,8 +16,8 @@ import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-
 import { RecipesService, Recipe, InstructionRecipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
 import { AuthService } from '../../core/auth.service';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
-import { forkJoin, Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, forkJoin, Observable, of, Subscription } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { formatQuantityAmount } from '../../shared/utils/quantity-format';
 
 @Component({
@@ -45,7 +45,7 @@ export class RecipeDetailComponent implements OnInit {
   private recipeRequest?: Subscription;
   private recommendationRequest?: Subscription;
   private subRecipeRequest?: Subscription;
-  private savedRecipeRequest?: Subscription;
+  private readonly visibleRecipeIds = new BehaviorSubject<string[]>([]);
   recipe: Recipe | null = null;
   loading = false;
   error: string | null = null;
@@ -83,25 +83,17 @@ export class RecipeDetailComponent implements OnInit {
       map(user => user !== null)
     );
 
-    // Load saved recipes for "isSaved" status in recommendations
-    this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
-      this.savedRecipeRequest?.unsubscribe();
-      if (user) {
-        this.savedRecipeRequest = this.recipesService.listRecipes({
-          savedByUser: user.id,
-          limit: 100 // Load more to cover more cases
-        }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(recipes => {
-            if (recipes) {
-                this.savedRecipeIds = new Set(recipes.map(r => r.id));
-                if (this.recipe) {
-                  this.isSaved = this.savedRecipeIds.has(this.recipe.id);
-                }
-            }
-        });
-      } else {
-        this.savedRecipeIds.clear();
-        this.isSaved = false;
-      }
+    combineLatest([this.authService.currentUser$, this.visibleRecipeIds]).pipe(
+      switchMap(([user, ids]) => {
+        if (!user?.id || ids.length === 0) return of([]);
+        return this.recipesService.listRecipes({ ids, savedByUser: user.id, limit: ids.length }).pipe(
+          catchError(() => of([]))
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(recipes => {
+      this.savedRecipeIds = new Set(recipes.map(recipe => recipe.id));
+      this.isSaved = !!this.recipe && this.savedRecipeIds.has(this.recipe.id);
     });
 
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
@@ -121,6 +113,7 @@ export class RecipeDetailComponent implements OnInit {
   loadRecommendedRecipes(recipeId: string) {
     this.recommendationRequest?.unsubscribe();
     this.recommendedRecipes = [];
+    this.updateVisibleRecipeIds();
     this.loadingRecommendedRecipes = true;
     this.recommendationRequest = this.recipesService.listRecipes({
       analyzedRecipe: recipeId,
@@ -131,6 +124,7 @@ export class RecipeDetailComponent implements OnInit {
     }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (recipes) => {
         this.recommendedRecipes = recipes || [];
+        this.updateVisibleRecipeIds();
         this.loadingRecommendedRecipes = false;
       },
       error: (err) => {
@@ -155,6 +149,7 @@ export class RecipeDetailComponent implements OnInit {
     this.recipeRequest = this.recipesService.getRecipe(recipeId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (recipe) => {
         this.recipe = recipe;
+        this.updateVisibleRecipeIds();
         this.isSaved = this.savedRecipeIds.has(recipe.id);
         // Initialize servings scaling
         this.displayServings = recipe.servings;
@@ -199,6 +194,13 @@ export class RecipeDetailComponent implements OnInit {
         this.loadingSubRecipes = false;
       }
     });
+  }
+
+  private updateVisibleRecipeIds(): void {
+    this.visibleRecipeIds.next(Array.from(new Set([
+      ...(this.recipe ? [this.recipe.id] : []),
+      ...this.recommendedRecipes.map(recipe => recipe.id)
+    ])));
   }
 
   printRecipe(): void {
