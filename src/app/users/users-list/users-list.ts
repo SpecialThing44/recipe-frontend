@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -41,7 +41,7 @@ export class UsersListComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  filterForm: FormGroup;
+  readonly filterForm;
   
   // Filter type options
   filterTypes = [
@@ -70,7 +70,7 @@ export class UsersListComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router
   ) {
-    this.filterForm = this.fb.group({
+    this.filterForm = this.fb.nonNullable.group({
       id: [''],
       
       nameFilterType: ['contains'],
@@ -98,7 +98,7 @@ export class UsersListComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const formValue = this.filterForm.value;
+    const formValue = this.filterForm.getRawValue();
     const filters: UsersFilters = {
       limit: this.pageSize,
       page: this.currentPage
@@ -111,16 +111,12 @@ export class UsersListComponent implements OnInit {
 
     // Name filter
     if (formValue.nameValue?.trim()) {
-      filters.name = {};
-      const nameFilterType = formValue.nameFilterType || 'contains';
-      filters.name[nameFilterType as keyof typeof filters.name] = formValue.nameValue.trim();
+      filters.name = { [formValue.nameFilterType]: formValue.nameValue.trim() };
     }
 
     // Email filter
     if (formValue.emailValue?.trim()) {
-      filters.email = {};
-      const emailFilterType = formValue.emailFilterType || 'contains';
-      filters.email[emailFilterType as keyof typeof filters.email] = formValue.emailValue.trim();
+      filters.email = { [formValue.emailFilterType]: formValue.emailValue.trim() };
     }
 
     // Sorting

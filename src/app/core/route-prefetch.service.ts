@@ -37,7 +37,7 @@ export class RoutePrefetchService {
 
     const uniquePaths = Array.from(new Set(paths.map(path => this.normalize(path)).filter(Boolean)));
     const runPrefetch = () => uniquePaths.forEach(path => this.prefetchPath(path));
-    const runtimeWindow = window as any;
+    const runtimeWindow = window;
 
     if (typeof runtimeWindow.requestIdleCallback === 'function') {
       runtimeWindow.requestIdleCallback(runPrefetch, { timeout: 1200 });
@@ -47,7 +47,7 @@ export class RoutePrefetchService {
   }
 
   private isEnabled(): boolean {
-    const raw = (window as any).ENV?.ROUTE_PREFETCH_ENABLED;
+    const raw = window.ENV?.ROUTE_PREFETCH_ENABLED;
     if (raw === undefined || raw === null || raw === '') {
       return true;
     }

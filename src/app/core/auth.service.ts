@@ -5,22 +5,8 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { catchError, tap, map, retry } from 'rxjs/operators';
 import { OidcSecurityService, LoginResponse } from 'angular-auth-oidc-client';
 
-export interface AvatarUrls {
-  thumbnail: string;
-  medium: string;
-  large: string;
-}
-
-export interface User {
-  id?: string;
-  name?: string;
-  email?: string;
-  admin?: boolean;
-  countryOfOrigin?: string;
-  avatar?: AvatarUrls;
-  createdOn?: string;
-  updatedOn?: string;
-}
+import { User } from './users.service';
+export type { User, AvatarUrls } from './users.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +16,7 @@ export class AuthService {
   loading$ = new BehaviorSubject<boolean>(false);
   error$ = new BehaviorSubject<string | null>(null);
   
-  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
+  private readonly API_BASE = window.ENV?.API_BASE_URL || 'http://localhost:9000';
   private oidcSecurityService = inject(OidcSecurityService);
   private router = inject(Router);
 
@@ -97,9 +83,9 @@ export class AuthService {
     this.loading$.next(true);
     // The backend now identifies the user by the token.
     // We assume GET /user returns the user profile.
-    this.http.get<any>(`${this.API_BASE}/user`).pipe(
+    this.http.get<User | { Body: User }>(`${this.API_BASE}/user`).pipe(
       retry({ count: 3, delay: 500 }),
-      map(response => response?.Body || response),
+      map(response => 'Body' in response ? response.Body : response),
       tap(user => this.currentUser$.next(user)),
       catchError(err => {
         console.error('Failed to fetch user profile', err);

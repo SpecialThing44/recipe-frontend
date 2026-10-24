@@ -22,12 +22,12 @@ export interface TagsFilters {
   providedIn: 'root'
 })
 export class TagsService {
-  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
+  private readonly API_BASE = window.ENV?.API_BASE_URL || 'http://localhost:9000';
 
   constructor(private http: HttpClient) {}
 
   listTags(filters?: TagsFilters): Observable<string[]> {
-    const body: any = {};
+    const body: TagsFilters = {};
 
     if (filters) {
       if (filters.name) body.name = filters.name;
@@ -35,12 +35,11 @@ export class TagsService {
       if (filters.page !== undefined) body.page = filters.page;
     }
 
-    return this.http.post<any>(`${this.API_BASE}/tags/query`, body, {
+    return this.http.post<{ Body: Array<Tag | string> }>(`${this.API_BASE}/tags/query`, body, {
       withCredentials: true
     }).pipe(
-      map((response: any) => {
+      map(response => {
         const tags = response?.Body || [];
-        // Extract just the tag strings from Tag objects
         return tags.map((t: Tag | string) => typeof t === 'string' ? t : t.tag);
       })
     );

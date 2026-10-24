@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -43,7 +43,7 @@ import { takeUntil, startWith, map, switchMap, catchError } from 'rxjs/operators
 export class UserProfileComponent implements OnInit, OnDestroy {
   user: User | null = null;
   currentUser: User | null = null;
-  profileForm: FormGroup;
+  readonly profileForm;
   loading = false;
   saving = false;
   avatarFile: File | null = null;
@@ -69,7 +69,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private dialog: MatDialog
   ) {
-    this.profileForm = this.fb.group({
+    this.profileForm = this.fb.nonNullable.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       countryOfOrigin: ['']

@@ -45,12 +45,12 @@ export interface IngredientsFilters {
   providedIn: 'root'
 })
 export class IngredientsService {
-  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
+  private readonly API_BASE = window.ENV?.API_BASE_URL || 'http://localhost:9000';
 
   constructor(private http: HttpClient) {}
 
   listIngredients(filters?: IngredientsFilters): Observable<Ingredient[]> {
-    const body: any = {};
+    const body: IngredientsFilters = {};
 
     if (filters) {
       if (filters.id) body.id = filters.id;
@@ -63,34 +63,34 @@ export class IngredientsService {
       if (filters.page !== undefined) body.page = filters.page;
     }
 
-    return this.http.post<any>(`${this.API_BASE}/ingredients/query`, body, {
+    return this.http.post<{ Body: Ingredient[] }>(`${this.API_BASE}/ingredients/query`, body, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || [])
+      map(response => response?.Body || [])
     );
   }
 
   getIngredient(id: string): Observable<Ingredient> {
-    return this.http.get<any>(`${this.API_BASE}/ingredients/${id}`, {
+    return this.http.get<Ingredient | { Body: Ingredient }>(`${this.API_BASE}/ingredients/${id}`, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   createIngredient(input: IngredientInput): Observable<Ingredient> {
-    return this.http.post<any>(`${this.API_BASE}/ingredients`, input, {
+    return this.http.post<Ingredient | { Body: Ingredient }>(`${this.API_BASE}/ingredients`, input, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   updateIngredient(id: string, input: Partial<IngredientInput>): Observable<Ingredient> {
-    return this.http.put<any>(`${this.API_BASE}/ingredients/${id}`, input, {
+    return this.http.put<Ingredient | { Body: Ingredient }>(`${this.API_BASE}/ingredients/${id}`, input, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
@@ -101,10 +101,10 @@ export class IngredientsService {
   }
 
   listSubstitutes(id: string): Observable<Ingredient[]> {
-    return this.http.get<any>(`${this.API_BASE}/ingredients/${id}/substitutes`, {
+    return this.http.get<{ Body: Ingredient[] }>(`${this.API_BASE}/ingredients/${id}/substitutes`, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || [])
+      map(response => response.Body || [])
     );
   }
 

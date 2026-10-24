@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -6,7 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../core/auth.service';
+import { AuthService, User } from '../core/auth.service';
 import { RoutePrefetchService } from '../core/route-prefetch.service';
 
 @Component({
@@ -26,8 +27,8 @@ import { RoutePrefetchService } from '../core/route-prefetch.service';
   styleUrls: ['./navbar.scss']
 })
 export class Navbar implements OnInit, OnDestroy {
-  user: any = null;
-  private sub: any;
+  user: User | null = null;
+  private sub: Subscription;
 
   constructor(
     public auth: AuthService,

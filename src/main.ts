@@ -6,14 +6,14 @@ import { App } from './app/app';
 function authConfig() {
   return {
     authority:
-      (window as any).ENV?.AUTH_AUTHORITY ||
+      window.ENV?.AUTH_AUTHORITY ||
       'https://auth.spencers.cc/application/o/cooking-app-dev/',
     authWellknownEndpointUrl:
-      (window as any).ENV?.AUTH_WELLKNOWN_ENDPOINT ||
+      window.ENV?.AUTH_WELLKNOWN_ENDPOINT ||
       'https://auth.spencers.cc/application/o/cooking-app-dev/.well-known/openid-configuration',
     redirectUrl: window.location.origin + '/callback',
     clientId:
-      (window as any).ENV?.AUTH_CLIENT_ID ||
+      window.ENV?.AUTH_CLIENT_ID ||
       'CrlaWqtWtKXSt8vYM6o9caiVGaLx2FxegYbOohOe',
     scope: 'openid profile email offline_access',
     responseType: 'code',

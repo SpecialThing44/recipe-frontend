@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -44,12 +44,12 @@ export interface UsersFilters {
   providedIn: 'root'
 })
 export class UsersService {
-  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
+  private readonly API_BASE = window.ENV?.API_BASE_URL || 'http://localhost:9000';
 
   constructor(private http: HttpClient) {}
 
   listUsers(filters?: UsersFilters): Observable<User[]> {
-    const body: any = {};
+    const body: UsersFilters = {};
 
     if (filters) {
       if (filters.id) {
@@ -79,45 +79,45 @@ export class UsersService {
       }
     }
 
-    return this.http.post<any>(`${this.API_BASE}/user/query`, body, { 
+    return this.http.post<{ Body: User[] }>(`${this.API_BASE}/user/query`, body, {
       withCredentials: true
     }).pipe(
-      map((response: any) => {
+      map(response => {
         return response?.Body || [];
       })
     );
   }
 
   getUser(id: string): Observable<User> {
-    return this.http.get<User>(`${this.API_BASE}/user/${id}`, { 
-      withCredentials: true 
+    return this.http.get<User | { Body: User }>(`${this.API_BASE}/user/${id}`, {
+      withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   updateUser(id: string, updates: Partial<User>): Observable<User> {
-    return this.http.put<any>(`${this.API_BASE}/user/${id}`, updates, {
+    return this.http.put<User | { Body: User }>(`${this.API_BASE}/user/${id}`, updates, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   uploadAvatar(id: string, imageFile: File): Observable<User> {
-    return this.http.put<any>(`${this.API_BASE}/user/${id}/avatar`, imageFile, {
+    return this.http.put<User | { Body: User }>(`${this.API_BASE}/user/${id}/avatar`, imageFile, {
       withCredentials: true,
       headers: {
         'Content-Type': imageFile.type
       }
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   deleteUser(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.API_BASE}/user/${id}`, { 
-      withCredentials: true 
+    return this.http.delete<void>(`${this.API_BASE}/user/${id}`, {
+      withCredentials: true
     });
   }
 }

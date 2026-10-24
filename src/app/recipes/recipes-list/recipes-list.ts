@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, OnInit, Input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Params } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -63,7 +63,7 @@ export class RecipesListComponent implements OnInit {
   private readonly recipeRequests = new Subject<RecipesFilters>();
   savedRecipeIds: Set<string> = new Set();
 
-  filterForm: FormGroup;
+  readonly filterForm;
   showAdvancedFilters = false;
   
   ingredientSuggestions: Observable<Ingredient[]> = of([]);
@@ -100,7 +100,7 @@ export class RecipesListComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {
-    this.filterForm = this.fb.group({
+    this.filterForm = this.fb.nonNullable.group({
       id: [''],
       nameFilterType: ['contains'],
       nameValue: [''],
@@ -108,11 +108,11 @@ export class RecipesListComponent implements OnInit {
       savedRecipes: [false],
       createdByUser: [''],
       savedByUser: [''],
-      prepTime: [null],
-      cookTime: [null],
-      ingredients: [[]],
-      notIngredients: [[]],
-      tags: [[]],
+      prepTime: this.fb.control<number | null>(null),
+      cookTime: this.fb.control<number | null>(null),
+      ingredients: this.fb.nonNullable.control<string[]>([]),
+      notIngredients: this.fb.nonNullable.control<string[]>([]),
+      tags: this.fb.nonNullable.control<string[]>([]),
       ingredientInput: [''],
       notIngredientInput: [''],
       tagInput: [''],
@@ -297,7 +297,7 @@ export class RecipesListComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const formValue = this.filterForm.value;
+    const formValue = this.filterForm.getRawValue();
     const filters: RecipesFilters = {
       limit: this.pageSize,
       page: this.currentPage
@@ -313,9 +313,7 @@ export class RecipesListComponent implements OnInit {
     }
 
     if (formValue.nameValue?.trim()) {
-      filters.name = {};
-      const nameFilterType = formValue.nameFilterType || 'contains';
-      filters.name[nameFilterType as keyof typeof filters.name] = formValue.nameValue.trim();
+      filters.name = { [formValue.nameFilterType]: formValue.nameValue.trim() };
     }
 
     if (formValue.myRecipes && this.currentUser) {
