@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { AuthService, User } from '../../core/auth.service';
 import { RecipesService } from '../../core/recipes.service';
 import { IngredientsService } from '../../core/ingredients.service';
@@ -59,4 +59,24 @@ describe('RecipesListComponent', () => {
       savedByUser: 'user-id', limit: 25, page: 0
     });
   });
+  it('ignores an older response after filters change', () => {
+    const olderResponse = new Subject<typeof recipeFixture[]>();
+    const newerResponse = new Subject<typeof recipeFixture[]>();
+    recipesService.listRecipes.and.returnValues(olderResponse, newerResponse);
+    component.ngOnInit();
+    component.filterForm.patchValue({ nameValue: 'new' });
+    component.applyFilters();
+    newerResponse.next([{ ...recipeFixture, name: 'New result' }]);
+    olderResponse.next([recipeFixture]);
+    expect(component.recipes.map(recipe => recipe.name)).toEqual(['New result']);
+  });
+
+  it('stops requesting recipes when the component is destroyed', () => {
+    component.ngOnInit();
+    recipesService.listRecipes.calls.reset();
+    TestBed.resetTestingModule();
+    currentUser.next(recipeFixture.createdBy);
+    expect(recipesService.listRecipes).not.toHaveBeenCalled();
+  });
+
 });
