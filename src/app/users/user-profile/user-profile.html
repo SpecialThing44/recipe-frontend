@@ -144,7 +144,10 @@
             [layout]="'scroll'"
             [canEdit]="canEditRecipe(recipe)"
             [isSaved]="savedRecipeIds.has(recipe.id)"
-            [isLoggedIn]="!!currentUser">
+            [isLoggedIn]="!!currentUser"
+            (saveClick)="toggleSave($event)"
+            (editClick)="editRecipe($event)"
+            (deleteClick)="deleteRecipe($event)">
           </app-recipe-card>
         </div>
       </div>
@@ -185,7 +188,10 @@
             [layout]="'scroll'"
             [canEdit]="canEditRecipe(recipe)"
             [isSaved]="true"
-            [isLoggedIn]="true">
+            [isLoggedIn]="true"
+            (saveClick)="toggleSave($event)"
+            (editClick)="editRecipe($event)"
+            (deleteClick)="deleteRecipe($event)">
           </app-recipe-card>
         </div>
       </div>
