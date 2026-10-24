@@ -126,8 +126,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   isOwnProfile(): boolean {
-    console.log(this.currentUser, this.user);
-    console.log(this.currentUser?.id === this.user?.id);
     return this.currentUser?.id === this.user?.id;
   }
 

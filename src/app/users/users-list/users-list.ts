@@ -131,12 +131,10 @@ export class UsersListComponent implements OnInit {
       }
     }
 
-    console.log('Loading users with filters:', filters);
 
     this.request?.unsubscribe();
     this.request = this.usersService.listUsers(filters).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (users) => {
-        console.log('Received users:', users);
         this.users = users;
         this.loading = false;
       },
