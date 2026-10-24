@@ -70,6 +70,15 @@ $recipe-frontend-theme: mat.define-theme(
 
 :root {
   @include mat.all-component-themes($recipe-frontend-theme);
+  @include mat.form-field-density(
+    mat.define-theme(
+      (
+        density: (
+          scale: -1,
+        ),
+      )
+    )
+  );
 
   --app-primary: #28513e;
   --app-accent: #995135;
