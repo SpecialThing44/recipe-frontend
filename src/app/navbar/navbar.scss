@@ -5,13 +5,13 @@
 }
 
 mat-toolbar {
-  height: 80px;
-  max-width: 1280px;
+  height: 56px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 0 clamp(20px, 4vw, 48px);
+  padding: 0 20px;
   color: var(--app-ink);
   background: transparent;
-  gap: 16px;
+  gap: 12px;
 }
 
 .brand-link {
@@ -22,23 +22,23 @@ mat-toolbar {
   color: var(--app-ink);
 
   mat-icon {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     margin-right: 10px;
-    padding: 8px;
+    padding: 5px;
     box-sizing: border-box;
-    border-radius: 11px;
+    border-radius: 6px;
     color: white;
     background: var(--app-primary);
-    font-size: 20px;
+    font-size: 18px;
   }
 }
 
 .brand {
   font-family: var(--app-heading-font);
-  font-size: 22px;
-  font-weight: 400;
-  letter-spacing: -0.04em;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: normal;
 }
 .spacer {
   flex: 1;
@@ -50,14 +50,14 @@ mat-toolbar {
 }
 .desktop-menu a {
   color: var(--app-muted);
-  padding: 0 18px;
+  padding: 0 12px;
 }
 .desktop-menu a.active-link {
   color: var(--app-primary);
   background: var(--app-soft);
 }
 .login-button {
-  margin-left: 16px;
+  margin-left: 8px;
   border: 1px solid var(--app-border);
 }
 .mobile-menu-trigger {
@@ -99,7 +99,8 @@ mat-toolbar {
 
 @media (max-width: 768px) {
   mat-toolbar {
-    height: 72px;
+    height: 56px;
+    padding: 0 12px;
   }
   .desktop-menu {
     display: none;

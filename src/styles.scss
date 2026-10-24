@@ -63,7 +63,7 @@ $recipe-frontend-theme: mat.define-theme(
       plain-family: 'Roboto, sans-serif',
     ),
     density: (
-      scale: 0,
+      scale: -2,
     ),
   )
 );
@@ -90,31 +90,35 @@ $recipe-frontend-theme: mat.define-theme(
   --app-muted: #68746c;
   --app-border: #e1e6dd;
   --app-soft: #edf2e8;
-  --app-radius: 18px;
+  --app-radius: 10px;
   --app-shadow: 0 8px 28px rgb(30 55 40 / 5%);
-  --app-heading-font: Georgia, 'Times New Roman', serif;
+  --app-heading-font: Roboto, 'Helvetica Neue', sans-serif;
 
   @include mat.button-overrides(
     (
       filled-container-color: var(--app-primary),
       filled-label-text-color: #ffffff,
-      filled-container-shape: 10px,
-      outlined-container-shape: 10px,
+      filled-container-shape: 6px,
+      filled-container-height: 36px,
+      outlined-container-shape: 6px,
+      outlined-container-height: 36px,
       outlined-outline-color: var(--app-border),
       outlined-label-text-color: var(--app-primary),
-      protected-container-shape: 10px,
+      protected-container-shape: 6px,
+      protected-container-height: 36px,
       protected-container-color: var(--app-surface),
       protected-label-text-color: var(--app-primary),
       protected-container-elevation-shadow: none,
-      text-container-shape: 10px,
+      text-container-shape: 6px,
+      text-container-height: 36px,
       text-label-text-color: var(--app-primary),
     )
   );
   @include mat.form-field-overrides(
     (
       filled-container-color: var(--app-soft),
-      filled-container-shape: 12px,
-      outlined-container-shape: 12px,
+      filled-container-shape: 6px,
+      outlined-container-shape: 6px,
       outlined-outline-color: #83917e,
       outlined-hover-outline-color: var(--app-primary),
       outlined-focus-outline-color: var(--app-primary),
@@ -145,15 +149,18 @@ $recipe-frontend-theme: mat.define-theme(
     (
       container-elevation-shadow: none,
       container-background-color: var(--app-surface),
-      container-shape: 12px,
+      container-shape: 8px,
     )
   );
   @include mat.dialog-overrides(
     (
       container-color: var(--app-surface),
-      container-shape: 22px,
+      container-shape: 12px,
+      content-padding: 12px 20px,
+      with-actions-content-padding: 12px 20px 0,
+      actions-padding: 8px 16px,
       subhead-font: var(--app-heading-font),
-      subhead-size: 28px,
+      subhead-size: 22px,
       subhead-weight: 400,
     )
   );
@@ -169,7 +176,8 @@ body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
   background: var(--app-background);
   color: var(--app-text);
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -182,12 +190,13 @@ h1,
 h2,
 h3 {
   color: var(--app-ink);
-  text-wrap: balance;
+  text-wrap: wrap;
 }
 h1 {
   font-family: var(--app-heading-font);
   font-weight: 400;
-  letter-spacing: -0.035em;
+  letter-spacing: normal;
+  font-size: 28px;
 }
 a {
   color: var(--app-primary);
@@ -215,9 +224,9 @@ select {
 }
 
 .page-shell {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 48px clamp(20px, 4vw, 48px) 64px;
+  padding: 20px 20px 32px;
   box-sizing: border-box;
 }
 
@@ -258,13 +267,13 @@ button[color='warn'] {
 .form-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding-bottom: 24px;
+  gap: 12px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--app-border);
 
   h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 500;
     color: var(--app-ink);
   }
@@ -276,13 +285,13 @@ button[color='warn'] {
 
 .time-fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .checkboxes {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   flex-wrap: wrap;
 }
 
@@ -343,6 +352,7 @@ button[color='warn'] {
   }
 
   .recipe-content {
+    display: block !important;
     gap: 12px !important;
   }
 
@@ -416,13 +426,22 @@ button[color='warn'] {
 
 @media (max-width: 600px) {
   .page-shell {
-    padding: 32px 20px 48px;
+    padding: 16px 12px 24px;
   }
   .section-header {
-    gap: 16px;
+    gap: 10px;
     flex-wrap: wrap;
   }
   .time-fields {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (pointer: coarse) {
+  .mat-mdc-button-base {
+    min-height: 44px;
+  }
+  .mat-mdc-icon-button {
+    min-width: 44px;
   }
 }

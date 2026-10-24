@@ -16,7 +16,7 @@
     <form [formGroup]="filterForm" class="filters-form">
       <!-- ID Filter -->
       <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>User ID</mat-label>
           <input matInput formControlName="id" placeholder="Enter UUID" />
           <mat-icon matPrefix>fingerprint</mat-icon>
@@ -25,7 +25,7 @@
 
       <!-- Name Filter -->
       <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-type">
+        <mat-form-field appearance="fill" class="filter-type" subscriptSizing="dynamic">
           <mat-label>Name Filter</mat-label>
           <mat-select formControlName="nameFilterType">
             <mat-option *ngFor="let type of filterTypes" [value]="type.value">
@@ -34,7 +34,7 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Name Value</mat-label>
           <input matInput formControlName="nameValue" placeholder="Enter name" />
           <mat-icon matPrefix>person</mat-icon>
@@ -43,7 +43,7 @@
 
       <!-- Email Filter -->
       <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-type">
+        <mat-form-field appearance="fill" class="filter-type" subscriptSizing="dynamic">
           <mat-label>Email Filter</mat-label>
           <mat-select formControlName="emailFilterType">
             <mat-option *ngFor="let type of filterTypes" [value]="type.value">
@@ -52,7 +52,7 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Email Value</mat-label>
           <input matInput formControlName="emailValue" placeholder="Enter email" />
           <mat-icon matPrefix>email</mat-icon>
@@ -61,7 +61,7 @@
 
       <!-- Sorting & Page Size -->
       <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Sort By</mat-label>
           <mat-select formControlName="sort">
             <mat-option *ngFor="let option of sortOptions" [value]="option.value">
@@ -71,7 +71,7 @@
           <mat-icon matPrefix>sort</mat-icon>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Results Per Page</mat-label>
           <mat-select formControlName="pageSize" (selectionChange)="onPageSizeChange()">
             <mat-option *ngFor="let size of pageSizes" [value]="size">

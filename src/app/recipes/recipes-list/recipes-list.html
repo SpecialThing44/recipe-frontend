@@ -44,13 +44,13 @@
 
       <!-- Time Filters -->
       <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Max Prep Time (min)</mat-label>
           <input matInput type="number" formControlName="prepTime" min="0" />
           <mat-icon matPrefix>schedule</mat-icon>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Max Cook Time (min)</mat-label>
           <input matInput type="number" formControlName="cookTime" min="0" />
           <mat-icon matPrefix>timer</mat-icon>
@@ -68,11 +68,11 @@
       <!-- Advanced Filters Section -->
       <div class="advanced-filters" *ngIf="showAdvancedFilters">
         <div class="filter-row">
-          <mat-form-field appearance="fill" class="filter-field">
+          <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
             <mat-label>Recipe ID</mat-label>
             <input matInput formControlName="id" placeholder="Enter UUID" />
           </mat-form-field>
-          <mat-form-field appearance="fill" class="filter-field">
+          <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
             <mat-label>Name matching</mat-label>
             <mat-select formControlName="nameFilterType">
               <mat-option *ngFor="let type of filterTypes" [value]="type.value">{{
@@ -83,7 +83,7 @@
         </div>
         <!-- Ingredients Filter -->
         <div class="filter-row full-width">
-          <mat-form-field appearance="fill" class="full-width">
+          <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
             <mat-label>Include Ingredients</mat-label>
             <mat-chip-grid #ingredientList>
               <mat-chip-row
@@ -119,7 +119,7 @@
 
         <!-- Not Ingredients Filter -->
         <div class="filter-row full-width">
-          <mat-form-field appearance="fill" class="full-width">
+          <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
             <mat-label>Exclude Ingredients</mat-label>
             <mat-chip-grid #notIngredientList>
               <mat-chip-row
@@ -155,7 +155,7 @@
 
         <!-- Tags Filter -->
         <div class="filter-row full-width">
-          <mat-form-field appearance="fill" class="full-width">
+          <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
             <mat-label>Tags</mat-label>
             <mat-chip-grid #tagList>
               <mat-chip-row
@@ -189,7 +189,7 @@
 
       <!-- Sorting & Page Size -->
       <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Sort By</mat-label>
           <mat-select formControlName="sort">
             <mat-option *ngFor="let option of sortOptions" [value]="option.value">
@@ -199,7 +199,7 @@
           <mat-icon matPrefix>sort</mat-icon>
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="filter-field">
+        <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Results Per Page</mat-label>
           <mat-select formControlName="pageSize" (selectionChange)="onPageSizeChange()">
             <mat-option *ngFor="let size of pageSizes" [value]="size">

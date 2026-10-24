@@ -2,17 +2,15 @@
   <a
     class="recipe-link"
     [routerLink]="['/recipes', recipe.id]"
-    [attr.aria-label]="'View recipe: ' + recipe.name">
+    [attr.aria-label]="'View recipe: ' + recipe.name"
+  >
   </a>
 
-  <div class="recipe-image">
-    <picture *ngIf="recipe.image as image">
-      <source media="(max-width: 348px)" [srcset]="image.thumbnail">
-      <img [src]="image.medium" [alt]="recipe.name" [loading]="imageLoading" decoding="async">
+  <div class="recipe-image" *ngIf="recipe.image as image">
+    <picture>
+      <source media="(max-width: 348px)" [srcset]="image.thumbnail" />
+      <img [src]="image.medium" [alt]="recipe.name" [loading]="imageLoading" decoding="async" />
     </picture>
-    <div *ngIf="!recipe.image?.thumbnail" class="recipe-image-placeholder">
-      <mat-icon>restaurant</mat-icon>
-    </div>
   </div>
 
   <mat-card-header>
@@ -33,21 +31,25 @@
       </div>
 
       <div class="tags" *ngIf="recipe.tags.length > 0">
-        <mat-chip *ngFor="let tag of recipe.tags | slice:0:3">{{ tag }}</mat-chip>
-        <span *ngIf="recipe.tags.length > 3" class="more-tags">+{{ recipe.tags.length - 3 }} more</span>
+        <mat-chip *ngFor="let tag of recipe.tags | slice: 0 : 3">{{ tag }}</mat-chip>
+        <span *ngIf="recipe.tags.length > 3" class="more-tags"
+          >+{{ recipe.tags.length - 3 }} more</span
+        >
       </div>
     </div>
   </mat-card-content>
 
   <mat-card-actions *ngIf="canEdit || isLoggedIn" align="end">
-    <button *ngIf="isLoggedIn && !canEdit"
-            mat-stroked-button
-            [color]="isSaved ? 'accent' : 'primary'"
-            (click)="onSaveClick($event)"
-            [disabled]="saving"
-            [attr.aria-pressed]="isSaved"
-            [matTooltip]="isSaved ? 'Remove from saved recipes' : 'Save recipe'"
-            class="save-button">
+    <button
+      *ngIf="isLoggedIn && !canEdit"
+      mat-stroked-button
+      [color]="isSaved ? 'accent' : 'primary'"
+      (click)="onSaveClick($event)"
+      [disabled]="saving"
+      [attr.aria-pressed]="isSaved"
+      [matTooltip]="isSaved ? 'Remove from saved recipes' : 'Save recipe'"
+      class="save-button"
+    >
       <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
       {{ saving ? 'Saving…' : isSaved ? 'Saved' : 'Save' }}
     </button>

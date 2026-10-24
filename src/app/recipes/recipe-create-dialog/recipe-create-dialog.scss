@@ -1,19 +1,19 @@
 .recipe-form {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 16px 0;
+  gap: 12px;
+  padding: 8px 0;
   min-width: min(700px, calc(95vw - 48px));
   max-width: 900px;
 
   .image-upload {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
-    padding: 16px;
+    padding: 10px;
     border: 1px dashed #c6d2bf;
-    border-radius: 12px;
+    border-radius: 8px;
     background: var(--app-background);
 
     .file-name {
@@ -23,22 +23,22 @@
   }
 
   quill-editor {
-    min-height: 300px;
+    min-height: 200px;
 
     ::ng-deep .ql-container {
-      min-height: 250px;
+      min-height: 160px;
       font-family: 'Roboto', sans-serif;
     }
 
     ::ng-deep .ql-editor {
-      min-height: 250px;
+      min-height: 160px;
     }
   }
 
   .ai-parse-section {
-    padding: 20px;
+    padding: 12px;
     border: 1px solid var(--app-border);
-    border-radius: 14px;
+    border-radius: 8px;
     background: var(--app-background);
     .ai-help {
       margin: 0 0 8px;
