@@ -2,11 +2,8 @@
   <!-- Not Logged In View -->
   <div *ngIf="!currentUser" class="guest-view">
     <div class="guest-copy">
-      <p class="eyebrow">Welcome to the kitchen</p>
-      <h1>A home for your favourite recipes.</h1>
-      <p class="guest-description">
-        Keep the recipes you love, discover new favourites, and make something good.
-      </p>
+      <h1>Recipes</h1>
+      <p class="guest-description">Browse recipes, or log in to create and save them.</p>
       <div class="guest-actions">
         <button mat-raised-button color="primary" (click)="login()">
           <mat-icon>login</mat-icon>
@@ -18,18 +15,12 @@
         </button>
       </div>
     </div>
-    <div class="kitchen-note" aria-hidden="true">
-      <mat-icon>menu_book</mat-icon>
-      <span>Good food,<br />kept close.</span>
-      <small>RECIPES TO MAKE YOUR OWN</small>
-    </div>
   </div>
 
   <!-- Logged In View -->
   <div *ngIf="currentUser">
     <div class="dashboard-header">
       <div>
-        <p class="eyebrow">Your kitchen</p>
         <h1>My Dashboard</h1>
       </div>
       <button mat-raised-button color="primary" (click)="createRecipe()">
@@ -77,7 +68,7 @@
         <p>You haven't created any recipes yet.</p>
         <button mat-raised-button color="primary" (click)="createRecipe()">
           <mat-icon>add</mat-icon>
-          Create Your First Recipe
+          Create Recipe
         </button>
       </div>
     </div>
