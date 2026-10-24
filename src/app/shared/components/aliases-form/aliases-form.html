@@ -7,11 +7,16 @@
   </div>
   <div class="aliases-list">
     <div *ngFor="let alias of aliases.controls; let i = index" class="row">
-      <mat-form-field appearance="fill" class="field">
+      <mat-form-field appearance="fill" class="field" floatLabel="always" subscriptSizing="dynamic">
         <mat-label>Alias {{ i + 1 }}</mat-label>
-        <input matInput [formControl]="$any(alias)" placeholder="Alternative name">
+        <input matInput [formControl]="$any(alias)" placeholder="Alternative name" />
       </mat-form-field>
-      <button mat-icon-button type="button" (click)="removeAlias(i)" [attr.aria-label]="'Remove alias ' + (i + 1)">
+      <button
+        mat-icon-button
+        type="button"
+        (click)="removeAlias(i)"
+        [attr.aria-label]="'Remove alias ' + (i + 1)"
+      >
         <mat-icon class="green">delete</mat-icon>
       </button>
     </div>

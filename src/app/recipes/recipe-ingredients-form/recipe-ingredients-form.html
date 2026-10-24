@@ -1,74 +1,147 @@
-    <div class="form-section">
-      <div class="section-header">
-        <h3>Ingredients</h3>
-        <button mat-icon-button type="button" (click)="addIngredient()" aria-label="Add ingredient">
-          <mat-icon class="green">add</mat-icon>
+<div class="form-section">
+  <div class="section-header">
+    <h3>Ingredients</h3>
+    <button mat-icon-button type="button" (click)="addIngredient()" aria-label="Add ingredient">
+      <mat-icon class="green">add</mat-icon>
+    </button>
+  </div>
+  <div cdkDropList (cdkDropListDropped)="drop($event)">
+    <div
+      *ngFor="let ingredient of ingredients.controls; let i = index"
+      [formGroup]="getAsFormGroup(ingredient)"
+      class="ingredient-row"
+      cdkDrag
+      cdkDragPreviewContainer="parent"
+    >
+      <div class="ingredient-controls">
+        <div class="drag-handle-container">
+          <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
+        </div>
+
+        <button
+          mat-icon-button
+          type="button"
+          class="kind-toggle"
+          (click)="toggleKind(i)"
+          [matTooltip]="
+            getAsFormGroup(ingredient).get('kind')?.value === 'recipe'
+              ? 'Switch to ingredient'
+              : 'Switch to recipe'
+          "
+          [attr.aria-label]="
+            getAsFormGroup(ingredient).get('kind')?.value === 'recipe'
+              ? 'Switch to ingredient'
+              : 'Switch to recipe'
+          "
+        >
+          <mat-icon>{{
+            getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'menu_book' : 'restaurant'
+          }}</mat-icon>
         </button>
       </div>
-      <div cdkDropList (cdkDropListDropped)="drop($event)">
-        <div *ngFor="let ingredient of ingredients.controls; let i = index" [formGroup]="getAsFormGroup(ingredient)" class="ingredient-row" cdkDrag>
-          <div class="drag-handle-container">
-            <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
-          </div>
 
-          <button mat-icon-button type="button" class="kind-toggle" (click)="toggleKind(i)"
-                  [matTooltip]="getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Switch to ingredient' : 'Switch to recipe'"
-                  [attr.aria-label]="getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Switch to ingredient' : 'Switch to recipe'">
-            <mat-icon>{{ getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'menu_book' : 'restaurant' }}</mat-icon>
-          </button>
+      <mat-form-field
+        appearance="fill"
+        floatLabel="always"
+        subscriptSizing="dynamic"
+        class="ingredient-field"
+      >
+        <mat-label>{{
+          getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Recipe' : 'Ingredient'
+        }}</mat-label>
+        <input
+          matInput
+          formControlName="ingredientName"
+          [placeholder]="
+            getAsFormGroup(ingredient).get('kind')?.value === 'recipe'
+              ? 'Search recipes...'
+              : 'Search ingredients...'
+          "
+          [matAutocomplete]="autoIngredient"
+        />
+        <mat-autocomplete
+          #autoIngredient="matAutocomplete"
+          (optionSelected)="onIngredientSelected(i, $event)"
+        >
+          <mat-option
+            *ngFor="let suggestion of ingredientSuggestions[i] | async"
+            [value]="suggestion"
+          >
+            {{ suggestion.name }}
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientName')?.invalid"
+          >Select a valid ingredient
+        </mat-error>
+      </mat-form-field>
 
-          <mat-form-field appearance="fill" subscriptSizing="fixed" class="ingredient-field">
-            <mat-label>{{ getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Recipe' : 'Ingredient' }}</mat-label>
-            <input
-              matInput
-              formControlName="ingredientName"
-              [placeholder]="getAsFormGroup(ingredient).get('kind')?.value === 'recipe' ? 'Search recipes...' : 'Search ingredients...'"
-              [matAutocomplete]="autoIngredient">
-            <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="onIngredientSelected(i, $event)">
-              <mat-option *ngFor="let suggestion of ingredientSuggestions[i] | async" [value]="suggestion">
-                {{ suggestion.name }}
-              </mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('ingredientName')?.invalid">Select a valid ingredient
-            </mat-error>
-          </mat-form-field>
+      <mat-form-field
+        appearance="fill"
+        floatLabel="always"
+        subscriptSizing="dynamic"
+        class="amount-field"
+      >
+        <mat-label>Amount</mat-label>
+        <input matInput type="number" formControlName="amount" [min]="minimumQuantity" step="0.1" />
+        <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('required')">
+          Required
+        </mat-error>
+        <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('min')"
+          >Must be positive
+        </mat-error>
+      </mat-form-field>
 
-          <mat-form-field appearance="fill" subscriptSizing="fixed" class="amount-field">
-            <mat-label>Amount</mat-label>
-            <input matInput type="number" formControlName="amount" [min]="minimumQuantity" step="0.1">
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('required')">
-              Required
-            </mat-error>
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('amount')?.hasError('min')">Must be positive
-            </mat-error>
-          </mat-form-field>
+      <mat-form-field
+        appearance="fill"
+        floatLabel="always"
+        subscriptSizing="dynamic"
+        class="unit-field"
+      >
+        <mat-label>Unit</mat-label>
+        <mat-select formControlName="unit">
+          <mat-option
+            *ngFor="let unit of unitsFor(getAsFormGroup(ingredient))"
+            [value]="unit.value"
+          >
+            {{ unit.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="getAsFormGroup(ingredient).get('unit')?.hasError('required')">
+          Required
+        </mat-error>
+      </mat-form-field>
 
-          <mat-form-field appearance="fill" subscriptSizing="fixed" class="unit-field">
-            <mat-label>Unit</mat-label>
-            <mat-select formControlName="unit">
-              <mat-option *ngFor="let unit of unitsFor(getAsFormGroup(ingredient))" [value]="unit.value">
-                {{ unit.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="getAsFormGroup(ingredient).get('unit')?.hasError('required')">
-              Required
-            </mat-error>
-          </mat-form-field>
+      <mat-form-field
+        appearance="fill"
+        floatLabel="always"
+        subscriptSizing="dynamic"
+        class="description-field"
+      >
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description" placeholder="e.g., chopped" />
+      </mat-form-field>
 
-          <mat-form-field appearance="fill" subscriptSizing="fixed" class="description-field">
-            <mat-label>Description (Optional)</mat-label>
-            <input matInput formControlName="description" placeholder="e.g., chopped">
-          </mat-form-field>
+      <div class="action-buttons">
+        <button
+          mat-icon-button
+          type="button"
+          (click)="addIngredient(i)"
+          matTooltip="Insert ingredient below"
+          aria-label="Insert ingredient below"
+        >
+          <mat-icon class="green">add</mat-icon>
+        </button>
 
-          <div class="action-buttons">
-            <button mat-icon-button type="button" (click)="addIngredient(i)" matTooltip="Insert ingredient below" aria-label="Insert ingredient below">
-              <mat-icon class="green">add</mat-icon>
-            </button>
-
-            <button mat-icon-button type="button" (click)="removeIngredient(i)" matTooltip="Remove ingredient" aria-label="Remove ingredient">
-              <mat-icon class="green">delete</mat-icon>
-            </button>
-          </div>
-        </div>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="removeIngredient(i)"
+          matTooltip="Remove ingredient"
+          aria-label="Remove ingredient"
+        >
+          <mat-icon class="green">delete</mat-icon>
+        </button>
       </div>
     </div>
+  </div>
+</div>
