@@ -1,4 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, Input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -16,15 +17,15 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RecipesService, Recipe, RecipesFilters } from '../../core/recipes.service';
-import { AuthService } from '../../core/auth.service';
+import { AuthService, User } from '../../core/auth.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
 import { RoutePrefetchService } from '../../core/route-prefetch.service';
 import { RecipeCreateDialogComponent } from '../recipe-create-dialog/recipe-create-dialog';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
-import { debounceTime, distinctUntilChanged, map, switchMap, startWith } from 'rxjs/operators';
-import { Observable, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, switchMap, startWith, filter } from 'rxjs/operators';
+import { combineLatest, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-recipes-list',
@@ -59,7 +60,8 @@ export class RecipesListComponent implements OnInit {
   loading = false;
   error: string | null = null;
   isLoggedIn$!: Observable<boolean>;
-  currentUser: any = null;
+  currentUser: User | null = null;
+  private readonly destroyRef = inject(DestroyRef);
   savedRecipeIds: Set<string> = new Set();
 
   filterForm: FormGroup;
@@ -119,13 +121,8 @@ export class RecipesListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.isLoggedIn$ = this.authService.currentUser$.pipe(
-      map(user => {
-        this.currentUser = user;
-        return user !== null;
-      })
-    );
-    
+    this.isLoggedIn$ = this.authService.currentUser$.pipe(map(user => user !== null));
+
     // Handle query parameters for pre-populated filters
     this.route.queryParams.subscribe(params => {
       const formUpdates: any = {};
@@ -194,7 +191,15 @@ export class RecipesListComponent implements OnInit {
       }
     });
     
-    this.loadRecipes();
+    combineLatest([this.authService.currentUser$, this.authService.loading$]).pipe(
+      filter(([, loading]) => !loading),
+      map(([user]) => user),
+      distinctUntilChanged((previous, current) => previous?.id === current?.id),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(user => {
+      this.currentUser = user;
+      this.loadRecipes();
+    });
     this.setupAutocomplete();
   }
 
