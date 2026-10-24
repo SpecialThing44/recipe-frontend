@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RecipeEditDialogComponent } from '../../recipes/recipe-edit-dialog/recipe-edit-dialog';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
 import { AuthService, User } from '../../core/auth.service';
 import { UsersService } from '../../core/users.service';
@@ -33,6 +35,7 @@ import { takeUntil, startWith, map } from 'rxjs/operators';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatAutocompleteModule,
+    MatDialogModule,
     RecipeCardComponent
   ],
   templateUrl: './user-profile.html',
@@ -61,7 +64,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     private countriesService: CountriesService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
@@ -292,6 +296,44 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
   
+  editRecipe(recipe: Recipe): void {
+    const dialogRef = this.dialog.open(RecipeEditDialogComponent, {
+      width: '900px', maxWidth: '95vw', data: { recipe }
+    });
+    dialogRef.afterClosed().pipe(takeUntil(this.destroy$)).subscribe(result => {
+      if (result) this.refreshRecipes();
+    });
+  }
+
+  deleteRecipe(recipe: Recipe): void {
+    if (!confirm(`Are you sure you want to delete "${recipe.name}"?`)) return;
+    this.recipesService.deleteRecipe(recipe.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => this.refreshRecipes(),
+      error: () => this.snackBar.open('Failed to delete recipe', 'Close', { duration: 3000 })
+    });
+  }
+
+  toggleSave(recipe: Recipe): void {
+    if (!this.currentUser) return;
+    const request = this.savedRecipeIds.has(recipe.id)
+      ? this.recipesService.unsaveRecipe(recipe.id)
+      : this.recipesService.saveRecipe(recipe.id);
+    request.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        if (this.savedRecipeIds.has(recipe.id)) this.savedRecipeIds.delete(recipe.id);
+        else this.savedRecipeIds.add(recipe.id);
+        if (this.isOwnProfile()) this.loadSavedRecipes();
+      },
+      error: () => this.snackBar.open('Failed to update saved recipe', 'Close', { duration: 3000 })
+    });
+  }
+
+  private refreshRecipes(): void {
+    if (!this.user?.id) return;
+    this.loadUserRecipes(this.user.id);
+    if (this.isOwnProfile()) this.loadSavedRecipes();
+  }
+
   canEditRecipe(recipe: Recipe): boolean {
     return this.currentUser?.id === recipe.createdBy.id;
   }
