@@ -227,7 +227,7 @@
     <app-recipe-card
       *ngFor="let recipe of recipes"
       [recipe]="recipe"
-      [canEdit]="(canEditRecipe(recipe) | async) || false"
+      [canEdit]="canEditRecipe(recipe)"
       [isSaved]="savedRecipeIds.has(recipe.id)"
       [isLoggedIn]="(isLoggedIn$ | async) || false"
       (mouseenter)="prefetchRecipeDetail(recipe.id)"
