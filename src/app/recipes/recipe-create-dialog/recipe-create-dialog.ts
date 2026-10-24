@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -70,7 +70,7 @@ export class RecipeCreateDialogComponent {
     private recipesService: RecipesService,
     private countriesService: CountriesService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialogRef: MatDialogRef<RecipeCreateDialogComponent>
   ) {
     this.recipeForm = this.fb.group({
       name: ['', Validators.required],
@@ -302,19 +302,19 @@ export class RecipeCreateDialogComponent {
         // Upload image if selected
         if (this.selectedImage) {
           this.recipesService.uploadRecipeImage(recipe.id, this.selectedImage).subscribe({
-            next: () => {
+            next: (updatedRecipe) => {
               this.snackBar.open('Recipe created successfully with image', 'Close', { duration: 3000 });
-              this.dialog.closeAll();
+              this.dialogRef.close(updatedRecipe);
             },
             error: (err) => {
               console.error('Error uploading recipe image:', err);
               this.snackBar.open('Recipe created but image upload failed', 'Close', { duration: 3000 });
-              this.dialog.closeAll();
+              this.dialogRef.close(recipe);
             }
           });
         } else {
           this.snackBar.open('Recipe created successfully', 'Close', { duration: 3000 });
-          this.dialog.closeAll();
+          this.dialogRef.close(recipe);
         }
       },
       error: (err) => {

@@ -202,8 +202,8 @@ export class RecipeDetailComponent implements OnInit {
       data: { recipe: this.recipe }
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadRecipe();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.loadRecipe();
     });
   }
 

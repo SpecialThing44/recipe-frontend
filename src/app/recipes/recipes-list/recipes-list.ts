@@ -488,8 +488,8 @@ export class RecipesListComponent implements OnInit {
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadRecipes();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.loadRecipes();
     });
   }
 
@@ -503,8 +503,8 @@ export class RecipesListComponent implements OnInit {
       data: { recipe }
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.loadRecipes();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) this.loadRecipes();
     });
   }
 
