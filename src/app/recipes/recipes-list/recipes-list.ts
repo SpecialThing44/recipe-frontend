@@ -516,4 +516,8 @@ export class RecipesListComponent implements OnInit {
   deleteRecipeFromCard(recipe: Recipe): void {
     this.deleteRecipe(recipe, new Event('click'));
   }
+  trackRecipe(_index: number, recipe: Recipe): string {
+    return recipe.id;
+  }
+
 }

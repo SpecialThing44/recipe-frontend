@@ -340,4 +340,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   canEditRecipe(recipe: Recipe): boolean {
     return this.currentUser?.id === recipe.createdBy.id;
   }
+  trackRecipe(_index: number, recipe: Recipe): string {
+    return recipe.id;
+  }
+
 }

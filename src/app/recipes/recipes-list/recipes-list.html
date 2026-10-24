@@ -225,7 +225,8 @@
   <!-- Recipes List -->
   <div *ngIf="!loading && !error" class="recipes-grid">
     <app-recipe-card
-      *ngFor="let recipe of recipes"
+      *ngFor="let recipe of recipes; trackBy: trackRecipe; let recipeIndex = index"
+            [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
       [recipe]="recipe"
       [canEdit]="canEditRecipe(recipe)"
       [isSaved]="savedRecipeIds.has(recipe.id)"

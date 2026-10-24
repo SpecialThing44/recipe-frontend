@@ -196,4 +196,8 @@ export class DashboardComponent implements OnInit {
       }
     });
   }
+  trackRecipe(_index: number, recipe: Recipe): string {
+    return recipe.id;
+  }
+
 }

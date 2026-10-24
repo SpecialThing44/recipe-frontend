@@ -6,7 +6,10 @@
   </a>
 
   <div class="recipe-image">
-    <img *ngIf="recipe.image?.thumbnail" [src]="recipe.image?.thumbnail" [alt]="recipe.name">
+    <picture *ngIf="recipe.image as image">
+      <source media="(max-width: 348px)" [srcset]="image.thumbnail">
+      <img [src]="image.medium" [alt]="recipe.name" [loading]="imageLoading" decoding="async">
+    </picture>
     <div *ngIf="!recipe.image?.thumbnail" class="recipe-image-placeholder">
       <mat-icon>restaurant</mat-icon>
     </div>

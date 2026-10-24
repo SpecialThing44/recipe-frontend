@@ -31,7 +31,10 @@
   <div class="recipe-content">
     <!-- Recipe Image -->
     <div class="recipe-image-section" *ngIf="recipe.image?.large">
-      <img [src]="recipe.image!.large" [alt]="recipe.name">
+      <picture>
+        <source media="(max-width: 548px)" [srcset]="recipe.image!.medium">
+        <img [src]="recipe.image!.large" [alt]="recipe.name" fetchpriority="high" decoding="async">
+      </picture>
     </div>
 
     <!-- Recipe Info Cards -->
@@ -210,7 +213,8 @@
       <div class="recipes-scroll-container">
         <div class="recipes-scroll" *ngIf="!loadingRecommendedRecipes">
           <app-recipe-card
-            *ngFor="let rec of recommendedRecipes"
+            *ngFor="let rec of recommendedRecipes; trackBy: trackRecipe; let recipeIndex = index"
+            [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
             [recipe]="rec"
             [layout]="'scroll'"
             [isSaved]="savedRecipeIds.has(rec.id)"

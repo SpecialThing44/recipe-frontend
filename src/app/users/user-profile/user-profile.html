@@ -139,7 +139,8 @@
       <div *ngIf="!loadingRecipes && userRecipes.length > 0" class="recipe-scroll-container">
         <div class="recipe-row">
           <app-recipe-card
-            *ngFor="let recipe of userRecipes"
+            *ngFor="let recipe of userRecipes; trackBy: trackRecipe; let recipeIndex = index"
+            [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
             [recipe]="recipe"
             [layout]="'scroll'"
             [canEdit]="canEditRecipe(recipe)"
@@ -183,7 +184,8 @@
       <div *ngIf="!loadingRecipes && savedRecipes.length > 0" class="recipe-scroll-container">
         <div class="recipe-row">
           <app-recipe-card
-            *ngFor="let recipe of savedRecipes"
+            *ngFor="let recipe of savedRecipes; trackBy: trackRecipe; let recipeIndex = index"
+            [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
             [recipe]="recipe"
             [layout]="'scroll'"
             [canEdit]="canEditRecipe(recipe)"

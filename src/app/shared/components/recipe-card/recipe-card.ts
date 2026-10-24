@@ -25,6 +25,7 @@ import { Recipe } from '../../../core/recipes.service';
 })
 export class RecipeCardComponent {
   @Input() recipe!: Recipe;
+  @Input() imageLoading: 'eager' | 'lazy' = 'lazy';
   @Input() layout: 'grid' | 'scroll' = 'grid';
   @Input() canEdit: boolean = false;
   @Input() isSaved: boolean = false;
