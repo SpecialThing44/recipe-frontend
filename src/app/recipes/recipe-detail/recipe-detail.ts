@@ -344,4 +344,8 @@ export class RecipeDetailComponent implements OnInit {
     return `"${text.replace(/"/g, '""')}"`;
   }
 
+  trackRecipe(_index: number, recipe: Recipe): string {
+    return recipe.id;
+  }
+
 }
