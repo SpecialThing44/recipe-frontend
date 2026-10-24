@@ -2,9 +2,8 @@
   <div class="header" *ngIf="showHeader">
     <div class="header-content">
       <div>
-        <p class="eyebrow">The recipe collection</p>
         <h1>Recipes</h1>
-        <p class="subtitle">A little inspiration for whatever you’re craving.</p>
+        <p class="subtitle">Search and filter recipes.</p>
       </div>
       <button
         *ngIf="isLoggedIn$ | async"
@@ -21,12 +20,7 @@
   <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="recipe-search">
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Search recipes</mat-label>
-      <input
-        matInput
-        type="search"
-        formControlName="nameValue"
-        placeholder="What would you like to cook?"
-      />
+      <input matInput type="search" formControlName="nameValue" placeholder="Recipe name" />
       <mat-icon matPrefix>search</mat-icon>
     </mat-form-field>
     <button mat-flat-button type="submit">Search</button>
@@ -230,7 +224,6 @@
   </mat-expansion-panel>
 
   <div class="collection-summary">
-    <h2>Find your next favourite</h2>
     <span *ngIf="!loading && !error"
       >{{ recipes.length }} {{ recipes.length === 1 ? 'recipe' : 'recipes' }} on this page</span
     >

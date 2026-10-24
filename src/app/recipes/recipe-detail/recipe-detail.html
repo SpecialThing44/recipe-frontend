@@ -3,7 +3,6 @@
   <div class="recipe-header">
     <div class="header-content">
       <div>
-        <p class="eyebrow">From the recipe collection</p>
         <h1>{{ recipe.name }}</h1>
         <p class="subtitle">
           by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a>

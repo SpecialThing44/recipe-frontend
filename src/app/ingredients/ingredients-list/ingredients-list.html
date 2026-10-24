@@ -2,9 +2,8 @@
   <div class="header">
     <div class="header-content">
       <div>
-        <p class="eyebrow">The pantry</p>
         <h1>Ingredients</h1>
-        <p class="subtitle">The building blocks of something delicious.</p>
+        <p class="subtitle">Browse and manage ingredients.</p>
       </div>
       <button *ngIf="isAdmin$ | async" mat-flat-button color="primary" (click)="openCreateDialog()">
         <mat-icon>add</mat-icon>
