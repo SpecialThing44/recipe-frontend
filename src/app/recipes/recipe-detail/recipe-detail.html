@@ -10,9 +10,9 @@
           <mat-icon>print</mat-icon>
           Print
         </button>
-        <button *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()">
+        <button *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()" [disabled]="saving" [attr.aria-pressed]="isSaved">
           <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-          {{ isSaved ? 'Saved' : 'Save' }}
+          {{ saving ? 'Saving…' : isSaved ? 'Saved' : 'Save' }}
         </button>
         <ng-container *ngIf="canEdit$ | async">
           <button mat-raised-button color="primary" (click)="openEditDialog()">

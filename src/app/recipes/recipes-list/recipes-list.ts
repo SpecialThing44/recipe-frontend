@@ -22,7 +22,7 @@ import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
 import { RoutePrefetchService } from '../../core/route-prefetch.service';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
-import { debounceTime, distinctUntilChanged, map, switchMap, startWith, filter, catchError } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, switchMap, startWith, filter, catchError, finalize } from 'rxjs/operators';
 import { combineLatest, Observable, of, Subject } from 'rxjs';
 
 @Component({
@@ -62,6 +62,7 @@ export class RecipesListComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly recipeRequests = new Subject<RecipesFilters>();
   savedRecipeIds: Set<string> = new Set();
+  savingRecipeIds = new Set<string>();
 
   readonly filterForm;
   showAdvancedFilters = false;
@@ -475,30 +476,21 @@ export class RecipesListComponent implements OnInit {
 
   toggleSave(recipe: Recipe, event: Event): void {
     event.stopPropagation();
-    
-    if (this.savedRecipeIds.has(recipe.id)) {
-      this.recipesService.unsaveRecipe(recipe.id).subscribe({
-        next: () => {
-          this.savedRecipeIds.delete(recipe.id);
-          this.snackBar.open('Recipe removed from saved recipes', 'Close', { duration: 3000 });
-        },
-        error: (err) => {
-          console.error('Error unsaving recipe:', err);
-          this.snackBar.open('Failed to unsave recipe', 'Close', { duration: 3000 });
-        }
-      });
-    } else {
-      this.recipesService.saveRecipe(recipe.id).subscribe({
-        next: () => {
-          this.savedRecipeIds.add(recipe.id);
-          this.snackBar.open('Recipe saved successfully', 'Close', { duration: 3000 });
-        },
-        error: (err) => {
-          console.error('Error saving recipe:', err);
-          this.snackBar.open('Failed to save recipe', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    if (this.savingRecipeIds.has(recipe.id)) return;
+    const wasSaved = this.savedRecipeIds.has(recipe.id);
+    const request = wasSaved ? this.recipesService.unsaveRecipe(recipe.id) : this.recipesService.saveRecipe(recipe.id);
+    this.savingRecipeIds.add(recipe.id);
+    request.pipe(
+      finalize(() => this.savingRecipeIds.delete(recipe.id)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: () => {
+        if (wasSaved) this.savedRecipeIds.delete(recipe.id);
+        else this.savedRecipeIds.add(recipe.id);
+        this.snackBar.open(wasSaved ? 'Recipe removed from saved recipes' : 'Recipe saved', 'Close', { duration: 3000 });
+      },
+      error: () => this.snackBar.open('Failed to update saved recipe', 'Close', { duration: 3000 })
+    });
   }
 
   canEditRecipe(recipe: Recipe): boolean {

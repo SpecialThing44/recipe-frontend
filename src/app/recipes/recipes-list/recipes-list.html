@@ -224,6 +224,7 @@
       [recipe]="recipe"
       [canEdit]="canEditRecipe(recipe)"
       [isSaved]="savedRecipeIds.has(recipe.id)"
+            [saving]="savingRecipeIds.has(recipe.id)"
       [isLoggedIn]="(isLoggedIn$ | async) || false"
       (mouseenter)="prefetchRecipeDetail(recipe.id)"
       (focusin)="prefetchRecipeDetail(recipe.id)"

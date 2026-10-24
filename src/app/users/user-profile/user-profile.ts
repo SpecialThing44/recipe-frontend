@@ -17,7 +17,7 @@ import { UsersService } from '../../core/users.service';
 import { RecipesService, Recipe } from '../../core/recipes.service';
 import { CountriesService, Country } from '../../core/countries.service';
 import { combineLatest, Subject, Observable, Subscription, of } from 'rxjs';
-import { takeUntil, startWith, map, switchMap, catchError } from 'rxjs/operators';
+import { takeUntil, startWith, map, switchMap, catchError, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-profile',
@@ -58,6 +58,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   savedRecipes: Recipe[] = [];
   loadingRecipes = false;
   savedRecipeIds = new Set<string>();
+  savingRecipeIds = new Set<string>();
 
   constructor(
     private authService: AuthService,
@@ -315,13 +316,15 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   toggleSave(recipe: Recipe): void {
-    if (!this.currentUser) return;
-    const request = this.savedRecipeIds.has(recipe.id)
+    if (!this.currentUser || this.savingRecipeIds.has(recipe.id)) return;
+    const wasSaved = this.savedRecipeIds.has(recipe.id);
+    const request = wasSaved
       ? this.recipesService.unsaveRecipe(recipe.id)
       : this.recipesService.saveRecipe(recipe.id);
-    request.pipe(takeUntil(this.destroy$)).subscribe({
+    this.savingRecipeIds.add(recipe.id);
+    request.pipe(finalize(() => this.savingRecipeIds.delete(recipe.id)), takeUntil(this.destroy$)).subscribe({
       next: () => {
-        if (this.savedRecipeIds.has(recipe.id)) this.savedRecipeIds.delete(recipe.id);
+        if (wasSaved) this.savedRecipeIds.delete(recipe.id);
         else this.savedRecipeIds.add(recipe.id);
         if (this.isOwnProfile()) this.loadSavedRecipes();
       },
