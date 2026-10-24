@@ -1,7 +1,7 @@
 <div class="form-section">
   <div class="section-header">
     <h3>Tags</h3>
-    <button mat-icon-button type="button" (click)="addTag()">
+    <button mat-icon-button type="button" (click)="addTag()" aria-label="Add tag">
       <mat-icon class="green">add</mat-icon>
     </button>
   </div>
@@ -20,7 +20,7 @@
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-      <button mat-icon-button type="button" (click)="removeTag(i)" >
+      <button mat-icon-button type="button" (click)="removeTag(i)" [attr.aria-label]="'Remove tag ' + (i + 1)" >
         <mat-icon class="green">delete</mat-icon>
       </button>
     </div>

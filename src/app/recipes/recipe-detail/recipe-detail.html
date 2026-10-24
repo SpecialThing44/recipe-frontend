@@ -1,3 +1,4 @@
+<p *ngIf="loading" role="status" class="visually-hidden">Loading recipe…</p>
 <div class="recipe-detail-container" *ngIf="recipe && !loading">
   <div class="recipe-header">
     <div class="header-content">
@@ -147,6 +148,8 @@
         <div class="instructions-content" [innerHTML]="instructionsHtml"></div>
       </mat-card-content>
     </mat-card>
+
+    <p *ngIf="loadingSubRecipes" role="status">Loading component recipes…</p>
 
     <section class="sub-recipes" *ngIf="subRecipes.length > 0">
       <h2>Recipes used in this recipe</h2>

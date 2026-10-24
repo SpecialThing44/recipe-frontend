@@ -1,7 +1,7 @@
     <div class="form-section">
       <div class="section-header">
         <h3>Ingredients</h3>
-        <button mat-icon-button type="button" (click)="addIngredient()">
+        <button mat-icon-button type="button" (click)="addIngredient()" aria-label="Add ingredient">
           <mat-icon class="green">add</mat-icon>
         </button>
       </div>
@@ -61,11 +61,11 @@
           </mat-form-field>
 
           <div class="action-buttons">
-            <button mat-icon-button type="button" (click)="addIngredient(i)" matTooltip="Insert ingredient below">
+            <button mat-icon-button type="button" (click)="addIngredient(i)" matTooltip="Insert ingredient below" aria-label="Insert ingredient below">
               <mat-icon class="green">add</mat-icon>
             </button>
 
-            <button mat-icon-button type="button" (click)="removeIngredient(i)" matTooltip="Remove ingredient">
+            <button mat-icon-button type="button" (click)="removeIngredient(i)" matTooltip="Remove ingredient" aria-label="Remove ingredient">
               <mat-icon class="green">delete</mat-icon>
             </button>
           </div>

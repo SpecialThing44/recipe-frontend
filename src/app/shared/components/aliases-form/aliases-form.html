@@ -1,7 +1,7 @@
 <div class="form-section">
   <div class="section-header">
     <h3>Aliases</h3>
-    <button mat-icon-button type="button" (click)="addAlias()">
+    <button mat-icon-button type="button" (click)="addAlias()" aria-label="Add alias">
       <mat-icon class="green">add</mat-icon>
     </button>
   </div>
@@ -11,7 +11,7 @@
         <mat-label>Alias {{ i + 1 }}</mat-label>
         <input matInput [formControl]="$any(alias)" placeholder="Alternative name">
       </mat-form-field>
-      <button mat-icon-button type="button" (click)="removeAlias(i)">
+      <button mat-icon-button type="button" (click)="removeAlias(i)" [attr.aria-label]="'Remove alias ' + (i + 1)">
         <mat-icon class="green">delete</mat-icon>
       </button>
     </div>
