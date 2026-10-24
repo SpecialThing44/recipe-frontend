@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, DoCheck } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { TagsService } from '../../../core/tags.service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
@@ -24,8 +25,23 @@ import { debounceTime, distinctUntilChanged, startWith, switchMap, catchError } 
   ],
   templateUrl: './tags-form.html',
 })
-export class TagsFormComponent implements OnInit {
-  @Input() tags!: FormArray;
+export class TagsFormComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  private formArray!: FormArray;
+  private formChanges?: Subscription;
+  private suggestionControls: AbstractControl[] = [];
+
+  @Input() set tags(controls: FormArray) {
+    this.formChanges?.unsubscribe();
+    this.formArray = controls;
+    this.ensureAutocompleteInitialized();
+    this.formChanges = controls.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.ensureAutocompleteInitialized());
+  }
+
+  get tags(): FormArray {
+    return this.formArray;
+  }
   @Input() placeholder: string = 'e.g., dessert, quick';
 
   tagSuggestions: Observable<string[]>[] = [];
@@ -36,14 +52,6 @@ export class TagsFormComponent implements OnInit {
     private tagsService: TagsService
   ) {}
 
-  ngOnInit(): void {
-    this.ensureAutocompleteInitialized();
-  }
-
-  ngDoCheck(): void {
-    this.ensureAutocompleteInitialized();
-  }
-
   addTag(): void {
     const tagControl = this.fb.control('');
     this.tags.push(tagControl);
@@ -52,7 +60,6 @@ export class TagsFormComponent implements OnInit {
 
   removeTag(index: number): void {
     this.tags.removeAt(index);
-    this.tagSuggestions.splice(index, 1);
   }
 
   private setupAutocomplete(control: FormControl): Observable<string[]> {
@@ -78,7 +85,11 @@ export class TagsFormComponent implements OnInit {
       return;
     }
 
-    this.tagSuggestions = this.tags.controls.map((control) => {
+    const controls = this.tags.controls;
+    if (controls.length === this.suggestionControls.length &&
+        controls.every((control, index) => control === this.suggestionControls[index])) return;
+    this.suggestionControls = [...controls];
+    this.tagSuggestions = controls.map((control) => {
       const existing = this.autocompleteByControl.get(control);
       if (existing) {
         return existing;
