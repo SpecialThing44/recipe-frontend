@@ -63,7 +63,9 @@ export class IngredientsListComponent implements OnInit {
 
   pageSizes = [10, 25, 50, 100];
   currentPage = 0;
-  pageSize = 25;
+  get pageSize(): number {
+    return this.filterForm.get('pageSize')?.value || 25;
+  }
 
   sortOptions = [
     { value: 'name-asc', label: 'Name (A-Z)' },
@@ -106,7 +108,7 @@ export class IngredientsListComponent implements OnInit {
 
     const formValue = this.filterForm.value;
     const filters: IngredientsFilters = {
-      limit: formValue.pageSize || this.pageSize,
+      limit: this.pageSize,
       page: this.currentPage
     };
 
@@ -169,7 +171,6 @@ export class IngredientsListComponent implements OnInit {
   }
 
   onPageSizeChange(): void {
-    this.pageSize = this.filterForm.value.pageSize;
     this.currentPage = 0;
     this.loadIngredients();
   }
