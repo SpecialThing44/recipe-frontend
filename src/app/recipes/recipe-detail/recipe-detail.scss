@@ -381,3 +381,13 @@ h1 {
     .ql-indent-#{$indent} { padding-left: #{$indent * 1.5}rem; }
   }
 }
+
+@media (max-width: 480px) {
+  .section-card mat-card-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .ingredients-actions { flex-wrap: wrap; }
+  .recipe-metadata { overflow-wrap: anywhere; }
+}
