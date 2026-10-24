@@ -5,6 +5,13 @@ import { throwError } from 'rxjs';
 import { switchMap, take, catchError } from 'rxjs/operators';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const apiUrl = new URL(window.ENV?.API_BASE_URL || 'http://localhost:9000', window.location.origin);
+  const requestUrl = new URL(req.url, window.location.origin);
+  const apiPath = apiUrl.pathname.replace(/\/$/, '');
+  if (requestUrl.origin !== apiUrl.origin ||
+      (apiPath && requestUrl.pathname !== apiPath && !requestUrl.pathname.startsWith(`${apiPath}/`))) {
+    return next(req);
+  }
   const oidcSecurityService = inject(OidcSecurityService);
 
   return oidcSecurityService.getAccessToken().pipe(
