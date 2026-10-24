@@ -1,3 +1,5 @@
+:host { display: flex; min-width: 0; }
+
 .recipe-card {
   background: white;
   border-radius: 8px;
@@ -7,7 +9,9 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 450px; // Fixed height for all cards
+  width: 100%;
+  min-height: 380px;
+  box-sizing: border-box;
   position: relative;
 
   &:hover {
@@ -17,11 +21,12 @@
 
   // Scroll layout specific styles (for horizontal scrolling in dashboard/profile)
   &.scroll-layout {
-    width: 350px;
-    height: 450px; // Shorter height for scroll layout
+    width: min(320px, calc(100vw - 48px));
+    min-height: 380px;
 
     .recipe-image {
-      height: 200px; // Smaller image
+      height: 200px;
+    flex-shrink: 0; // Smaller image
     }
 
     mat-card-content {
@@ -35,7 +40,7 @@
       }
 
       .tags {
-        max-height: 50px; // Slightly less height for tags in scroll layout
+        gap: 6px;
       }
     }
 
@@ -95,6 +100,7 @@
     font-size: 1.25rem;
     font-weight: 500;
     margin-bottom: 4px;
+    overflow-wrap: anywhere;
   }
 
   mat-card-subtitle {
@@ -105,7 +111,6 @@
   mat-card-content {
     padding: 8px 16px 16px 16px;
     flex: 1;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -133,39 +138,12 @@
         color: rgba(0, 0, 0, 0.87);
       }
 
-      .recipe-id {
-        font-family: monospace;
-        font-size: 0.75rem;
-        color: rgba(0, 0, 0, 0.5);
-      }
-    }
-
-    .dietary-badges {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-
-      .dietary-chip {
-        padding: 4px 12px;
-        font-size: 0.75rem;
-        height: auto;
-
-        mat-icon {
-          font-size: 16px;
-          width: 16px;
-          height: 16px;
-          margin-right: 4px;
-        }
-      }
     }
 
     .tags {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      max-height: 60px; // Fixed height for tags (2 rows max)
-      overflow: hidden;
       margin-top: auto; // Push to bottom of available space
 
       mat-chip {
@@ -195,4 +173,10 @@
     outline: 3px solid var(--app-primary, #0b3d2e);
     outline-offset: -3px;
   }
+}
+
+.more-tags {
+  align-self: center;
+  color: #595959;
+  font-size: 0.8rem;
 }
