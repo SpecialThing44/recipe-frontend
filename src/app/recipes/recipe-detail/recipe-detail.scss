@@ -370,3 +370,14 @@ h1 {
     flex-direction: column;
   }
 }
+
+:host ::ng-deep .instructions-content {
+  pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  @for $indent from 1 through 8 {
+    .ql-indent-#{$indent} { padding-left: #{$indent * 1.5}rem; }
+  }
+}

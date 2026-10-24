@@ -1,3 +1,4 @@
+import { instructionsToHtml } from '../../shared/quill/instructions-html';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -158,7 +159,7 @@ export class RecipeDetailComponent implements OnInit {
         // Initialize servings scaling
         this.displayServings = recipe.servings;
         this.scaleFactor = 1;
-        this.instructionsHtml = this.toInstructionsHtml(recipe.instructions);
+        this.instructionsHtml = instructionsToHtml(recipe.instructions);
         this.loadSubRecipes(recipe);
         this.loading = false;
 
@@ -189,7 +190,7 @@ export class RecipeDetailComponent implements OnInit {
         this.subRecipes = recipes.map((subRecipe, index) => ({
           component: components[index],
           recipe: subRecipe,
-          instructionsHtml: this.toInstructionsHtml(subRecipe.instructions)
+          instructionsHtml: instructionsToHtml(subRecipe.instructions)
         }));
         this.loadingSubRecipes = false;
       },
@@ -340,69 +341,4 @@ export class RecipeDetailComponent implements OnInit {
     return `"${text.replace(/"/g, '""')}"`;
   }
 
-  private toInstructionsHtml(instructions: unknown): string {
-    const parsed = this.parseInstructions(instructions);
-
-    if (!parsed || !Array.isArray(parsed.ops)) {
-      return `<p>${this.escapeHtml(String(instructions ?? ''))}</p>`;
-    }
-
-    const blocks: string[] = [];
-    let lineBuffer = '';
-
-    const flushLine = () => {
-      const line = lineBuffer.trim();
-      blocks.push(line ? `<p>${line}</p>` : '<p><br></p>');
-      lineBuffer = '';
-    };
-
-    for (const op of parsed.ops) {
-      const insert = op?.insert;
-      if (typeof insert === 'string') {
-        const parts = insert.split('\n');
-        for (let i = 0; i < parts.length; i += 1) {
-          lineBuffer += this.escapeHtml(parts[i]);
-          if (i < parts.length - 1) {
-            flushLine();
-          }
-        }
-      } else if (insert && typeof insert.image === 'string') {
-        const imageUrl = this.escapeAttribute(insert.image);
-        if (lineBuffer.trim()) {
-          flushLine();
-        }
-        blocks.push(`<p><img src="${imageUrl}" alt="Instruction image" loading="lazy"></p>`);
-      }
-    }
-
-    if (lineBuffer.trim()) {
-      flushLine();
-    }
-
-    return blocks.join('');
-  }
-
-  private parseInstructions(instructions: unknown): any {
-    if (typeof instructions === 'string') {
-      try {
-        return JSON.parse(instructions.replace(/\n/g, '\\n'));
-      } catch {
-        return null;
-      }
-    }
-    return instructions;
-  }
-
-  private escapeHtml(value: string): string {
-    return value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  private escapeAttribute(value: string): string {
-    return value.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
 }
