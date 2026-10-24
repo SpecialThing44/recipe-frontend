@@ -54,7 +54,9 @@ export class UsersListComponent implements OnInit {
   // Pagination options
   pageSizes = [10, 25, 50, 100];
   currentPage = 0;
-  pageSize = 25;
+  get pageSize(): number {
+    return this.filterForm.get('pageSize')?.value || 25;
+  }
 
   // Sorting options
   sortOptions = [
@@ -98,7 +100,7 @@ export class UsersListComponent implements OnInit {
 
     const formValue = this.filterForm.value;
     const filters: UsersFilters = {
-      limit: formValue.pageSize || this.pageSize,
+      limit: this.pageSize,
       page: this.currentPage
     };
 
@@ -176,7 +178,6 @@ export class UsersListComponent implements OnInit {
   }
 
   onPageSizeChange(): void {
-    this.pageSize = this.filterForm.value.pageSize;
     this.currentPage = 0;
     this.loadUsers();
   }

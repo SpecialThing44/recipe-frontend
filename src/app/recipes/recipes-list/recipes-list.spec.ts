@@ -79,4 +79,23 @@ describe('RecipesListComponent', () => {
     expect(recipesService.listRecipes).not.toHaveBeenCalled();
   });
 
+  it('uses the URL page size for both requests and pagination', () => {
+    queryParams.next({ pageSize: '10' });
+    recipesService.listRecipes.and.returnValue(of(Array.from({ length: 10 }, () => recipeFixture)));
+    component.ngOnInit();
+    component.nextPage();
+    expect(component.currentPage).toBe(1);
+    expect(recipesService.listRecipes).toHaveBeenCalledWith({ limit: 10, page: 1 });
+  });
+
+  it('restores pagination to 25 after clearing a different page size', () => {
+    component.filterForm.patchValue({ pageSize: 10 });
+    recipesService.listRecipes.and.returnValue(of(Array.from({ length: 25 }, () => recipeFixture)));
+    component.clearFilters();
+    component.nextPage();
+    expect(component.pageSize).toBe(25);
+    expect(component.currentPage).toBe(1);
+    expect(recipesService.listRecipes).toHaveBeenCalledWith({ limit: 25, page: 1 });
+  });
+
 });
