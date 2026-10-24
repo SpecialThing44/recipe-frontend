@@ -11,7 +11,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { RecipeEditDialogComponent } from '../../recipes/recipe-edit-dialog/recipe-edit-dialog';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
 import { AuthService, User } from '../../core/auth.service';
 import { UsersService } from '../../core/users.service';
@@ -299,7 +298,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
 
-  editRecipe(recipe: Recipe): void {
+  async editRecipe(recipe: Recipe): Promise<void> {
+    const { RecipeEditDialogComponent } = await import('../../recipes/recipe-edit-dialog/recipe-edit-dialog');
     const dialogRef = this.dialog.open(RecipeEditDialogComponent, {
       width: '900px', maxWidth: '95vw', data: { recipe }
     });

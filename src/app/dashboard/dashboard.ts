@@ -9,8 +9,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RecipeCardComponent } from '../shared/components/recipe-card/recipe-card';
-import { RecipeCreateDialogComponent } from '../recipes/recipe-create-dialog/recipe-create-dialog';
-import { RecipeEditDialogComponent } from '../recipes/recipe-edit-dialog/recipe-edit-dialog';
 import { AuthService, User } from '../core/auth.service';
 import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../core/recipes.service';
 
@@ -50,7 +48,9 @@ export class DashboardComponent implements OnInit {
     private dialog: MatDialog
   ) {}
 
-  editRecipe(recipe: Recipe) {
+  async editRecipe(recipe: Recipe) {
+    const { RecipeEditDialogComponent } = await import('../recipes/recipe-edit-dialog/recipe-edit-dialog');
+    if (this.destroyRef.destroyed) return;
     const dialogRef = this.dialog.open(RecipeEditDialogComponent, {
       width: '900px',
       maxWidth: '95vw',
@@ -181,7 +181,9 @@ export class DashboardComponent implements OnInit {
     this.authService.login();
   }
 
-  createRecipe() {
+  async createRecipe() {
+    const { RecipeCreateDialogComponent } = await import('../recipes/recipe-create-dialog/recipe-create-dialog');
+    if (this.destroyRef.destroyed) return;
     const dialogRef = this.dialog.open(RecipeCreateDialogComponent, {
       width: '900px',
       maxWidth: '95vw',

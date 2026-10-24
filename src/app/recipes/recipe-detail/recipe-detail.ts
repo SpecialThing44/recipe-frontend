@@ -15,7 +15,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
 import { RecipesService, Recipe, InstructionRecipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
 import { AuthService } from '../../core/auth.service';
-import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
 import { BehaviorSubject, combineLatest, forkJoin, Observable, of, Subscription } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { formatQuantityAmount } from '../../shared/utils/quantity-format';
@@ -209,9 +208,11 @@ export class RecipeDetailComponent implements OnInit {
     }
   }
 
-  openEditDialog(): void {
+  async openEditDialog(): Promise<void> {
     if (!this.recipe) return;
 
+    const { RecipeEditDialogComponent } = await import('../recipe-edit-dialog/recipe-edit-dialog');
+    if (this.destroyRef.destroyed) return;
     const dialogRef = this.dialog.open(RecipeEditDialogComponent, {
       width: '900px',
       maxWidth: '95vw',
