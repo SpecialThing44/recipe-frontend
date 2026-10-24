@@ -17,7 +17,7 @@ import { UsersService } from '../../core/users.service';
 import { RecipesService, Recipe } from '../../core/recipes.service';
 import { CountriesService, Country } from '../../core/countries.service';
 import { combineLatest, Subject, Observable, Subscription, of } from 'rxjs';
-import { takeUntil, startWith, map, switchMap, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, startWith, map, switchMap, catchError, finalize, distinctUntilChanged, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-profile',
@@ -85,6 +85,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     combineLatest([this.authService.currentUser$, this.route.params]).pipe(
+      tap(([currentUser]) => this.currentUser = currentUser),
+      distinctUntilChanged(([previousUser, previousParams], [currentUser, params]) =>
+        previousUser?.id === currentUser?.id && previousParams['id'] === params['id']),
       switchMap(([currentUser, params]) => {
         this.currentUser = currentUser;
         this.userRecipeRequest?.unsubscribe();

@@ -2,7 +2,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { AuthService } from '../../core/auth.service';
 import { CountriesService } from '../../core/countries.service';
 import { RecipesService } from '../../core/recipes.service';
@@ -47,4 +47,20 @@ describe('Profile recipe actions', () => {
     component.deleteRecipe(recipeFixture);
     expect(recipesService.deleteRecipe).not.toHaveBeenCalled();
   });
+  it('keeps an edited profile loaded when the same account is updated', () => {
+    const currentUser = new BehaviorSubject(recipeFixture.createdBy);
+    const usersService = jasmine.createSpyObj<UsersService>('UsersService', ['getUser']);
+    usersService.getUser.and.returnValue(of(recipeFixture.createdBy));
+    const profile = new UserProfileComponent({ currentUser$: currentUser } as unknown as AuthService,
+      usersService, recipesService, new CountriesService(),
+      { params: of({ id: recipeFixture.createdBy.id }) } as unknown as ActivatedRoute,
+      new FormBuilder(), jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']), dialog);
+    profile.ngOnInit();
+    currentUser.next({ ...recipeFixture.createdBy, name: 'Updated Cook' });
+    expect(usersService.getUser).toHaveBeenCalledTimes(1);
+    expect(profile.user).not.toBeNull();
+    expect(profile.currentUser?.name).toBe('Updated Cook');
+    profile.ngOnDestroy();
+  });
+
 });
