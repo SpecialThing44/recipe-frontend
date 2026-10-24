@@ -168,7 +168,7 @@ export class RecipeDetailComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading recipe:', err);
-        this.error = err.message || 'Failed to load recipe';
+        this.error = 'We couldn’t load the recipe. Please check your connection and try again.';
         this.loading = false;
       }
     });

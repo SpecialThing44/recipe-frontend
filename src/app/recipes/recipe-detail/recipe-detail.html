@@ -250,7 +250,7 @@
   <div class="skeleton-block skeleton-paragraph" *ngFor="let _ of [1, 2, 3, 4]"></div>
 </div>
 
-<div *ngIf="error && !loading" class="error-container">
+<div *ngIf="error && !loading" class="error-container" role="alert">
   <mat-icon color="warn">error</mat-icon>
   <p>{{ error }}</p>
   <button mat-raised-button color="primary" (click)="loadRecipe()">Retry</button>

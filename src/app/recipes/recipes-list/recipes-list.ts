@@ -133,7 +133,7 @@ export class RecipesListComponent implements OnInit {
         }),
         catchError(error => {
           console.error('Error loading recipes:', error);
-          this.error = error.message || 'Failed to load recipes';
+          this.error = 'We couldn’t load the recipes. Please check your connection and try again.';
           this.loading = false;
           this.recipes = [];
           return of([]);

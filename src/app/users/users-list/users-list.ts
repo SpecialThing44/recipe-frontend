@@ -136,7 +136,7 @@ export class UsersListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading users:', err);
-        this.error = err.message || 'Failed to load users';
+        this.error = 'We couldn’t load the users. Please check your connection and try again.';
         this.loading = false;
         this.users = [];
       }

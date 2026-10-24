@@ -131,4 +131,15 @@ describe('RecipesListComponent', () => {
     subscription.unsubscribe();
   }));
 
+  it('shows a useful error without exposing the API and can retry', () => {
+    spyOn(console, 'error');
+    recipesService.listRecipes.and.returnValues(throwError(() => new Error('http://internal-api/recipes')), of([recipeFixture]));
+    component.ngOnInit();
+    expect(component.error).toContain('try again');
+    expect(component.error).not.toContain('http');
+    component.loadRecipes();
+    expect(component.error).toBeNull();
+    expect(component.recipes).toEqual([recipeFixture]);
+  });
+
 });
