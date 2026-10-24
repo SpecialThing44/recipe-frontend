@@ -498,13 +498,8 @@ export class RecipesListComponent implements OnInit {
     }
   }
 
-  canEditRecipe(recipe: Recipe): Observable<boolean> {
-    return this.authService.currentUser$.pipe(
-      map(user => {
-        if (!user) return false;
-        return user.id === recipe.createdBy.id;
-      })
-    );
+  canEditRecipe(recipe: Recipe): boolean {
+    return this.currentUser?.id === recipe.createdBy.id;
   }
 
   // Wrapper methods for recipe card component
