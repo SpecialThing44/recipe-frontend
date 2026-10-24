@@ -212,7 +212,7 @@
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error && !loading" class="error-container">
+  <div *ngIf="error && !loading" class="error-container" role="alert">
     <mat-icon color="warn">error</mat-icon>
     <p>{{ error }}</p>
     <button mat-raised-button color="primary" (click)="loadRecipes()">Retry</button>

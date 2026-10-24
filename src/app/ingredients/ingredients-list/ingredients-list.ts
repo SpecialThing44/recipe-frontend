@@ -135,7 +135,7 @@ export class IngredientsListComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading ingredients:', err);
-        this.error = err.message || 'Failed to load ingredients';
+        this.error = 'We couldn’t load the ingredients. Please check your connection and try again.';
         this.loading = false;
         this.ingredients = [];
       }
