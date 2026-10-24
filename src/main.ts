@@ -44,7 +44,7 @@ async function getAuthProviders(): Promise<Array<Provider | EnvironmentProviders
     provideAuth({
       config: {
         ...authConfig(),
-        logLevel: LogLevel.Debug
+        logLevel: LogLevel.Warn
       }
     }),
     {
