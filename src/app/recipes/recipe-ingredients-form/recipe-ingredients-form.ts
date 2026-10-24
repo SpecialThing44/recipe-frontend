@@ -1,4 +1,5 @@
-import { Component, Input, OnInit, DoCheck } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,7 +13,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { Recipe, RecipesService } from '../../core/recipes.service';
-import { combineLatest, Observable, of } from 'rxjs';
+import { combineLatest, Observable, of, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith, switchMap, catchError } from 'rxjs/operators';
 import { availableRecipeUnits, availableUnits } from '../../shared/units/available-units';
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog';
@@ -36,8 +37,23 @@ import { ConfirmationDialogComponent } from '../../shared/components/confirmatio
   templateUrl: './recipe-ingredients-form.html',
   styleUrl: './recipe-ingredients-form.scss'
 })
-export class RecipeIngredientsFormComponent implements OnInit {
-  @Input() ingredients!: FormArray;
+export class RecipeIngredientsFormComponent {
+  private readonly destroyRef = inject(DestroyRef);
+  private formArray!: FormArray;
+  private formChanges?: Subscription;
+  private suggestionControls: AbstractControl[] = [];
+
+  @Input() set ingredients(controls: FormArray) {
+    this.formChanges?.unsubscribe();
+    this.formArray = controls;
+    this.ensureAutocompleteInitialized();
+    this.formChanges = controls.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.ensureAutocompleteInitialized());
+  }
+
+  get ingredients(): FormArray {
+    return this.formArray;
+  }
   @Input() currentRecipeId?: string;
 
   ingredientSuggestions: Observable<Array<Ingredient | Recipe>>[] = [];
@@ -52,14 +68,6 @@ export class RecipeIngredientsFormComponent implements OnInit {
     private recipesService: RecipesService,
     private dialog: MatDialog
   ) {}
-
-  ngOnInit(): void {
-    this.ensureAutocompleteInitialized();
-  }
-
-  ngDoCheck(): void {
-    this.ensureAutocompleteInitialized();
-  }
 
   addIngredient(index: number = -1): void {
     const ingredientGroup = this.fb.group({
@@ -77,7 +85,6 @@ export class RecipeIngredientsFormComponent implements OnInit {
       this.ensureAutocompleteInitialized();
     } else {
       this.ingredients.insert(index + 1, ingredientGroup);
-      this.ingredientSuggestions.splice(index + 1, 0, of([]));
       this.ensureAutocompleteInitialized();
     }
   }
@@ -111,11 +118,10 @@ export class RecipeIngredientsFormComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.ingredients.removeAt(index);
-        this.ingredientSuggestions.splice(index, 1);
       }
     });
   }
-drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<string[]>) {
     const previousIndex = event.previousIndex;
     const currentIndex = event.currentIndex;
     
@@ -123,22 +129,11 @@ drop(event: CdkDragDrop<string[]>) {
       return;
     }
 
-    const dir = this.ingredients.at(previousIndex);
+    const movedIngredient = this.ingredients.at(previousIndex);
     this.ingredients.removeAt(previousIndex);
-    this.ingredients.insert(currentIndex, dir);
+    this.ingredients.insert(currentIndex, movedIngredient);
 
-    const suggestion = this.ingredientSuggestions[previousIndex];
-    this.ingredientSuggestions.splice(previousIndex, 1);
-    this.ingredientSuggestions.splice(currentIndex, 0, suggestion);
-    
-    // Re-setup autocompletes if necessary, typically valueChanges subscriptions persist with the control,
-    // but the index passed to setupAutocomplete closure might be stale if I used index in closure.
-    // Looking at setupAutocomplete:
-    // this.ingredientSuggestions[index] = ... 
-    // It updates the array at index. I just moved the array elements around.
-    // The subscription is on the control. 
-    // The issue is if setupAutocomplete uses 'index' inside the pipe?
-    // Let's check setupAutocomplete.
+
   }
 
   
@@ -190,7 +185,7 @@ drop(event: CdkDragDrop<string[]>) {
 
       if (!this.invalidateSelectionBound.has(ingredientNameControl)) {
         // Invalidate selection when user types
-        ingredientNameControl.valueChanges.subscribe(value => {
+        ingredientNameControl.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(value => {
           ingredientIdControl.setValue('');
           recipeIdControl.setValue('');
           if (value && typeof value === 'string' && value.trim().length > 0) {
@@ -221,7 +216,11 @@ drop(event: CdkDragDrop<string[]>) {
       return;
     }
 
-    this.ingredientSuggestions = this.ingredients.controls.map((control) => {
+    const controls = this.ingredients.controls;
+    if (controls.length === this.suggestionControls.length &&
+        controls.every((control, index) => control === this.suggestionControls[index])) return;
+    this.suggestionControls = [...controls];
+    this.ingredientSuggestions = controls.map((control) => {
       const existing = this.autocompleteByControl.get(control);
       if (existing) {
         return existing;
