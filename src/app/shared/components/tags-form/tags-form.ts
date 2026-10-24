@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { TagsService } from '../../../core/tags.service';
 import { Observable, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-tags-form',
@@ -68,7 +68,7 @@ export class TagsFormComponent implements OnInit {
         return this.tagsService.listTags({
           name: { contains: searchValue },
           limit: 10
-        });
+        }).pipe(catchError(() => of([])));
       })
     );
   }

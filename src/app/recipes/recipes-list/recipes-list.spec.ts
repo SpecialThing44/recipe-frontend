@@ -1,9 +1,9 @@
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, tick, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, of, Subject } from 'rxjs';
+import { BehaviorSubject, of, Subject, throwError } from 'rxjs';
 import { AuthService, User } from '../../core/auth.service';
 import { RecipesService } from '../../core/recipes.service';
 import { IngredientsService } from '../../core/ingredients.service';
@@ -15,6 +15,7 @@ import { RecipesListComponent } from './recipes-list';
 describe('RecipesListComponent', () => {
   let component: RecipesListComponent;
   let recipesService: jasmine.SpyObj<RecipesService>;
+  let tagsService: jasmine.SpyObj<TagsService>;
   let currentUser: BehaviorSubject<User | null>;
   let authLoading: BehaviorSubject<boolean>;
   let queryParams: BehaviorSubject<Params>;
@@ -22,6 +23,7 @@ describe('RecipesListComponent', () => {
   beforeEach(() => {
     recipesService = jasmine.createSpyObj('RecipesService', ['listRecipes']);
     recipesService.listRecipes.and.returnValue(of([]));
+    tagsService = jasmine.createSpyObj('TagsService', ['listTags']);
     currentUser = new BehaviorSubject<User | null>(null);
     authLoading = new BehaviorSubject(false);
     queryParams = new BehaviorSubject<Params>({});
@@ -29,7 +31,7 @@ describe('RecipesListComponent', () => {
     component = TestBed.runInInjectionContext(() => new RecipesListComponent(
       recipesService,
       jasmine.createSpyObj<IngredientsService>('IngredientsService', ['listIngredients']),
-      jasmine.createSpyObj<TagsService>('TagsService', ['listTags']),
+      tagsService,
       new FormBuilder(), { queryParams } as unknown as ActivatedRoute,
       { currentUser$: currentUser, loading$: authLoading } as unknown as AuthService,
       jasmine.createSpyObj<RoutePrefetchService>('RoutePrefetchService', ['scheduleIdlePrefetch']),
@@ -115,5 +117,18 @@ describe('RecipesListComponent', () => {
     component.ngOnInit();
     expect(component.pageSize).toBe(25);
   });
+
+  it('continues suggesting tags after a failed request', fakeAsync(() => {
+    tagsService.listTags.and.returnValues(throwError(() => new Error('offline')), of(['dinner']));
+    component.setupAutocomplete();
+    const suggestions: string[][] = [];
+    const subscription = component.tagSuggestions.subscribe(tags => suggestions.push(tags));
+    component.filterForm.get('tagInput')!.setValue('soup');
+    tick(100);
+    component.filterForm.get('tagInput')!.setValue('dinner');
+    tick(100);
+    expect(suggestions).toEqual([[], ['dinner']]);
+    subscription.unsubscribe();
+  }));
 
 });
