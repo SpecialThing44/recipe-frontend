@@ -24,8 +24,8 @@ import { RoutePrefetchService } from '../../core/route-prefetch.service';
 import { RecipeCreateDialogComponent } from '../recipe-create-dialog/recipe-create-dialog';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
-import { debounceTime, distinctUntilChanged, map, switchMap, startWith, filter } from 'rxjs/operators';
-import { combineLatest, Observable, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, switchMap, startWith, filter, catchError } from 'rxjs/operators';
+import { combineLatest, Observable, of, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-recipes-list',
@@ -62,6 +62,7 @@ export class RecipesListComponent implements OnInit {
   isLoggedIn$!: Observable<boolean>;
   currentUser: User | null = null;
   private readonly destroyRef = inject(DestroyRef);
+  private readonly recipeRequests = new Subject<RecipesFilters>();
   savedRecipeIds: Set<string> = new Set();
 
   filterForm: FormGroup;
@@ -117,6 +118,29 @@ export class RecipesListComponent implements OnInit {
       tagInput: [''],
       sort: ['none'],
       pageSize: [25]
+    });
+    this.recipeRequests.pipe(
+      switchMap(filters => this.recipesService.listRecipes(filters).pipe(
+        switchMap(recipes => {
+          this.recipes = recipes;
+          this.loading = false;
+          this.prefetchVisibleRecipeDetails(recipes);
+          if (!this.currentUser || recipes.length === 0) return of([]);
+          return this.recipesService.listRecipes({
+            ids: recipes.map(recipe => recipe.id), savedByUser: this.currentUser.id
+          }).pipe(catchError(() => of([])));
+        }),
+        catchError(error => {
+          console.error('Error loading recipes:', error);
+          this.error = error.message || 'Failed to load recipes';
+          this.loading = false;
+          this.recipes = [];
+          return of([]);
+        })
+      )),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(savedRecipes => {
+      this.savedRecipeIds = new Set(savedRecipes.map(recipe => recipe.id));
     });
   }
 
@@ -400,32 +424,8 @@ export class RecipesListComponent implements OnInit {
       }
     }
 
-    this.recipesService.listRecipes(filters).subscribe({
-      next: (recipes) => {
-        this.recipes = recipes;
-        this.loading = false;
-        this.prefetchVisibleRecipeDetails(recipes);
-        
-        // Check saved status for loaded recipes if user is logged in
-        if (this.currentUser && recipes.length > 0) {
-          const recipeIds = recipes.map(r => r.id);
-          this.recipesService.listRecipes({
-            ids: recipeIds,
-            savedByUser: this.currentUser.id
-          }).subscribe(savedRecipes => {
-            this.savedRecipeIds = new Set(savedRecipes.map(r => r.id));
-          });
-        } else {
-          this.savedRecipeIds.clear();
-        }
-      },
-      error: (err) => {
-        console.error('Error loading recipes:', err);
-        this.error = err.message || 'Failed to load recipes';
-        this.loading = false;
-        this.recipes = [];
-      }
-    });
+    this.savedRecipeIds.clear();
+    this.recipeRequests.next(filters);
   }
 
   clearFilters(): void {

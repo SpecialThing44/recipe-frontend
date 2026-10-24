@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subscription } from 'rxjs';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -43,6 +45,8 @@ import { Observable } from 'rxjs';
   styleUrl: './ingredients-list.scss',
 })
 export class IngredientsListComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private request?: Subscription;
   ingredients: Ingredient[] = [];
   loading = false;
   error: string | null = null;
@@ -123,7 +127,8 @@ export class IngredientsListComponent implements OnInit {
       }
     }
 
-    this.ingredientsService.listIngredients(filters).subscribe({
+    this.request?.unsubscribe();
+    this.request = this.ingredientsService.listIngredients(filters).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (ingredients) => {
         this.ingredients = ingredients;
         this.loading = false;

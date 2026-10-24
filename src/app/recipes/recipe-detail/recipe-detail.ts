@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +15,7 @@ import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-
 import { RecipesService, Recipe, InstructionRecipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
 import { AuthService } from '../../core/auth.service';
 import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { formatQuantityAmount } from '../../shared/utils/quantity-format';
 
@@ -39,6 +40,11 @@ import { formatQuantityAmount } from '../../shared/utils/quantity-format';
   styleUrl: './recipe-detail.scss',
 })
 export class RecipeDetailComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private recipeRequest?: Subscription;
+  private recommendationRequest?: Subscription;
+  private subRecipeRequest?: Subscription;
+  private savedRecipeRequest?: Subscription;
   recipe: Recipe | null = null;
   loading = false;
   error: string | null = null;
@@ -77,12 +83,13 @@ export class RecipeDetailComponent implements OnInit {
     );
 
     // Load saved recipes for "isSaved" status in recommendations
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
+      this.savedRecipeRequest?.unsubscribe();
       if (user) {
-        this.recipesService.listRecipes({
+        this.savedRecipeRequest = this.recipesService.listRecipes({
           savedByUser: user.id,
           limit: 100 // Load more to cover more cases
-        }).subscribe(recipes => {
+        }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(recipes => {
             if (recipes) {
                 this.savedRecipeIds = new Set(recipes.map(r => r.id));
                 if (this.recipe) {
@@ -96,7 +103,7 @@ export class RecipeDetailComponent implements OnInit {
       }
     });
 
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const id = params.get('id');
       if (id) {
           // If the ID changed, reload everything
@@ -111,14 +118,16 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   loadRecommendedRecipes(recipeId: string) {
+    this.recommendationRequest?.unsubscribe();
+    this.recommendedRecipes = [];
     this.loadingRecommendedRecipes = true;
-    this.recipesService.listRecipes({
+    this.recommendationRequest = this.recipesService.listRecipes({
       analyzedRecipe: recipeId,
       ingredientSimilarity: DEFAULT_ANALYTICAL_FILTER,
       coSaveSimilarity: DEFAULT_ANALYTICAL_FILTER,
       tagSimilarity: DEFAULT_ANALYTICAL_FILTER,
       limit: 5
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (recipes) => {
         this.recommendedRecipes = recipes || [];
         this.loadingRecommendedRecipes = false;
@@ -134,10 +143,15 @@ export class RecipeDetailComponent implements OnInit {
     const recipeId = id || this.route.snapshot.paramMap.get('id');
     if (!recipeId) return;
 
+    this.recipeRequest?.unsubscribe();
+    this.subRecipeRequest?.unsubscribe();
+    this.recipe = null;
+    this.subRecipes = [];
+    this.loadingSubRecipes = false;
     this.loading = true;
     this.error = null;
 
-    this.recipesService.getRecipe(recipeId).subscribe({
+    this.recipeRequest = this.recipesService.getRecipe(recipeId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (recipe) => {
         this.recipe = recipe;
         this.isSaved = this.savedRecipeIds.has(recipe.id);
@@ -170,7 +184,7 @@ export class RecipeDetailComponent implements OnInit {
     this.loadingSubRecipes = components.length > 0;
     if (components.length === 0) return;
 
-    forkJoin(components.map(component => this.recipesService.getRecipe(component.recipe.id))).subscribe({
+    this.subRecipeRequest = forkJoin(components.map(component => this.recipesService.getRecipe(component.recipe.id))).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: recipes => {
         this.subRecipes = recipes.map((subRecipe, index) => ({
           component: components[index],

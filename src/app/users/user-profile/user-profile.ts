@@ -17,8 +17,8 @@ import { AuthService, User } from '../../core/auth.service';
 import { UsersService } from '../../core/users.service';
 import { RecipesService, Recipe } from '../../core/recipes.service';
 import { CountriesService, Country } from '../../core/countries.service';
-import { combineLatest, Subject, Observable } from 'rxjs';
-import { takeUntil, startWith, map } from 'rxjs/operators';
+import { combineLatest, Subject, Observable, Subscription, of } from 'rxjs';
+import { takeUntil, startWith, map, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-profile',
@@ -51,6 +51,8 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   avatarPreview: string | null = null;
   filteredCountries$!: Observable<Country[]>;
   private destroy$ = new Subject<void>();
+  private userRecipeRequest?: Subscription;
+  private savedRecipeRequest?: Subscription;
   
   userRecipes: Recipe[] = [];
   savedRecipes: Recipe[] = [];
@@ -81,57 +83,39 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loading = true;
-
-    
-    combineLatest([
-      this.authService.currentUser$,
-      this.route.params
-    ]).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(([currentUser, params]) => {
-      this.currentUser = currentUser;
-      const userId = params['id'];
-      
-      if (userId) {
-        this.usersService.getUser(userId).subscribe({
-          next: (user) => {
-            this.user = user;
-            console.log('Loaded user:', (<any>user).Body);
-            
-            const isOwn = this.isOwnProfile();
-            
-            this.profileForm.patchValue({
-              name: user.name || '',
-              email: user.email || '',
-              countryOfOrigin: user.countryOfOrigin || ''
-            }, { emitEvent: false });
-            
-            if (isOwn) {
-              this.profileForm.enable({ emitEvent: false });
-            } else {
-              this.profileForm.disable({ emitEvent: false });
-            }
-            
-            if (user.avatar?.large) {
-              this.avatarPreview = user.avatar.large;
-            }
-            this.loading = false;
-            
-            // Load recipes
-            this.loadUserRecipes(user.id!);
-            if (this.isOwnProfile()) {
-              this.loadSavedRecipes();
-            }
-            
-          },
-          error: (err) => {
-            console.error('Error loading user:', err);
+    combineLatest([this.authService.currentUser$, this.route.params]).pipe(
+      switchMap(([currentUser, params]) => {
+        this.currentUser = currentUser;
+        this.userRecipeRequest?.unsubscribe();
+        this.savedRecipeRequest?.unsubscribe();
+        this.user = null;
+        this.userRecipes = [];
+        this.savedRecipes = [];
+        this.savedRecipeIds.clear();
+        this.avatarPreview = null;
+        this.avatarFile = null;
+        this.loading = true;
+        return this.usersService.getUser(params['id']).pipe(
+          catchError(error => {
+            console.error('Error loading user:', error);
             this.snackBar.open('Failed to load user profile', 'Close', { duration: 3000 });
-            this.loading = false;
-          }
-        });
-      }
+            return of(null);
+          })
+        );
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
+      this.loading = false;
+      if (!user) return;
+      this.user = user;
+      this.profileForm.patchValue({
+        name: user.name, email: user.email, countryOfOrigin: user.countryOfOrigin || ''
+      }, { emitEvent: false });
+      if (this.isOwnProfile()) this.profileForm.enable({ emitEvent: false });
+      else this.profileForm.disable({ emitEvent: false });
+      this.avatarPreview = user.avatar?.large || null;
+      this.loadUserRecipes(user.id);
+      if (this.isOwnProfile()) this.loadSavedRecipes();
     });
   }
 
@@ -261,11 +245,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   loadUserRecipes(userId: string): void {
     this.loadingRecipes = true;
     
-    this.recipesService.listRecipes({
+    this.userRecipeRequest?.unsubscribe();
+    this.userRecipeRequest = this.recipesService.listRecipes({
       belongsToUser: userId,
       limit: 10,
       page: 0
-    }).subscribe({
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (recipes: Recipe[]) => {
         this.userRecipes = recipes || [];
         this.loadingRecipes = false;
@@ -280,11 +265,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   loadSavedRecipes(): void {
     if (!this.user?.id) return;
     
-    this.recipesService.listRecipes({
+    this.savedRecipeRequest?.unsubscribe();
+    this.savedRecipeRequest = this.recipesService.listRecipes({
       savedByUser: this.user.id,
       limit: 10,
       page: 0
-    }).subscribe({
+    }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (recipes: Recipe[]) => {
         this.savedRecipes = recipes || [];
         // Extract IDs from saved recipes

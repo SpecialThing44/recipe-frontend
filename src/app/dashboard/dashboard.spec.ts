@@ -1,3 +1,4 @@
+import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { AuthService } from '../core/auth.service';
@@ -12,7 +13,7 @@ describe('Dashboard recipe changes', () => {
       dialog.open.and.returnValue({ afterClosed: () => of(recipeFixture) } as never);
       const recipesService = jasmine.createSpyObj<RecipesService>('RecipesService', ['listRecipes']);
       recipesService.listRecipes.and.returnValue(of([]));
-      const component = new DashboardComponent({} as AuthService, recipesService, dialog);
+      const component = TestBed.runInInjectionContext(() => new DashboardComponent({} as AuthService, recipesService, dialog));
       component.currentUser = recipeFixture.createdBy;
 
       if (action === 'create') component.createRecipe();

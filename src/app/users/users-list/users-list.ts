@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subscription } from 'rxjs';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -33,6 +35,8 @@ import { UsersService, User, UsersFilters } from '../../core/users.service';
   styleUrl: './users-list.scss',
 })
 export class UsersListComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private request?: Subscription;
   users: User[] = [];
   loading = false;
   error: string | null = null;
@@ -127,7 +131,8 @@ export class UsersListComponent implements OnInit {
 
     console.log('Loading users with filters:', filters);
 
-    this.usersService.listUsers(filters).subscribe({
+    this.request?.unsubscribe();
+    this.request = this.usersService.listUsers(filters).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (users) => {
         console.log('Received users:', users);
         this.users = users;

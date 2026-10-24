@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subscription } from 'rxjs';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -29,6 +31,10 @@ import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../core/recip
   styleUrl: './dashboard.scss'
 })
 export class DashboardComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private myRecipeRequest?: Subscription;
+  private savedRecipeRequest?: Subscription;
+  private recommendationRequest?: Subscription;
   currentUser: User | null = null;
   myRecipes: Recipe[] = [];
   savedRecipes: Recipe[] = [];
@@ -74,7 +80,17 @@ export class DashboardComponent implements OnInit {
 
   
   ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
+    this.authService.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(user => {
+      this.myRecipeRequest?.unsubscribe();
+      this.savedRecipeRequest?.unsubscribe();
+      this.recommendationRequest?.unsubscribe();
+      this.myRecipes = [];
+      this.savedRecipes = [];
+      this.recommendedRecipes = [];
+      this.savedRecipeIds.clear();
+      this.loadingMyRecipes = false;
+      this.loadingSavedRecipes = false;
+      this.loadingRecommendedRecipes = false;
       this.currentUser = user;
       if (user) {
         this.loadMyRecipes();
@@ -94,11 +110,12 @@ export class DashboardComponent implements OnInit {
     if (!this.currentUser?.id) return;
     
     this.loadingMyRecipes = true;
-    this.recipesService.listRecipes({
+    this.myRecipeRequest?.unsubscribe();
+    this.myRecipeRequest = this.recipesService.listRecipes({
       belongsToUser: this.currentUser.id,
       limit: 10,
       page: 0
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (recipes: Recipe[]) => {
         this.myRecipes = recipes || [];
         this.loadingMyRecipes = false;
@@ -114,11 +131,12 @@ export class DashboardComponent implements OnInit {
     if (!this.currentUser?.id) return;
     
     this.loadingSavedRecipes = true;
-    this.recipesService.listRecipes({
+    this.savedRecipeRequest?.unsubscribe();
+    this.savedRecipeRequest = this.recipesService.listRecipes({
       savedByUser: this.currentUser.id,
       limit: 10,
       page: 0
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (recipes: Recipe[]) => {
         this.savedRecipes = recipes || [];
         this.savedRecipeIds = new Set(recipes.map(r => r.id));
@@ -135,14 +153,15 @@ export class DashboardComponent implements OnInit {
     if (!this.currentUser?.id) return;
     
     this.loadingRecommendedRecipes = true;
-    this.recipesService.listRecipes({
+    this.recommendationRequest?.unsubscribe();
+    this.recommendationRequest = this.recipesService.listRecipes({
       analyzedUser: this.currentUser.id,
       ingredientSimilarity: DEFAULT_ANALYTICAL_FILTER,
       coSaveSimilarity: DEFAULT_ANALYTICAL_FILTER,
       tagSimilarity: DEFAULT_ANALYTICAL_FILTER,
       limit: 10,
       page: 0
-    }).subscribe({
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (recipes: Recipe[]) => {
         this.recommendedRecipes = recipes || [];
         this.loadingRecommendedRecipes = false;
