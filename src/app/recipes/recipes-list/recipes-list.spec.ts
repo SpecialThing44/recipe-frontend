@@ -98,4 +98,22 @@ describe('RecipesListComponent', () => {
     expect(recipesService.listRecipes).toHaveBeenCalledWith({ limit: 25, page: 1 });
   });
 
+  it('reloads URL changes and clears removed filters', () => {
+    queryParams.next({ nameValue: 'soup', tags: 'quick, dinner', createdByUser: 'old-user' });
+    component.ngOnInit();
+    component.currentPage = 3;
+    queryParams.next({ nameValue: 'bread', cookTime: '0' });
+    expect(component.currentPage).toBe(0);
+    expect(recipesService.listRecipes.calls.mostRecent().args[0]).toEqual({
+      name: { contains: 'bread' }, cookTime: { lessOrEqual: 0 }, limit: 25, page: 0
+    });
+    expect(component.filterForm.value.tags).toEqual([]);
+  });
+
+  it('uses a supported page size when URL input is invalid', () => {
+    queryParams.next({ pageSize: '-1' });
+    component.ngOnInit();
+    expect(component.pageSize).toBe(25);
+  });
+
 });

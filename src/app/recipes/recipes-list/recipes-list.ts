@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, OnInit, Input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -149,81 +149,16 @@ export class RecipesListComponent implements OnInit {
   ngOnInit(): void {
     this.isLoggedIn$ = this.authService.currentUser$.pipe(map(user => user !== null));
 
-    // Handle query parameters for pre-populated filters
-    this.route.queryParams.subscribe(params => {
-      const formUpdates: any = {};
-      
-      // User filter parameters
-      if (params['myRecipes'] === 'true') {
-        formUpdates.myRecipes = true;
-      }
-      if (params['savedRecipes'] === 'true') {
-        formUpdates.savedRecipes = true;
-      }
-      if (params['createdByUser']) {
-        formUpdates.createdByUser = params['createdByUser'];
-      }
-      if (params['savedByUser']) {
-        formUpdates.savedByUser = params['savedByUser'];
-      }
-      
-      // Basic filters
-      if (params['id']) {
-        formUpdates.id = params['id'];
-      }
-      if (params['nameValue']) {
-        formUpdates.nameValue = params['nameValue'];
-      }
-      if (params['nameFilterType']) {
-        formUpdates.nameFilterType = params['nameFilterType'];
-      }
-      
-      // Time filters
-      if (params['prepTime']) {
-        formUpdates.prepTime = parseInt(params['prepTime'], 10);
-      }
-      if (params['cookTime']) {
-        formUpdates.cookTime = parseInt(params['cookTime'], 10);
-      }
-      
-      // Sorting
-      if (params['sort']) {
-        formUpdates.sort = params['sort'];
-      }
-      
-      // Page size
-      if (params['pageSize']) {
-        formUpdates.pageSize = parseInt(params['pageSize'], 10);
-      }
-      
-      // Tags (comma-separated)
-      if (params['tags']) {
-        formUpdates.tags = params['tags'].split(',').filter((t: string) => t.trim());
-      }
-      
-      // Ingredients (comma-separated)
-      if (params['ingredients']) {
-        formUpdates.ingredients = params['ingredients'].split(',').filter((i: string) => i.trim());
-      }
-      
-      // Not ingredients (comma-separated)
-      if (params['notIngredients']) {
-        formUpdates.notIngredients = params['notIngredients'].split(',').filter((i: string) => i.trim());
-      }
-      
-      // Apply all updates at once
-      if (Object.keys(formUpdates).length > 0) {
-        this.filterForm.patchValue(formUpdates, { emitEvent: false });
-      }
-    });
-    
     combineLatest([this.authService.currentUser$, this.authService.loading$]).pipe(
       filter(([, loading]) => !loading),
       map(([user]) => user),
       distinctUntilChanged((previous, current) => previous?.id === current?.id),
+      switchMap(user => this.route.queryParams.pipe(map(params => ({ user, params })))),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe(user => {
+    ).subscribe(({ user, params }) => {
       this.currentUser = user;
+      this.resetFilters(params);
+      this.currentPage = 0;
       this.loadRecipes();
     });
     this.setupAutocomplete();
@@ -399,11 +334,11 @@ export class RecipesListComponent implements OnInit {
       filters.savedByUser = formValue.savedByUser;
     }
 
-    if (formValue.prepTime) {
+    if (formValue.prepTime !== null) {
       filters.prepTime = { lessOrEqual: formValue.prepTime };
     }
 
-    if (formValue.cookTime) {
+    if (formValue.cookTime !== null) {
       filters.cookTime = { lessOrEqual: formValue.cookTime };
     }
 
@@ -430,24 +365,31 @@ export class RecipesListComponent implements OnInit {
     this.recipeRequests.next(filters);
   }
 
-  clearFilters(): void {
+  private resetFilters(params: Params = {}): void {
+    const pageSize = Number(params['pageSize']);
+    const names = (value?: string) => value?.split(',').map(name => name.trim()).filter(Boolean) || [];
     this.filterForm.reset({
-      id: '',
-      nameFilterType: 'contains',
-      nameValue: '',
-      myRecipes: false,
-      savedRecipes: false,
-      prepTime: null,
-      cookTime: null,
-      ingredients: [],
-      notIngredients: [],
-      tags: [],
-      ingredientInput: '',
-      notIngredientInput: '',
-      tagInput: '',
-      sort: 'none',
-      pageSize: 25
-    });
+      id: params['id'] || '',
+      nameFilterType: this.filterTypes.some(type => type.value === params['nameFilterType'])
+        ? params['nameFilterType'] : 'contains',
+      nameValue: params['nameValue'] || '',
+      myRecipes: params['myRecipes'] === 'true',
+      savedRecipes: params['savedRecipes'] === 'true',
+      createdByUser: params['createdByUser'] || '',
+      savedByUser: params['savedByUser'] || '',
+      prepTime: params['prepTime'] !== undefined ? Number(params['prepTime']) : null,
+      cookTime: params['cookTime'] !== undefined ? Number(params['cookTime']) : null,
+      ingredients: names(params['ingredients']),
+      notIngredients: names(params['notIngredients']),
+      tags: names(params['tags']),
+      ingredientInput: '', notIngredientInput: '', tagInput: '',
+      sort: this.sortOptions.some(option => option.value === params['sort']) ? params['sort'] : 'none',
+      pageSize: this.pageSizes.includes(pageSize) ? pageSize : 25
+    }, { emitEvent: false });
+  }
+
+  clearFilters(): void {
+    this.resetFilters();
     this.currentPage = 0;
     this.loadRecipes();
   }
