@@ -16,7 +16,7 @@ import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-
 import { RecipesService, Recipe, InstructionRecipe, DEFAULT_ANALYTICAL_FILTER } from '../../core/recipes.service';
 import { AuthService } from '../../core/auth.service';
 import { BehaviorSubject, combineLatest, forkJoin, Observable, of, Subscription } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, finalize } from 'rxjs/operators';
 import { formatQuantityAmount } from '../../shared/utils/quantity-format';
 
 @Component({
@@ -51,6 +51,7 @@ export class RecipeDetailComponent implements OnInit {
   canEdit$!: Observable<boolean>;
   isLoggedIn$!: Observable<boolean>;
   isSaved = false;
+  saving = false;
   instructionsHtml = '';
   displayServings: number = 1;
   scaleFactor: number = 1;
@@ -245,31 +246,20 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   toggleSave(): void {
-    if (!this.recipe) return;
-
-    if (this.isSaved) {
-      this.recipesService.unsaveRecipe(this.recipe.id).subscribe({
-        next: () => {
-          this.isSaved = false;
-          this.snackBar.open('Recipe removed from saved recipes', 'Close', { duration: 3000 });
-        },
-        error: (err) => {
-          console.error('Error unsaving recipe:', err);
-          this.snackBar.open('Failed to unsave recipe', 'Close', { duration: 3000 });
-        }
-      });
-    } else {
-      this.recipesService.saveRecipe(this.recipe.id).subscribe({
-        next: () => {
-          this.isSaved = true;
-          this.snackBar.open('Recipe saved successfully', 'Close', { duration: 3000 });
-        },
-        error: (err) => {
-          console.error('Error saving recipe:', err);
-          this.snackBar.open('Failed to save recipe', 'Close', { duration: 3000 });
-        }
-      });
-    }
+    if (!this.recipe || this.saving) return;
+    const recipeId = this.recipe.id;
+    const wasSaved = this.isSaved;
+    const request = wasSaved ? this.recipesService.unsaveRecipe(recipeId) : this.recipesService.saveRecipe(recipeId);
+    this.saving = true;
+    request.pipe(finalize(() => this.saving = false), takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        if (wasSaved) this.savedRecipeIds.delete(recipeId);
+        else this.savedRecipeIds.add(recipeId);
+        if (this.recipe?.id === recipeId) this.isSaved = !wasSaved;
+        this.snackBar.open(wasSaved ? 'Recipe removed from saved recipes' : 'Recipe saved', 'Close', { duration: 3000 });
+      },
+      error: () => this.snackBar.open('Failed to update saved recipe', 'Close', { duration: 3000 })
+    });
   }
 
   getUnitName(unit: any): string {

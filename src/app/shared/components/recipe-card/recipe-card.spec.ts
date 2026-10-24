@@ -45,4 +45,22 @@ describe('RecipeCardComponent', () => {
     expect(recipeLink.getAttribute('href')).toBe('/recipes/recipe-id');
     expect(recipeLink.getAttribute('aria-label')).toBe('View recipe: Test Recipe');
   });
+  it('shows saved and pending state and blocks duplicate save actions', () => {
+    fixture.componentInstance.isLoggedIn = true;
+    fixture.componentInstance.isSaved = true;
+    fixture.componentInstance.saving = true;
+    const saved = jasmine.createSpy('saved');
+    fixture.componentInstance.saveClick.subscribe(saved);
+    fixture.detectChanges();
+    const button = fixture.nativeElement.querySelector('.save-button') as HTMLButtonElement;
+    expect(button.disabled).toBeTrue();
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(button.textContent).toContain('Saving');
+    button.click();
+    expect(saved).not.toHaveBeenCalled();
+    fixture.componentInstance.saving = false;
+    fixture.detectChanges();
+    expect(button.textContent).toContain('Saved');
+  });
+
 });

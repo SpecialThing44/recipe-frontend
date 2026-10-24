@@ -28,6 +28,7 @@ export class RecipeCardComponent {
   @Input() imageLoading: 'eager' | 'lazy' = 'lazy';
   @Input() layout: 'grid' | 'scroll' = 'grid';
   @Input() canEdit: boolean = false;
+  @Input() saving = false;
   @Input() isSaved: boolean = false;
   @Input() isLoggedIn: boolean = false;
   
@@ -37,7 +38,7 @@ export class RecipeCardComponent {
 
   onSaveClick(event: Event): void {
     event.stopPropagation();
-    this.saveClick.emit(this.recipe);
+    if (!this.saving) this.saveClick.emit(this.recipe);
   }
 
   onEditClick(event: Event): void {
