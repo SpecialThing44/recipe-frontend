@@ -13,7 +13,7 @@ import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { Recipe, RecipesService } from '../../core/recipes.service';
 import { combineLatest, Observable, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, startWith, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, catchError } from 'rxjs/operators';
 import { availableRecipeUnits, availableUnits } from '../../shared/units/available-units';
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog';
 
@@ -178,10 +178,13 @@ drop(event: CdkDragDrop<string[]>) {
           }
           if (kind === 'recipe') {
             return this.recipesService.listRecipes({ name: { contains: value.trim() }, limit: 10 }).pipe(
-              switchMap(recipes => of(recipes.filter(recipe => recipe.id !== this.currentRecipeId)))
+              switchMap(recipes => of(recipes.filter(recipe => recipe.id !== this.currentRecipeId))),
+              catchError(() => of([]))
             );
           }
-          return this.ingredientsService.listIngredients({ aliasesOrName: [value.trim()], limit: 10 });
+          return this.ingredientsService.listIngredients({ aliasesOrName: [value.trim()], limit: 10 }).pipe(
+            catchError(() => of([]))
+          );
         })
       );
 

@@ -176,7 +176,8 @@ export class RecipesListComponent implements OnInit {
           map(results => {
             const selectedIngredients = new Set<string>(this.filterForm.get('ingredients')?.value || []);
             return results.filter(result => !selectedIngredients.has(result.name));
-          })
+          }),
+          catchError(() => of([]))
         );
       })
     );
@@ -194,7 +195,8 @@ export class RecipesListComponent implements OnInit {
           map(results => {
             const selectedIngredients = new Set<string>(this.filterForm.get('notIngredients')?.value || []);
             return results.filter(result => !selectedIngredients.has(result.name));
-          })
+          }),
+          catchError(() => of([]))
         );
       })
     );
@@ -212,7 +214,8 @@ export class RecipesListComponent implements OnInit {
           map(results => {
             const selectedTags = new Set<string>(this.filterForm.get('tags')?.value || []);
             return results.filter(result => !selectedTags.has(result));
-          })
+          }),
+          catchError(() => of([]))
         );
       })
     );
