@@ -5,7 +5,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -69,7 +69,7 @@ export class RecipeEditDialogComponent {
     private recipesService: RecipesService,
     private countriesService: CountriesService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog,
+    private dialogRef: MatDialogRef<RecipeEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { recipe: Recipe }
   ) {
     this.recipeId = data.recipe.id;
@@ -351,19 +351,19 @@ export class RecipeEditDialogComponent {
         // Upload image if selected
         if (this.selectedImage) {
           this.recipesService.uploadRecipeImage(recipe.id, this.selectedImage).subscribe({
-            next: () => {
+            next: (updatedRecipe) => {
               this.snackBar.open('Recipe updated successfully with image', 'Close', { duration: 3000 });
-              this.dialog.closeAll();
+              this.dialogRef.close(updatedRecipe);
             },
             error: (err) => {
               console.error('Error uploading recipe image:', err);
               this.snackBar.open('Recipe updated but image upload failed', 'Close', { duration: 3000 });
-              this.dialog.closeAll();
+              this.dialogRef.close(recipe);
             }
           });
         } else {
           this.snackBar.open('Recipe updated successfully', 'Close', { duration: 3000 });
-          this.dialog.closeAll();
+          this.dialogRef.close(recipe);
         }
       },
       error: (err) => {

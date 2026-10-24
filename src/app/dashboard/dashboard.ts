@@ -54,7 +54,7 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loadMyRecipes();
+        this.refreshRecipes();
       }
     });
   }
@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit {
     if (confirm(`Are you sure you want to delete "${recipe.name}"?`)) {
       this.recipesService.deleteRecipe(recipe.id).subscribe({
         next: () => {
-          this.loadMyRecipes();
+          this.refreshRecipes();
         },
         error: (err: any) => {
           console.error('Error deleting recipe:', err);
@@ -82,6 +82,12 @@ export class DashboardComponent implements OnInit {
         this.loadRecommendedRecipes();
       }
     });
+  }
+
+  private refreshRecipes(): void {
+    this.loadMyRecipes();
+    this.loadSavedRecipes();
+    this.loadRecommendedRecipes();
   }
 
   loadMyRecipes() {
@@ -165,7 +171,7 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.loadMyRecipes();
+        this.refreshRecipes();
       }
     });
   }

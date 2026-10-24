@@ -1,5 +1,5 @@
 import { FormBuilder } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { of } from 'rxjs';
 import { CountriesService } from '../core/countries.service';
@@ -16,7 +16,7 @@ describe('Recipe instruction image handlers', () => {
       recipesService.uploadInstructionImage.and.returnValue(of({ url: '/image.png' }));
       const argumentsForDialog = [new FormBuilder(), recipesService, new CountriesService(),
         jasmine.createSpyObj<MatSnackBar>('MatSnackBar', ['open']),
-        jasmine.createSpyObj<MatDialog>('MatDialog', ['closeAll'])] as const;
+        jasmine.createSpyObj('MatDialogRef', ['close'])] as const;
       const component = mode === 'create'
         ? new RecipeCreateDialogComponent(...argumentsForDialog)
         : new RecipeEditDialogComponent(...argumentsForDialog, { recipe: recipeFixture });
