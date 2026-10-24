@@ -290,7 +290,7 @@ export class RecipeDetailComponent implements OnInit {
     const componentUnit = this.getUnitName(entry.component.quantity.unit);
     const servingScale = componentUnit === 'serving'
       ? entry.component.quantity.amount / entry.recipe.servings
-      : 1;
+      : entry.component.quantity.amount;
     return formatQuantityAmount(
       amount * servingScale * this.scaleFactor,
       this.getUnitName(unit)
