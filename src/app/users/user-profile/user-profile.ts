@@ -175,7 +175,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       updates.email = formValue.email;
     }
     if (formValue.countryOfOrigin !== this.user.countryOfOrigin) {
-      updates.countryOfOrigin = formValue.countryOfOrigin || undefined;
+      updates.countryOfOrigin = formValue.countryOfOrigin || "";
     }
 
     // Update profile first if there are changes

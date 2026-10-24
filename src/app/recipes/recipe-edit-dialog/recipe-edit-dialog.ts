@@ -341,8 +341,8 @@ export class RecipeEditDialogComponent {
       prepTime: formValue.prepTime,
       cookTime: formValue.cookTime,
       servings: formValue.servings,
-      countryOfOrigin: countryName || undefined,
-      wikiLink: formValue.wikiLink || undefined,
+      countryOfOrigin: countryName || "",
+      wikiLink: formValue.wikiLink || "",
       instructions: instructionsJson
     };
 
