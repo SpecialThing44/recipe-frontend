@@ -1,4 +1,4 @@
-<div class="recipes-list-container">
+<div class="recipes-list-container" [attr.aria-busy]="loading">
   <div class="header" *ngIf="showHeader">
     <div class="header-content">
       <div>
@@ -85,7 +85,7 @@
             <mat-chip-grid #ingredientList>
               <mat-chip-row *ngFor="let ingredient of filterForm.get('ingredients')?.value" (removed)="removeIngredient(ingredient, 'ingredients')">
                 {{ ingredient }}
-                <button matChipRemove>
+                <button matChipRemove aria-label="Remove filter">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip-row>
@@ -111,7 +111,7 @@
             <mat-chip-grid #notIngredientList>
               <mat-chip-row *ngFor="let ingredient of filterForm.get('notIngredients')?.value" (removed)="removeIngredient(ingredient, 'notIngredients')">
                 {{ ingredient }}
-                <button matChipRemove>
+                <button matChipRemove aria-label="Remove filter">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip-row>
@@ -137,7 +137,7 @@
             <mat-chip-grid #tagList>
               <mat-chip-row *ngFor="let tag of filterForm.get('tags')?.value" (removed)="removeTag(tag)">
                 {{ tag }}
-                <button matChipRemove>
+                <button matChipRemove aria-label="Remove filter">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip-row>
@@ -192,6 +192,8 @@
       </div>
     </form>
   </mat-expansion-panel>
+
+  <p *ngIf="loading" role="status" class="visually-hidden">Loading recipes…</p>
 
   <!-- Loading State -->
   <div *ngIf="loading" class="recipes-skeleton-grid" aria-hidden="true">
