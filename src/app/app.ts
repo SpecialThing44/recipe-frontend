@@ -1,4 +1,4 @@
-import { Component, OnInit, Type, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, Type, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
@@ -9,6 +9,13 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
+  @ViewChild('mainContent') private mainContent?: ElementRef<HTMLElement>;
+
+  skipToContent(event: Event): void {
+    event.preventDefault();
+    this.mainContent?.nativeElement.focus();
+  }
+
   protected readonly title = signal('recipe-frontend');
   navbarComponent: Type<unknown> | null = null;
 

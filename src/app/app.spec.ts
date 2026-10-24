@@ -22,4 +22,16 @@ describe('App', () => {
     expect(compiled.querySelector('.skip-link')?.getAttribute('href')).toBe('#main-content');
     expect(compiled.querySelector('main#main-content router-outlet')).not.toBeNull();
   });
+  it('focuses content without following the base URL to another page', () => {
+    const fixture = TestBed.createComponent(App);
+    spyOn(fixture.componentInstance, 'ngOnInit').and.resolveTo();
+    fixture.detectChanges();
+    const content = fixture.nativeElement.querySelector('main') as HTMLElement;
+    const focus = spyOn(content, 'focus');
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+    fixture.nativeElement.querySelector('.skip-link').dispatchEvent(event);
+    expect(event.defaultPrevented).toBeTrue();
+    expect(focus).toHaveBeenCalled();
+  });
+
 });
