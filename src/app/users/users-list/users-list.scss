@@ -7,25 +7,25 @@
     border-color: #b9c9b2;
   }
   mat-card-header {
-    padding: 24px 24px 8px;
+    padding: 12px 12px 6px;
   }
   mat-card-title {
     font-family: var(--app-heading-font);
-    font-size: 26px;
-    font-weight: 400;
+    font-size: 17px;
+    font-weight: 500;
     color: var(--app-ink);
   }
   mat-card-content {
-    padding: 0 24px 24px;
+    padding: 0 12px 12px;
   }
 }
 .user-avatar {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--app-soft);
   color: var(--app-primary);
   img {
@@ -35,13 +35,13 @@
   }
 }
 .user-info {
-  margin-top: 16px;
+  margin-top: 8px;
 }
 .info-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   font-size: 12px;
   color: var(--app-muted);
   mat-icon {

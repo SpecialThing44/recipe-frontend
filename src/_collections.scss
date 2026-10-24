@@ -1,33 +1,30 @@
 .collection-page {
-  min-height: calc(100vh - 80px);
-  padding-top: 36px;
-
+  min-height: calc(100vh - 56px);
   .header {
-    margin-bottom: 28px;
+    margin-bottom: 12px;
   }
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 24px;
+    gap: 12px;
   }
   .header h1 {
-    margin: 0 0 10px;
+    margin: 0 0 4px;
     font-family: var(--app-heading-font);
-    font-size: clamp(2.75rem, 5vw, 3.5rem);
-    font-weight: 400;
-    line-height: 1.08;
-    letter-spacing: -0.045em;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.2;
   }
   .subtitle {
     margin: 0;
     color: var(--app-muted);
-    font-size: 16px;
+    font-size: 14px;
   }
   .filters-panel {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     border: 1px solid var(--app-border);
-    border-radius: 12px;
+    border-radius: 8px;
     background: var(--app-surface);
     box-shadow: none;
   }
@@ -37,12 +34,12 @@
     color: var(--app-primary);
   }
   .filters-form {
-    padding-top: 16px;
+    padding-top: 8px;
   }
   .filter-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
     margin-bottom: 8px;
   }
   .filter-field {
@@ -54,13 +51,13 @@
   }
   .checkbox-row {
     align-items: center;
-    padding-bottom: 16px;
+    padding-bottom: 8px;
   }
   .filter-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-    padding-top: 20px;
+    padding-top: 12px;
     border-top: 1px solid var(--app-border);
   }
   .empty-state,
@@ -71,7 +68,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 64px 24px;
+    padding: 28px 16px;
     text-align: center;
     border: 1px dashed #cad4c6;
     border-radius: var(--app-radius);
@@ -79,19 +76,19 @@
   }
   .empty-state > mat-icon,
   .error-container > mat-icon {
-    width: 40px;
-    height: 40px;
-    padding: 16px;
+    width: 28px;
+    height: 28px;
+    padding: 10px;
     border-radius: 50%;
-    font-size: 40px;
+    font-size: 28px;
     color: var(--app-primary);
     background: var(--app-soft);
   }
   .empty-state h3 {
     font-family: var(--app-heading-font);
-    font-size: 28px;
-    font-weight: 400;
-    margin: 20px 0 8px;
+    font-size: 20px;
+    font-weight: 500;
+    margin: 12px 0 4px;
   }
   .empty-state p,
   .error-container p,
@@ -104,9 +101,9 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 32px;
-    padding-top: 24px;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--app-border);
   }
   .page-info {
@@ -118,8 +115,8 @@
   .users-grid,
   .recipes-skeleton-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+    gap: 12px;
   }
 }
 
@@ -128,10 +125,10 @@
     .header-content {
       align-items: flex-start;
       flex-direction: column;
-      gap: 20px;
+      gap: 12px;
     }
     .header h1 {
-      font-size: 2.75rem;
+      font-size: 24px;
     }
     .filter-row {
       flex-direction: column;
@@ -150,7 +147,7 @@
     }
     .empty-state,
     .error-container {
-      padding: 48px 20px;
+      padding: 24px 16px;
     }
   }
 }

@@ -1,17 +1,17 @@
 .recipe-search {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 8px;
+  margin-bottom: 8px;
   mat-form-field {
     flex: 1;
     min-width: 0;
     background: var(--app-surface);
-    border-radius: 12px;
+    border-radius: 6px;
   }
   button {
-    min-height: 54px;
-    padding: 0 28px;
+    min-height: 44px;
+    padding: 0 20px;
   }
 }
 .collection-summary {
@@ -19,20 +19,20 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   span {
     color: var(--app-muted);
     font-size: 12px;
   }
 }
 .advanced-filters-toggle {
-  margin: 8px 0 20px;
+  margin: 4px 0 12px;
 }
 .advanced-filters {
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 12px;
+  margin-bottom: 10px;
   background: var(--app-background);
-  border-radius: 12px;
+  border-radius: 6px;
 }
 .recipe-skeleton-card {
   border: 1px solid var(--app-border);
@@ -42,7 +42,7 @@
 }
 .skeleton-content,
 .skeleton-actions {
-  padding: 20px 22px;
+  padding: 12px;
 }
 .skeleton-block {
   border-radius: 6px;
@@ -51,18 +51,18 @@
   animation: shimmer 1.5s ease-in-out infinite;
 }
 .skeleton-image {
-  height: 210px;
+  height: 120px;
   border-radius: 0;
 }
 .skeleton-title {
   width: 70%;
-  height: 20px;
+  height: 17px;
   margin-bottom: 12px;
 }
 .skeleton-subtitle {
   width: 45%;
   height: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 10px;
 }
 .skeleton-meta {
   width: 80%;

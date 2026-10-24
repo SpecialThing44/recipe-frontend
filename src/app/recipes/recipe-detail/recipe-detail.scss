@@ -1,5 +1,5 @@
 .recipe-header {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 .header-content,
 .header-actions,
@@ -9,21 +9,21 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 .header-content {
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
+  align-items: center;
+  gap: 12px;
 }
 h1 {
   max-width: 820px;
-  margin: 0 0 16px;
+  margin: 0 0 6px;
   font-family: var(--app-heading-font);
-  font-size: clamp(36px, 5vw, 58px);
-  font-weight: 400;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  font-size: clamp(24px, 2.5vw, 32px);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: normal;
 }
 .subtitle {
   color: var(--app-muted);
@@ -31,30 +31,32 @@ h1 {
   font-size: 14px;
 }
 .recipe-content {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
 }
 .recipe-image-section {
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: 10px;
 }
 .recipe-image-section img {
   display: block;
-  width: 100%;
-  max-height: 560px;
-  object-fit: cover;
+  width: auto;
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
 }
 .info-cards {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: 10px;
 }
 .info-card mat-card-content {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 22px;
+  gap: 10px;
+  padding: 10px 12px;
 }
 .info-card mat-icon {
   color: var(--app-accent);
@@ -62,15 +64,14 @@ h1 {
 }
 .label {
   color: var(--app-muted);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12px;
 }
 .value {
   color: var(--app-ink);
   font-family: var(--app-heading-font);
-  font-size: 26px;
-  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 2px;
 }
 .badges-section .tags {
   display: flex;
@@ -89,32 +90,32 @@ h1 {
   align-items: center;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 16px;
-  padding: 24px 28px 16px;
+  gap: 10px;
+  padding: 12px 14px 8px;
 }
 .section-card mat-card-title {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   font-family: var(--app-heading-font);
-  font-size: 28px;
-  font-weight: 400;
-  letter-spacing: -0.025em;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: normal;
 }
 .section-card mat-card-title mat-icon {
   color: var(--app-primary);
 }
 .section-card mat-card-content {
-  padding: 0 28px 28px;
+  padding: 0 14px 12px;
 }
 .ingredients-actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 .servings-input {
-  width: 88px;
+  width: 80px;
 }
 .servings-input input {
   text-align: center;
@@ -125,8 +126,8 @@ h1 {
   margin: 0;
 }
 .ingredients-list li {
-  padding: 14px 0;
-  line-height: 1.65;
+  padding: 6px 0;
+  line-height: 1.5;
   border-bottom: 1px solid var(--app-border);
 }
 .ingredients-list li:last-child {
@@ -143,17 +144,17 @@ h1 {
 .sub-recipes {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 .sub-recipes h2,
 .recommended-title {
   font-family: var(--app-heading-font);
-  font-size: 30px;
-  font-weight: 400;
-  letter-spacing: -0.03em;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: normal;
 }
 .recipe-metadata {
-  padding: 20px 0;
+  padding: 10px 0;
   color: var(--app-muted);
   font-size: 12px;
   border-top: 1px solid var(--app-border);
@@ -168,37 +169,29 @@ h1 {
   font-size: 16px;
 }
 .error-container {
-  margin: 32px auto;
+  margin: 16px auto;
   max-width: 600px;
   text-align: center;
-  padding: 24px;
+  padding: 16px;
 }
 .recipes-scroll-container {
   overflow-x: auto;
-  padding: 4px 0 20px;
+  padding: 2px 0 10px;
   scrollbar-width: thin;
 }
 .recipes-scroll {
   display: flex;
-  gap: 24px;
+  gap: 12px;
   width: max-content;
 }
 @media (max-width: 768px) {
   .info-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
   }
-  .info-card mat-card-content {
-    padding: 16px;
-    gap: 10px;
-  }
-  .value {
-    font-size: 23px;
-  }
-  .section-card mat-card-header {
-    padding: 20px 20px 12px;
-  }
-  .section-card mat-card-content {
-    padding: 0 20px 20px;
+}
+
+@media (min-width: 1000px) {
+  .recipe-content {
+    grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.4fr);
   }
 }

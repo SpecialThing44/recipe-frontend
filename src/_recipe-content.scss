@@ -1,7 +1,11 @@
+.recipe-detail-container .recipe-content > :not(.section-card) {
+  grid-column: 1 / -1;
+}
+
 .recipe-detail-container .instructions-content {
   max-width: 75ch;
-  font-size: 16px;
-  line-height: 1.85;
+  font-size: 14px;
+  line-height: 1.55;
   overflow-wrap: anywhere;
   img {
     display: block;
@@ -12,11 +16,11 @@
   p,
   ul,
   ol {
-    margin: 0 0 18px;
+    margin: 0 0 10px;
   }
   li {
     padding-left: 6px;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
   li::marker {
     color: var(--app-primary);
@@ -30,13 +34,13 @@
   }
   blockquote {
     border-left: 3px solid #c6d2bf;
-    margin: 20px 0;
-    padding-left: 20px;
+    margin: 12px 0;
+    padding-left: 12px;
     color: var(--app-muted);
   }
   pre {
     white-space: pre-wrap;
-    padding: 16px;
+    padding: 12px;
     background: var(--app-soft);
     border-radius: 10px;
   }
@@ -50,7 +54,7 @@
 .recipe-detail-skeleton {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 20px;
+  padding: 20px;
   background: var(--app-background);
 }
 
@@ -83,8 +87,8 @@
 
 .skeleton-heading {
   width: min(420px, 80%);
-  height: 34px;
-  margin-bottom: 10px;
+  height: 24px;
+  margin-bottom: 6px;
 }
 
 .skeleton-subheading {
@@ -94,7 +98,7 @@
 
 .skeleton-icon {
   width: 34px;
-  height: 34px;
+  height: 24px;
   border-radius: 50%;
 }
 
@@ -119,7 +123,7 @@
 .skeleton-paragraph {
   width: 100%;
   height: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .skeleton-paragraph:nth-of-type(4n) {
@@ -138,14 +142,14 @@
 
 .recommended-skeleton {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   overflow-x: auto;
   padding-bottom: 10px;
 }
 
 .recommended-skeleton-card {
-  width: 280px;
-  min-width: 280px;
+  width: 260px;
+  min-width: 260px;
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
@@ -164,7 +168,7 @@
 
 .recommended-skeleton-block.image {
   width: 100%;
-  height: 155px;
+  height: 120px;
   border-radius: 0;
 }
 
@@ -177,7 +181,7 @@
 .recommended-skeleton-block.subtitle {
   width: 48%;
   height: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .recommended-skeleton-block.meta {
@@ -192,12 +196,5 @@
 
   100% {
     background-position: 0 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .recipe-detail-container .info-card mat-card-content {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
