@@ -62,7 +62,7 @@ export class RecipeEditDialogComponent {
   quillEditor: any;
   recipeId: string;
 
-  quillModules = getQuillModules(this.imageHandler)
+  quillModules = getQuillModules(() => this.imageHandler())
 
   constructor(
     private fb: FormBuilder,
