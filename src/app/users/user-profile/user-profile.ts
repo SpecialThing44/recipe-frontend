@@ -53,6 +53,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private userRecipeRequest?: Subscription;
   private savedRecipeRequest?: Subscription;
+  private savedStatusRequest?: Subscription;
   
   userRecipes: Recipe[] = [];
   savedRecipes: Recipe[] = [];
@@ -88,6 +89,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         this.currentUser = currentUser;
         this.userRecipeRequest?.unsubscribe();
         this.savedRecipeRequest?.unsubscribe();
+        this.savedStatusRequest?.unsubscribe();
         this.user = null;
         this.userRecipes = [];
         this.savedRecipes = [];
@@ -253,6 +255,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (recipes: Recipe[]) => {
         this.userRecipes = recipes || [];
+        this.loadVisibleSavedStatus();
         this.loadingRecipes = false;
       },
       error: (err: any) => {
@@ -273,8 +276,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }).pipe(takeUntil(this.destroy$)).subscribe({
       next: (recipes: Recipe[]) => {
         this.savedRecipes = recipes || [];
-        // Extract IDs from saved recipes
-        this.savedRecipeIds = new Set(recipes.map(r => r.id));
+        this.loadVisibleSavedStatus();
       },
       error: (err: any) => {
         console.error('Error loading saved recipes:', err);
@@ -282,6 +284,21 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }
   
+  private loadVisibleSavedStatus(): void {
+    this.savedStatusRequest?.unsubscribe();
+    const ids = Array.from(new Set([...this.userRecipes, ...this.savedRecipes].map(recipe => recipe.id)));
+    if (!this.currentUser?.id || ids.length === 0) {
+      this.savedRecipeIds.clear();
+      return;
+    }
+    this.savedStatusRequest = this.recipesService.listRecipes({
+      ids, savedByUser: this.currentUser.id, limit: ids.length
+    }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: recipes => this.savedRecipeIds = new Set(recipes.map(recipe => recipe.id)),
+      error: () => this.savedRecipeIds.clear()
+    });
+  }
+
   editRecipe(recipe: Recipe): void {
     const dialogRef = this.dialog.open(RecipeEditDialogComponent, {
       width: '900px', maxWidth: '95vw', data: { recipe }

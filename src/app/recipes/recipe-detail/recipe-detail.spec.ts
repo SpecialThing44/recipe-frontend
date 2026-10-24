@@ -47,4 +47,15 @@ describe('RecipeDetailComponent', () => {
     currentUser.next(recipeFixture.createdBy);
     expect(recipesService.listRecipes).not.toHaveBeenCalled();
   });
+  it('checks the current recipe by ID rather than scanning the first 100 saved recipes', () => {
+    currentUser.next(recipeFixture.createdBy);
+    recipesService.listRecipes.and.callFake(filters => of(filters?.savedByUser ? [recipeFixture] : []));
+    component.ngOnInit();
+    expect(component.isSaved).toBeTrue();
+    expect(recipesService.listRecipes).toHaveBeenCalledWith({
+      ids: [recipeFixture.id], savedByUser: 'user-id', limit: 1
+    });
+    expect(recipesService.listRecipes.calls.allArgs().some(([filters]) => filters?.limit === 100)).toBeFalse();
+  });
+
 });
