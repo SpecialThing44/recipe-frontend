@@ -82,6 +82,7 @@
 
   .filter-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
     margin-top: 16px;
     padding-top: 16px;
@@ -119,7 +120,7 @@
 
 .recipes-skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 20px;
   margin-bottom: 24px;
 }
@@ -194,7 +195,7 @@
 
 .recipes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
   gap: 20px;
   margin-bottom: 24px;
 
@@ -239,6 +240,7 @@
 
 .pagination {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 16px;
@@ -308,4 +310,21 @@
       // line-height: 18px;
     }
   }
+}
+
+.recipe-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  mat-form-field { flex: 1; min-width: 0; }
+  button { min-height: 48px; }
+}
+
+@media (max-width: 480px) {
+  .recipes-list-container { padding: 16px; }
+  .recipe-search { gap: 8px; }
+  .filters-form .filter-field { min-width: 0; }
+  .advanced-filters { padding: 12px; }
 }

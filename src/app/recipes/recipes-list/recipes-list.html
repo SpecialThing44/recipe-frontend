@@ -16,6 +16,15 @@
     </div>
   </div>
 
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="recipe-search">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Search recipes</mat-label>
+      <input matInput type="search" formControlName="nameValue" placeholder="What would you like to cook?">
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+    <button mat-flat-button type="submit">Search</button>
+  </form>
+
   <!-- Filters Panel -->
   <mat-expansion-panel class="filters-panel">
     <mat-expansion-panel-header>
@@ -25,34 +34,7 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <form [formGroup]="filterForm" class="filters-form">
-      <!-- ID Filter -->
-      <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-field">
-          <mat-label>Recipe ID</mat-label>
-          <input matInput formControlName="id" placeholder="Enter UUID">
-          <mat-icon matPrefix>fingerprint</mat-icon>
-        </mat-form-field>
-      </div>
-
-      <!-- Name Filter -->
-      <div class="filter-row">
-        <mat-form-field appearance="fill" class="filter-type">
-          <mat-label>Name Filter</mat-label>
-          <mat-select formControlName="nameFilterType">
-            <mat-option *ngFor="let type of filterTypes" [value]="type.value">
-              {{ type.label }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="fill" class="filter-field">
-          <mat-label>Name Value</mat-label>
-          <input matInput formControlName="nameValue" placeholder="Enter recipe name">
-          <mat-icon matPrefix>restaurant</mat-icon>
-        </mat-form-field>
-      </div>
-
+    <form [formGroup]="filterForm" class="filters-form" (ngSubmit)="applyFilters()">
       <!-- User Filters (Only for logged in users) -->
       <div class="filter-row checkbox-row" *ngIf="showUserFilters && (isLoggedIn$ | async)">
         <mat-checkbox formControlName="myRecipes">My Recipes</mat-checkbox>
@@ -84,6 +66,18 @@
 
       <!-- Advanced Filters Section -->
       <div class="advanced-filters" *ngIf="showAdvancedFilters">
+        <div class="filter-row">
+          <mat-form-field appearance="fill" class="filter-field">
+            <mat-label>Recipe ID</mat-label>
+            <input matInput formControlName="id" placeholder="Enter UUID">
+          </mat-form-field>
+          <mat-form-field appearance="fill" class="filter-field">
+            <mat-label>Name matching</mat-label>
+            <mat-select formControlName="nameFilterType">
+              <mat-option *ngFor="let type of filterTypes" [value]="type.value">{{ type.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
         <!-- Ingredients Filter -->
         <div class="filter-row full-width">
           <mat-form-field appearance="fill" class="full-width">
