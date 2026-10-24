@@ -298,11 +298,12 @@ button[color='warn'] {
 .row {
   display: flex;
   gap: 8px;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 8px;
 
   .field {
     flex: 1;
+    min-width: 0;
   }
 }
 
@@ -444,4 +445,12 @@ button[color='warn'] {
   .mat-mdc-icon-button {
     min-width: 44px;
   }
+}
+
+.mat-mdc-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
 }

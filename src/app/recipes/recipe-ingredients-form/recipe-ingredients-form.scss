@@ -1,163 +1,141 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .ingredient-row {
   display: grid;
-  grid-template-columns: 24px 40px minmax(150px, 2fr) minmax(76px, 0.8fr) minmax(92px, 1fr) minmax(
-      100px,
-      1.3fr
-    ) 36px;
-  gap: 8px;
+  grid-template-columns:
+    max-content minmax(150px, 1.8fr) minmax(76px, 0.8fr) minmax(96px, 1fr)
+    minmax(120px, 1.3fr) auto;
+  grid-template-rows: auto auto;
   align-items: center;
-  margin-bottom: 12px;
-  padding: 20px 8px 4px 8px;
+  gap: 0 8px;
+  margin-bottom: 8px;
+  padding: 8px;
   border: 1px solid var(--app-border);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--app-background);
-
-  mat-form-field {
-    align-self: start;
-  }
 
   &:last-child {
     margin-bottom: 0;
   }
-
-  .drag-handle-container {
-    display: flex;
+  mat-form-field {
+    display: grid;
+    grid-row: 1 / span 2;
+    grid-template-rows: subgrid;
     align-items: center;
-    justify-content: center;
-    cursor: grab;
-
-    &:active {
-      cursor: grabbing;
-    }
-  }
-
-  .drag-handle {
-    color: rgba(0, 0, 0, 0.38);
-  }
-
-  .ingredient-field {
     min-width: 0;
     width: 100%;
   }
+}
 
-  .kind-toggle {
-    width: 40px;
-    height: 40px;
-    color: rgba(0, 0, 0, 0.78) !important;
+.ingredient-controls,
+.action-buttons {
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: var(--mat-form-field-container-height, 52px);
+}
+
+.action-buttons {
+  @include mat.icon-button-overrides(
+    (
+      state-layer-size: 28px,
+      icon-size: 20px,
+    )
+  );
+  flex-direction: column;
+  gap: 0;
+  height: auto;
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
   }
+}
 
-  .amount-field {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .unit-field {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .description-field {
-    min-width: 0;
-    width: 100%;
-  }
-
+@media (pointer: coarse) {
   .action-buttons {
-    display: flex;
-    flex-direction: column;
+    @include mat.icon-button-overrides(
+      (
+        state-layer-size: 44px,
+      )
+    );
+  }
+}
+
+.drag-handle-container {
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  &:active {
+    cursor: grabbing;
+  }
+}
+.drag-handle {
+  color: var(--app-muted);
+}
+.kind-toggle {
+  color: var(--app-primary);
+}
+
+@container (max-width: 700px) {
+  .ingredient-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 8px;
+    mat-form-field {
+      display: inline-flex;
+      grid-row: auto;
+      grid-template-rows: none;
+      align-items: stretch;
+    }
+  }
+  .ingredient-controls {
+    grid-column: 1;
+    grid-row: 1;
+    justify-content: flex-start;
+  }
+  .action-buttons {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
     justify-content: center;
-    align-items: center;
-
-    button {
-      width: 32px;
-      height: 32px;
-      line-height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-        line-height: 20px;
-      }
-    }
+  }
+  .ingredient-controls {
+    height: 44px;
+  }
+  .ingredient-field,
+  .description-field {
+    grid-column: 1 / -1;
+  }
+  .amount-field {
+    grid-column: 1;
+  }
+  .unit-field {
+    grid-column: 2;
   }
 }
 
-@media (min-width: 801px) {
-  .ingredient-row {
-    .drag-handle-container {
-      align-self: start;
-      height: 56px;
-    }
-
-    .kind-toggle {
-      align-self: start;
-      margin-top: 8px;
-    }
-
-    .action-buttons {
-      align-self: start;
-    }
-  }
-}
-
-@media (max-width: 800px) {
-  .ingredient-row {
-    grid-template-columns: 40px 1fr;
-    align-items: center;
-    padding: 12px;
-
-    .drag-handle-container {
-      grid-row: 1 / span 6; // Span all rows
-      height: 100%;
-      align-items: center;
-      padding-top: 0;
-    }
-
-    .ingredient-field,
-    .kind-toggle,
-    .amount-field,
-    .unit-field,
-    .description-field,
-    .action-buttons {
-      grid-column: 2;
-    }
-
-    button {
-      justify-self: start;
-    }
-  }
-}
-
-// CDK Drag Styles
 .cdk-drag-preview {
   box-sizing: border-box;
-  border-radius: 10px;
-  box-shadow:
-    0 5px 5px -3px rgba(0, 0, 0, 0.2),
-    0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    0 3px 14px 2px rgba(0, 0, 0, 0.12);
-  background: #f4f7f5;
-  padding: 12px;
-  display: grid;
-  grid-template-columns: 24px 40px minmax(150px, 2fr) minmax(76px, 0.8fr) minmax(92px, 1fr) minmax(
-      100px,
-      1.3fr
-    ) 36px;
-  gap: 10px;
-  align-items: center;
+  border-radius: 8px;
+  box-shadow: var(--app-shadow);
 }
-
 .cdk-drag-placeholder {
   opacity: 0;
 }
-
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
+.cdk-drag-animating,
 .cdk-drop-list-dragging .ingredient-row:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 180ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cdk-drag-animating,
+  .cdk-drop-list-dragging .ingredient-row:not(.cdk-drag-placeholder) {
+    transition: none;
+  }
 }
