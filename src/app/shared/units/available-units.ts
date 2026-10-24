@@ -14,5 +14,5 @@ export const availableUnits = [
 
 export const availableRecipeUnits = [
   { value: 'serving', label: 'Serving' },
-  ...availableUnits
+  { value: 'piece', label: 'Whole recipe' }
 ];

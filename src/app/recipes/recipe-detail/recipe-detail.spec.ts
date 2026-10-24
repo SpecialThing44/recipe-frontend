@@ -58,4 +58,15 @@ describe('RecipeDetailComponent', () => {
     expect(recipesService.listRecipes.calls.allArgs().some(([filters]) => filters?.limit === 100)).toBeFalse();
   });
 
+  it('scales whole sub-recipes by their quantity and servings by the recipe yield', () => {
+    const entry = {
+      component: { recipe: { id: 'component', name: 'Sauce' }, quantity: { unit: 'piece', amount: 2 } },
+      recipe: { ...recipeFixture, servings: 4 }
+    };
+    component.scaleFactor = 1.5;
+    expect(component.getFormattedSubRecipeScaledAmount(entry, 100, 'gram')).toBe('300');
+    entry.component.quantity.unit = 'serving';
+    expect(component.getFormattedSubRecipeScaledAmount(entry, 100, 'gram')).toBe('75');
+  });
+
 });
