@@ -1,18 +1,23 @@
 .recipe-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
   padding: 16px 0;
-  min-width: 700px;
+  min-width: min(700px, calc(95vw - 48px));
   max-width: 900px;
 
   .image-upload {
     display: flex;
     align-items: center;
     gap: 16px;
+    flex-wrap: wrap;
+    padding: 16px;
+    border: 1px dashed #c6d2bf;
+    border-radius: 12px;
+    background: var(--app-background);
 
     .file-name {
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--app-muted);
       font-size: 14px;
     }
   }
@@ -31,6 +36,10 @@
   }
 
   .ai-parse-section {
+    padding: 20px;
+    border: 1px solid var(--app-border);
+    border-radius: 14px;
+    background: var(--app-background);
     .ai-help {
       margin: 0 0 8px;
       color: rgba(0, 0, 0, 0.7);

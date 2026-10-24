@@ -1,17 +1,32 @@
 <p *ngIf="loading" role="status" class="visually-hidden">Loading recipe…</p>
-<div class="recipe-detail-container" *ngIf="recipe && !loading">
+<div class="recipe-detail-container page-shell" *ngIf="recipe && !loading">
   <div class="recipe-header">
     <div class="header-content">
       <div>
+        <p class="eyebrow">From the recipe collection</p>
         <h1>{{ recipe.name }}</h1>
-        <p class="subtitle">by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a></p>
+        <p class="subtitle">
+          by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a>
+        </p>
       </div>
       <div class="header-actions">
-        <button mat-raised-button type="button" (click)="printRecipe()" [disabled]="loadingSubRecipes">
+        <button
+          mat-raised-button
+          type="button"
+          (click)="printRecipe()"
+          [disabled]="loadingSubRecipes"
+        >
           <mat-icon>print</mat-icon>
           Print
         </button>
-        <button *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)" mat-raised-button [color]="isSaved ? 'accent' : 'primary'" (click)="toggleSave()" [disabled]="saving" [attr.aria-pressed]="isSaved">
+        <button
+          *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)"
+          mat-raised-button
+          [color]="isSaved ? 'accent' : 'primary'"
+          (click)="toggleSave()"
+          [disabled]="saving"
+          [attr.aria-pressed]="isSaved"
+        >
           <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
           {{ saving ? 'Saving…' : isSaved ? 'Saved' : 'Save' }}
         </button>
@@ -33,8 +48,13 @@
     <!-- Recipe Image -->
     <div class="recipe-image-section" *ngIf="recipe.image?.large">
       <picture>
-        <source media="(max-width: 548px)" [srcset]="recipe.image!.medium">
-        <img [src]="recipe.image!.large" [alt]="recipe.name" fetchpriority="high" decoding="async">
+        <source media="(max-width: 548px)" [srcset]="recipe.image!.medium" />
+        <img
+          [src]="recipe.image!.large"
+          [alt]="recipe.name"
+          fetchpriority="high"
+          decoding="async"
+        />
       </picture>
     </div>
 
@@ -112,21 +132,33 @@
           </button>
           <mat-form-field appearance="outline" class="servings-input">
             <mat-label>Servings</mat-label>
-            <input matInput type="number" min="1" [(ngModel)]="displayServings" (ngModelChange)="onServingsChange()">
+            <input
+              matInput
+              type="number"
+              min="1"
+              [(ngModel)]="displayServings"
+              (ngModelChange)="onServingsChange()"
+            />
           </mat-form-field>
         </div>
       </mat-card-header>
       <mat-card-content>
         <ul class="ingredients-list">
           <li *ngFor="let ingredient of recipe.ingredients">
-            <strong>{{ getFormattedScaledAmount(ingredient.quantity.amount, ingredient.quantity.unit) }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
+            <strong
+              >{{ getFormattedScaledAmount(ingredient.quantity.amount, ingredient.quantity.unit) }}
+              {{ getUnitName(ingredient.quantity.unit) }}</strong
+            >
             {{ ingredient.ingredient.name }}
             <span *ngIf="ingredient.description" class="ingredient-description">
               ({{ ingredient.description }})
             </span>
           </li>
           <li *ngFor="let component of recipe.recipeIngredients">
-            <strong>{{ getFormattedScaledAmount(component.quantity.amount, component.quantity.unit) }} {{ getUnitName(component.quantity.unit) }}</strong>
+            <strong
+              >{{ getFormattedScaledAmount(component.quantity.amount, component.quantity.unit) }}
+              {{ getUnitName(component.quantity.unit) }}</strong
+            >
             <a [routerLink]="['/recipes', component.recipe.id]">{{ component.recipe.name }}</a>
             <span *ngIf="component.description" class="ingredient-description">
               ({{ component.description }})
@@ -164,12 +196,32 @@
           <h3>Ingredients</h3>
           <ul class="ingredients-list">
             <li *ngFor="let ingredient of entry.recipe.ingredients">
-              <strong>{{ getFormattedSubRecipeScaledAmount(entry, ingredient.quantity.amount, ingredient.quantity.unit) }} {{ getUnitName(ingredient.quantity.unit) }}</strong>
+              <strong
+                >{{
+                  getFormattedSubRecipeScaledAmount(
+                    entry,
+                    ingredient.quantity.amount,
+                    ingredient.quantity.unit
+                  )
+                }}
+                {{ getUnitName(ingredient.quantity.unit) }}</strong
+              >
               {{ ingredient.ingredient.name }}
-              <span *ngIf="ingredient.description" class="ingredient-description">({{ ingredient.description }})</span>
+              <span *ngIf="ingredient.description" class="ingredient-description"
+                >({{ ingredient.description }})</span
+              >
             </li>
             <li *ngFor="let component of entry.recipe.recipeIngredients">
-              <strong>{{ getFormattedSubRecipeScaledAmount(entry, component.quantity.amount, component.quantity.unit) }} {{ getUnitName(component.quantity.unit) }}</strong>
+              <strong
+                >{{
+                  getFormattedSubRecipeScaledAmount(
+                    entry,
+                    component.quantity.amount,
+                    component.quantity.unit
+                  )
+                }}
+                {{ getUnitName(component.quantity.unit) }}</strong
+              >
               <a [routerLink]="['/recipes', component.recipe.id]">{{ component.recipe.name }}</a>
             </li>
           </ul>
@@ -190,16 +242,19 @@
       </p>
       <p class="metadata-item">
         <mat-icon>event</mat-icon>
-        <span>Created: {{ recipe.createdOn | date:'medium' }}</span>
+        <span>Created: {{ recipe.createdOn | date: 'medium' }}</span>
       </p>
       <p class="metadata-item">
         <mat-icon>update</mat-icon>
-        <span>Updated: {{ recipe.updatedOn | date:'medium' }}</span>
+        <span>Updated: {{ recipe.updatedOn | date: 'medium' }}</span>
       </p>
     </div>
 
     <!-- Recommended Recipes -->
-    <div class="recommended-section" *ngIf="loadingRecommendedRecipes || recommendedRecipes.length > 0">
+    <div
+      class="recommended-section"
+      *ngIf="loadingRecommendedRecipes || recommendedRecipes.length > 0"
+    >
       <h2 class="recommended-title">Similar Recipes</h2>
 
       <div class="recommended-skeleton" *ngIf="loadingRecommendedRecipes" aria-hidden="true">
@@ -221,7 +276,8 @@
             [recipe]="rec"
             [layout]="'scroll'"
             [isSaved]="savedRecipeIds.has(rec.id)"
-            [canEdit]="false">
+            [canEdit]="false"
+          >
           </app-recipe-card>
         </div>
       </div>

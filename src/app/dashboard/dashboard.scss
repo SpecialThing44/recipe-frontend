@@ -1,135 +1,127 @@
-.dashboard-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
 .guest-view {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 64px;
+  padding: 56px;
+  border: 1px solid var(--app-border);
+  border-radius: 24px;
+  background: var(--app-surface);
+  h1 {
+    margin: 0 0 24px;
+    font-family: var(--app-heading-font);
+    font-size: clamp(36px, 4.7vw, 62px);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.045em;
+  }
+  .guest-description {
+    max-width: 430px;
+    margin: 0 0 32px;
+    color: var(--app-muted);
+    line-height: 1.8;
+  }
+}
+.guest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.kitchen-note {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: 60vh;
+  align-items: center;
+  min-height: 380px;
+  padding: 24px;
+  box-sizing: border-box;
+  border-radius: 160px 160px 20px 20px;
+  background: var(--app-soft);
+  color: var(--app-primary);
   text-align: center;
-
-  h1 {
-    margin: 0 0 16px 0;
+  mat-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 42px;
+    margin-bottom: 32px;
+  }
+  span {
+    font-family: var(--app-heading-font);
     font-size: 36px;
-    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
   }
-
-  p {
-    margin: 0 0 32px 0;
-    font-size: 18px;
-    color: rgba(0, 0, 0, 0.6);
-  }
-
-  .guest-actions {
-    display: flex;
-    gap: 16px;
-
-    button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      font-size: 16px;
-    }
+  small {
+    margin-top: 24px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
   }
 }
-
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
-
-  h1 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 500;
-  }
-
-  button {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
+  gap: 24px;
+  margin-bottom: 48px;
 }
-
+.dashboard-header h1 {
+  margin: 0;
+  font-family: var(--app-heading-font);
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
 .recipes-section {
   margin-bottom: 48px;
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-
-    h2 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
-    }
-
-    a {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+}
+.section-header {
+  margin-bottom: 20px;
+  h2 {
+    margin: 0;
+    font-family: var(--app-heading-font);
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: -0.03em;
   }
-
-  .recipes-scroll-container {
-    overflow-x: auto;
-    padding-bottom: 16px;
-
-    &::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 4px;
-
-      &:hover {
-        background: #555;
-      }
-    }
+}
+.recipes-scroll-container {
+  overflow-x: auto;
+  padding: 2px 2px 20px;
+  scrollbar-color: #bccdb3 transparent;
+  scrollbar-width: thin;
+}
+.recipes-scroll {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+}
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+.empty-state {
+  padding: 40px 24px;
+  border: 1px dashed #cad4c6;
+  border-radius: var(--app-radius);
+  color: var(--app-muted);
+  text-align: center;
+  p {
+    margin: 0 0 16px;
   }
-
-  .recipes-scroll {
-    display: flex;
-    gap: 16px;
-    width: fit-content;
+}
+@media (max-width: 768px) {
+  .guest-view {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 32px 24px;
   }
-
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    padding: 48px 0;
+  .kitchen-note {
+    min-height: 260px;
+    border-radius: 120px 120px 16px 16px;
   }
-
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 48px 0;
-    color: rgba(0, 0, 0, 0.6);
-
-    p {
-      margin: 0 0 16px 0;
-      font-size: 16px;
-    }
-
-    button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+  .dashboard-header {
+    flex-wrap: wrap;
+    margin-bottom: 32px;
   }
 }

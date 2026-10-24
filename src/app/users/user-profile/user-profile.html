@@ -1,7 +1,9 @@
-<div class="profile-container">
+<div class="profile-container page-shell">
   <div class="header">
-    <h1>{{ isOwnProfile() ? 'My Profile' : user?.name + '\'s Profile' }}</h1>
-    <p class="subtitle">{{ isOwnProfile() ? 'Manage your account information' : 'View user information' }}</p>
+    <h1>{{ isOwnProfile() ? 'My Profile' : user?.name + "'s Profile" }}</h1>
+    <p class="subtitle">
+      {{ isOwnProfile() ? 'Manage your account information' : 'View user information' }}
+    </p>
   </div>
 
   <div *ngIf="loading" class="loading-container">
@@ -20,25 +22,27 @@
         <div class="avatar-section">
           <div class="avatar-display">
             <div *ngIf="hasAvatarToDisplay()" class="avatar-image">
-              <img [src]="getAvatarDisplay()" alt="User avatar">
+              <img [src]="getAvatarDisplay()" alt="User avatar" />
             </div>
             <div *ngIf="!hasAvatarToDisplay()" class="avatar-placeholder">
               <mat-icon>person</mat-icon>
             </div>
           </div>
-          
+
           <div class="avatar-controls" *ngIf="isOwnProfile()">
-            <input 
-              type="file" 
-              #fileInput 
-              accept="image/*" 
+            <input
+              type="file"
+              #fileInput
+              accept="image/*"
               (change)="onAvatarSelected($event)"
-              style="display: none">
-            <button 
-              mat-raised-button 
-              color="primary" 
+              style="display: none"
+            />
+            <button
+              mat-raised-button
+              color="primary"
               (click)="fileInput.click()"
-              [disabled]="saving">
+              [disabled]="saving"
+            >
               <mat-icon>photo_camera</mat-icon>
               Change Avatar
             </button>
@@ -50,7 +54,7 @@
         <form [formGroup]="profileForm" class="profile-form">
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Name</mat-label>
-            <input matInput formControlName="name" placeholder="Your name">
+            <input matInput formControlName="name" placeholder="Your name" />
             <mat-icon matPrefix>person</mat-icon>
             <mat-error *ngIf="profileForm.get('name')?.hasError('required')">
               Name is required
@@ -59,7 +63,12 @@
 
           <mat-form-field appearance="fill" class="full-width" *ngIf="isOwnProfile()">
             <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email" placeholder="your.email@example.com">
+            <input
+              matInput
+              formControlName="email"
+              type="email"
+              placeholder="your.email@example.com"
+            />
             <mat-icon matPrefix>email</mat-icon>
             <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
               Email is required
@@ -71,11 +80,12 @@
 
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Country of Origin</mat-label>
-            <input 
-              matInput 
-              formControlName="countryOfOrigin" 
+            <input
+              matInput
+              formControlName="countryOfOrigin"
               placeholder="Start typing to search countries"
-              [matAutocomplete]="countryAuto">
+              [matAutocomplete]="countryAuto"
+            />
             <mat-icon matPrefix>public</mat-icon>
             <mat-autocomplete #countryAuto="matAutocomplete">
               <mat-option *ngFor="let country of filteredCountries$ | async" [value]="country.name">
@@ -93,24 +103,29 @@
             <div class="metadata-item">
               <mat-icon>calendar_today</mat-icon>
               <span class="label">Member Since:</span>
-              <span class="value">{{ user.createdOn | date:'medium' }}</span>
+              <span class="value">{{ user.createdOn | date: 'medium' }}</span>
             </div>
             <div class="metadata-item">
               <mat-icon>update</mat-icon>
               <span class="label">Last Updated:</span>
-              <span class="value">{{ user.updatedOn | date:'medium' }}</span>
+              <span class="value">{{ user.updatedOn | date: 'medium' }}</span>
             </div>
           </div>
         </form>
       </mat-card-content>
 
       <mat-card-actions *ngIf="isOwnProfile()">
-        <button 
-          mat-raised-button 
-          color="primary" 
+        <button
+          mat-raised-button
+          color="primary"
           (click)="saveProfile()"
-          [disabled]="profileForm.invalid || saving">
-          <mat-spinner *ngIf="saving" diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+          [disabled]="profileForm.invalid || saving"
+        >
+          <mat-spinner
+            *ngIf="saving"
+            diameter="20"
+            style="display: inline-block; margin-right: 8px"
+          ></mat-spinner>
           <mat-icon *ngIf="!saving">save</mat-icon>
           {{ saving ? 'Saving...' : 'Save Changes' }}
         </button>
@@ -120,13 +135,14 @@
     <!-- User's Recipes Section -->
     <div class="recipes-section" *ngIf="user">
       <div class="section-header">
-        <h2>{{ isOwnProfile() ? 'My Recipes' : user.name + '\'s Recipes' }}</h2>
-        <button 
-          *ngIf="userRecipes.length > 0" 
-          mat-raised-button 
+        <h2>{{ isOwnProfile() ? 'My Recipes' : user.name + "'s Recipes" }}</h2>
+        <button
+          *ngIf="userRecipes.length > 0"
+          mat-raised-button
           color="primary"
           [routerLink]="['/recipes']"
-          [queryParams]="{createdByUser: user.id}">
+          [queryParams]="{ createdByUser: user.id }"
+        >
           See All
           <mat-icon>arrow_forward</mat-icon>
         </button>
@@ -149,14 +165,21 @@
             [isLoggedIn]="!!currentUser"
             (saveClick)="toggleSave($event)"
             (editClick)="editRecipe($event)"
-            (deleteClick)="deleteRecipe($event)">
+            (deleteClick)="deleteRecipe($event)"
+          >
           </app-recipe-card>
         </div>
       </div>
 
       <div *ngIf="!loadingRecipes && userRecipes.length === 0" class="empty-state">
         <mat-icon>restaurant_menu</mat-icon>
-        <p>{{ isOwnProfile() ? 'You haven\'t created any recipes yet' : 'This user hasn\'t created any recipes yet' }}</p>
+        <p>
+          {{
+            isOwnProfile()
+              ? "You haven't created any recipes yet"
+              : "This user hasn't created any recipes yet"
+          }}
+        </p>
         <button *ngIf="isOwnProfile()" mat-raised-button color="primary" routerLink="/recipes">
           Browse Recipes
         </button>
@@ -167,12 +190,13 @@
     <div class="recipes-section" *ngIf="user && isOwnProfile()">
       <div class="section-header">
         <h2>Saved Recipes</h2>
-        <button 
-          *ngIf="savedRecipes.length > 0" 
-          mat-raised-button 
+        <button
+          *ngIf="savedRecipes.length > 0"
+          mat-raised-button
           color="primary"
           [routerLink]="['/recipes']"
-          [queryParams]="{savedByUser: user.id}">
+          [queryParams]="{ savedByUser: user.id }"
+        >
           See All
           <mat-icon>arrow_forward</mat-icon>
         </button>
@@ -195,7 +219,8 @@
             [isLoggedIn]="true"
             (saveClick)="toggleSave($event)"
             (editClick)="editRecipe($event)"
-            (deleteClick)="deleteRecipe($event)">
+            (deleteClick)="deleteRecipe($event)"
+          >
           </app-recipe-card>
         </div>
       </div>
@@ -203,9 +228,7 @@
       <div *ngIf="!loadingRecipes && savedRecipes.length === 0" class="empty-state">
         <mat-icon>bookmark_border</mat-icon>
         <p>You haven't saved any recipes yet</p>
-        <button mat-raised-button color="primary" routerLink="/recipes">
-          Browse Recipes
-        </button>
+        <button mat-raised-button color="primary" routerLink="/recipes">Browse Recipes</button>
       </div>
     </div>
   </div>

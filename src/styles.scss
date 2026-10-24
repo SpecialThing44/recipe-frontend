@@ -1,5 +1,7 @@
 @use '@angular/material' as mat;
 @use './theme-colors' as palettes;
+@use './collections';
+@use './recipe-content';
 
 @font-face {
   font-family: 'Roboto';
@@ -7,9 +9,9 @@
   font-weight: 400;
   font-display: swap;
   src: url('/fonts/roboto-latin-400-normal.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
-    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -18,9 +20,9 @@
   font-weight: 500;
   font-display: swap;
   src: url('/fonts/roboto-latin-500-normal.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC,
-    U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -49,63 +51,199 @@
 
 @include mat.core();
 
-$recipe-frontend-theme: mat.define-theme((
-  color: (
-    theme-type: light,
-    primary: palettes.$primary-palette,
-    tertiary: palettes.$tertiary-palette,
-  ),
-  typography: (
-    brand-family: 'Roboto, sans-serif',
-    plain-family: 'Roboto, sans-serif',
-  ),
-  density: (
-    scale: 0,
+$recipe-frontend-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: palettes.$primary-palette,
+      tertiary: palettes.$tertiary-palette,
+    ),
+    typography: (
+      brand-family: 'Roboto, sans-serif',
+      plain-family: 'Roboto, sans-serif',
+    ),
+    density: (
+      scale: 0,
+    ),
   )
-));
+);
 
 :root {
   @include mat.all-component-themes($recipe-frontend-theme);
 
-  --app-primary: #0b3d2e;
-  --app-accent:  #8b5e3c; /* moderate brown */
-  --app-cream:   #fff7e6; /* main backsplash / surface */
-  --app-surface: var(--app-cream);
+  --app-primary: #28513e;
+  --app-accent: #995135;
+  --app-background: #f7f7f2;
+  --app-surface: #ffffff;
+  --app-cream: var(--app-background);
+  --app-ink: #213c30;
+  --app-text: #34443b;
+  --app-muted: #68746c;
+  --app-border: #e1e6dd;
+  --app-soft: #edf2e8;
+  --app-radius: 18px;
+  --app-shadow: 0 8px 28px rgb(30 55 40 / 5%);
+  --app-heading-font: Georgia, 'Times New Roman', serif;
 
-  --md-sys-color-primary: var(--app-primary);
-  --md-sys-color-on-primary: #e9e7e1;
-  --md-sys-color-secondary: var(--app-accent);
-  --md-sys-color-surface: var(--app-surface);
-  --md-sys-color-background: var(--app-surface);
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--app-primary),
+      filled-label-text-color: #ffffff,
+      filled-container-shape: 10px,
+      outlined-container-shape: 10px,
+      outlined-outline-color: var(--app-border),
+      outlined-label-text-color: var(--app-primary),
+      protected-container-shape: 10px,
+      protected-container-color: var(--app-surface),
+      protected-label-text-color: var(--app-primary),
+      protected-container-elevation-shadow: none,
+      text-container-shape: 10px,
+      text-label-text-color: var(--app-primary),
+    )
+  );
+  @include mat.form-field-overrides(
+    (
+      filled-container-color: var(--app-soft),
+      filled-container-shape: 12px,
+      outlined-container-shape: 12px,
+      outlined-outline-color: #83917e,
+      outlined-hover-outline-color: var(--app-primary),
+      outlined-focus-outline-color: var(--app-primary),
+      outlined-label-text-color: var(--app-muted),
+      outlined-input-text-color: var(--app-text),
+      leading-icon-color: var(--app-muted),
+    )
+  );
+  @include mat.card-overrides(
+    (
+      elevated-container-color: var(--app-surface),
+      elevated-container-shape: var(--app-radius),
+      elevated-container-elevation: none,
+      title-text-weight: 500,
+      subtitle-text-color: var(--app-muted),
+    )
+  );
+  @include mat.chips-overrides(
+    (
+      container-shape-radius: 6px,
+      outline-color: transparent,
+      label-text-color: var(--app-primary),
+      label-text-size: 12px,
+      label-text-weight: 400,
+    )
+  );
+  @include mat.expansion-overrides(
+    (
+      container-elevation-shadow: none,
+      container-background-color: var(--app-surface),
+      container-shape: 12px,
+    )
+  );
+  @include mat.dialog-overrides(
+    (
+      container-color: var(--app-surface),
+      container-shape: 22px,
+      subhead-font: var(--app-heading-font),
+      subhead-size: 28px,
+      subhead-weight: 400,
+    )
+  );
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background: var(--app-surface);
-  color: rgba(20, 20, 20, 0.87);
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background: var(--app-background);
+  color: var(--app-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-mat-toolbar {
-  background-color: var(--app-primary) !important;
-  color: var(--md-sys-color-on-primary, #e9e7e1) !important;
+::selection {
+  background: #d9e7cf;
+  color: var(--app-ink);
 }
 
-mat-toolbar a[mat-button],
-mat-toolbar button[mat-button],
-mat-toolbar button[mat-icon-button] {
-  color: var(--md-sys-color-on-primary, #e9e7e1) !important;
+h1,
+h2,
+h3 {
+  color: var(--app-ink);
+  text-wrap: balance;
+}
+h1 {
+  font-family: var(--app-heading-font);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+}
+a {
+  color: var(--app-primary);
+  text-underline-offset: 3px;
+}
+button,
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus-visible {
+  outline: 2px solid var(--app-primary);
+  outline-offset: 4px;
+}
+.mat-mdc-card {
+  border: 1px solid var(--app-border);
+}
+.mat-mdc-chip {
+  background: var(--app-soft);
+}
+.muted {
+  color: var(--app-muted);
 }
 
-.mat-mdc-card, .auth-form, .card {
-  background: var(--app-cream);
+.eyebrow {
+  margin: 0 0 14px;
+  color: var(--app-accent);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-.muted { color: rgba(0,0,0,0.6); }
+.page-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px clamp(20px, 4vw, 48px) 64px;
+  box-sizing: border-box;
+}
+
+button[mat-raised-button][color='primary'] {
+  @include mat.button-overrides(
+    (
+      protected-container-color: var(--app-primary),
+      protected-label-text-color: #ffffff,
+    )
+  );
+}
+
+button[color='warn'] {
+  @include mat.button-overrides(
+    (
+      outlined-label-text-color: #a63c31,
+      protected-label-text-color: #a63c31,
+      text-label-text-color: #a63c31,
+    )
+  );
+}
+
+.mat-mdc-dialog-actions {
+  border-top: 1px solid var(--app-border);
+  background: var(--app-background);
+}
 
 .section-header {
   display: flex;
@@ -121,14 +259,14 @@ mat-toolbar button[mat-icon-button] {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--app-border);
 
   h3 {
     margin: 0;
     font-size: 18px;
     font-weight: 500;
-    color: rgba(0, 0, 0, 0.87);
+    color: var(--app-ink);
   }
 }
 
@@ -261,10 +399,30 @@ mat-toolbar button[mat-icon-button] {
   padding: 12px 20px;
   background: white;
   color: var(--app-primary);
-  &:focus { top: 8px; }
+  &:focus {
+    top: 8px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton-block, .recommended-skeleton-block { animation: none !important; }
-  .recipe-card { transition: none !important; }
+  .skeleton-block,
+  .recommended-skeleton-block {
+    animation: none !important;
+  }
+  .recipe-card {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-shell {
+    padding: 32px 20px 48px;
+  }
+  .section-header {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .time-fields {
+    grid-template-columns: 1fr;
+  }
 }
