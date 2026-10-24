@@ -21,8 +21,6 @@ import { AuthService, User } from '../../core/auth.service';
 import { IngredientsService, Ingredient } from '../../core/ingredients.service';
 import { TagsService } from '../../core/tags.service';
 import { RoutePrefetchService } from '../../core/route-prefetch.service';
-import { RecipeCreateDialogComponent } from '../recipe-create-dialog/recipe-create-dialog';
-import { RecipeEditDialogComponent } from '../recipe-edit-dialog/recipe-edit-dialog';
 import { RecipeCardComponent } from '../../shared/components/recipe-card/recipe-card';
 import { debounceTime, distinctUntilChanged, map, switchMap, startWith, filter, catchError } from 'rxjs/operators';
 import { combineLatest, Observable, of, Subject } from 'rxjs';
@@ -424,7 +422,9 @@ export class RecipesListComponent implements OnInit {
     this.routePrefetchService.scheduleIdlePrefetch(likelyRecipePaths);
   }
 
-  openCreateDialog(): void {
+  async openCreateDialog(): Promise<void> {
+    const { RecipeCreateDialogComponent } = await import('../recipe-create-dialog/recipe-create-dialog');
+    if (this.destroyRef.destroyed) return;
     const dialogRef = this.dialog.open(RecipeCreateDialogComponent, {
       width: '900px',
       maxWidth: '95vw',
@@ -436,9 +436,11 @@ export class RecipesListComponent implements OnInit {
     });
   }
 
-  openEditDialog(recipe: Recipe, event: Event): void {
+  async openEditDialog(recipe: Recipe, event: Event): Promise<void> {
     event.stopPropagation(); // Prevent card click navigation
     
+    const { RecipeEditDialogComponent } = await import('../recipe-edit-dialog/recipe-edit-dialog');
+    if (this.destroyRef.destroyed) return;
     const dialogRef = this.dialog.open(RecipeEditDialogComponent, {
       width: '900px',
       maxWidth: '95vw',

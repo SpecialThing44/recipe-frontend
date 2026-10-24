@@ -37,8 +37,8 @@ describe('Profile recipe actions', () => {
     expect(recipesService.unsaveRecipe).toHaveBeenCalledWith(recipeFixture.id);
   });
 
-  it('refreshes recipes after editing', () => {
-    component.editRecipe(recipeFixture);
+  it('refreshes recipes after editing', async () => {
+    await component.editRecipe(recipeFixture);
     expect(recipesService.listRecipes).toHaveBeenCalledWith({ belongsToUser: 'another-user', limit: 10, page: 0 });
   });
 
