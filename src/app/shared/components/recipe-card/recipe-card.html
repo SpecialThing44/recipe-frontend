@@ -24,21 +24,22 @@
     <div class="recipe-info">
       <div class="info-row">
         <mat-icon>schedule</mat-icon>
-        <span>Prep: {{ recipe.prepTime }}m | Cook: {{ recipe.cookTime }}m</span>
+        <span>{{ recipe.prepTime + recipe.cookTime }} min total</span>
       </div>
 
       <div class="info-row">
-        <mat-icon>fingerprint</mat-icon>
-        <span class="info-value recipe-id">{{ recipe.id }}</span>
+        <mat-icon>people</mat-icon>
+        <span>{{ recipe.servings }} servings</span>
       </div>
 
       <div class="tags" *ngIf="recipe.tags.length > 0">
-        <mat-chip *ngFor="let tag of recipe.tags">{{ tag }}</mat-chip>
+        <mat-chip *ngFor="let tag of recipe.tags | slice:0:3">{{ tag }}</mat-chip>
+        <span *ngIf="recipe.tags.length > 3" class="more-tags">+{{ recipe.tags.length - 3 }} more</span>
       </div>
     </div>
   </mat-card-content>
 
-  <mat-card-actions align="end">
+  <mat-card-actions *ngIf="canEdit || isLoggedIn" align="end">
     <button *ngIf="isLoggedIn && !canEdit" 
             mat-stroked-button 
             [color]="isSaved ? 'accent' : 'primary'" 
