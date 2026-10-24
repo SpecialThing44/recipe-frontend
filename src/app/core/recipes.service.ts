@@ -50,7 +50,7 @@ export interface Recipe {
   public: boolean;
   countryOfOrigin?: string;
   wikiLink?: string;
-  instructions: any; // Quill Delta object from backend
+  instructions: unknown;
   instructionImages: string[];
   image?: ImageUrls;
   createdOn: string;
@@ -160,12 +160,12 @@ export interface RecipesFilters {
   providedIn: 'root'
 })
 export class RecipesService {
-  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
+  private readonly API_BASE = window.ENV?.API_BASE_URL || 'http://localhost:9000';
 
   constructor(private http: HttpClient) {}
 
   listRecipes(filters?: RecipesFilters): Observable<Recipe[]> {
-    const body: any = {};
+    const body: RecipesFilters = {};
 
     if (filters) {
       if (filters.id) body.id = filters.id;
@@ -188,37 +188,37 @@ export class RecipesService {
       if (filters.page !== undefined) body.page = filters.page;
     }
 
-    return this.http.post<any>(`${this.API_BASE}/recipes/query`, body, {
+    return this.http.post<{ Body: Recipe[] }>(`${this.API_BASE}/recipes/query`, body, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || [])
+      map(response => response?.Body || [])
     );
   }
 
   getRecipe(id: string): Observable<Recipe> {
-    return this.http.get<any>(`${this.API_BASE}/recipes/${id}`, {
+    return this.http.get<Recipe | { Body: Recipe }>(`${this.API_BASE}/recipes/${id}`, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   createRecipe(input: RecipeInput): Observable<Recipe> {
-    return this.http.post<any>(`${this.API_BASE}/recipes`, input, {
+    return this.http.post<Recipe | { Body: Recipe }>(`${this.API_BASE}/recipes`, input, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   uploadRecipeImage(id: string, imageFile: File): Observable<Recipe> {
-    return this.http.put<any>(`${this.API_BASE}/recipes/${id}/image`, imageFile, {
+    return this.http.put<Recipe | { Body: Recipe }>(`${this.API_BASE}/recipes/${id}/image`, imageFile, {
       withCredentials: true,
       headers: {
         'Content-Type': imageFile.type
       }
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
@@ -232,10 +232,10 @@ export class RecipesService {
   }
 
   updateRecipe(id: string, input: Partial<RecipeInput>): Observable<Recipe> {
-    return this.http.put<any>(`${this.API_BASE}/recipes/${id}`, input, {
+    return this.http.put<Recipe | { Body: Recipe }>(`${this.API_BASE}/recipes/${id}`, input, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
@@ -258,7 +258,7 @@ export class RecipesService {
   }
 
   checkAiHealth(): Observable<boolean> {
-    return this.http.get<any>(`${this.API_BASE}/ai/health`, {
+    return this.http.get<unknown>(`${this.API_BASE}/ai/health`, {
       withCredentials: true
     }).pipe(
       map(() => true),
@@ -267,10 +267,10 @@ export class RecipesService {
   }
 
   parseRecipeWithAi(text: string): Observable<AiRecipeParseResponse> {
-    return this.http.post<any>(`${this.API_BASE}/recipes/parse`, { text }, {
+    return this.http.post<AiRecipeParseResponse | { Body: AiRecipeParseResponse }>(`${this.API_BASE}/recipes/parse`, { text }, {
       withCredentials: true
     }).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 }

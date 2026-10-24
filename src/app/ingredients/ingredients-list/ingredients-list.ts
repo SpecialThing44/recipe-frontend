@@ -2,7 +2,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -52,7 +52,7 @@ export class IngredientsListComponent implements OnInit {
   error: string | null = null;
   isAdmin$!: Observable<boolean>;
 
-  filterForm: FormGroup;
+  readonly filterForm;
   
   filterTypes = [
     { value: 'contains', label: 'Contains' },
@@ -80,7 +80,7 @@ export class IngredientsListComponent implements OnInit {
     private authService: AuthService,
     private snackBar: MatSnackBar
   ) {
-    this.filterForm = this.fb.group({
+    this.filterForm = this.fb.nonNullable.group({
       id: [''],
       nameFilterType: ['contains'],
       nameValue: [''],
@@ -106,7 +106,7 @@ export class IngredientsListComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    const formValue = this.filterForm.value;
+    const formValue = this.filterForm.getRawValue();
     const filters: IngredientsFilters = {
       limit: this.pageSize,
       page: this.currentPage
@@ -117,9 +117,7 @@ export class IngredientsListComponent implements OnInit {
     }
 
     if (formValue.nameValue?.trim()) {
-      filters.name = {};
-      const nameFilterType = formValue.nameFilterType || 'contains';
-      filters.name[nameFilterType as keyof typeof filters.name] = formValue.nameValue.trim();
+      filters.name = { [formValue.nameFilterType]: formValue.nameValue.trim() };
     }
 
     if (formValue.sort && formValue.sort !== 'none') {

@@ -31,54 +31,54 @@ export interface IngredientWeightSettingsResponse {
   providedIn: 'root'
 })
 export class AdminService {
-  private readonly API_BASE = (window as any).ENV?.API_BASE_URL || 'http://localhost:9000';
+  private readonly API_BASE = window.ENV?.API_BASE_URL || 'http://localhost:9000';
 
   constructor(private http: HttpClient) {}
 
   processIngredientWeightEvents(): Observable<IngredientWeightQueueResponse> {
-    return this.http.post<IngredientWeightQueueResponse>(
+    return this.http.post<IngredientWeightQueueResponse | { Body: IngredientWeightQueueResponse }>(
       `${this.API_BASE}/admin/ingredient-weights/process-events`,
       {},
       { withCredentials: true }
     ).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   rebuildIngredientWeights(): Observable<IngredientWeightQueueResponse> {
-    return this.http.post<IngredientWeightQueueResponse>(
+    return this.http.post<IngredientWeightQueueResponse | { Body: IngredientWeightQueueResponse }>(
       `${this.API_BASE}/admin/ingredient-weights/rebuild`,
       {},
       { withCredentials: true }
     ).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   ingredientWeightJobStatus(jobId: string): Observable<IngredientWeightJobStatus> {
-    return this.http.get<IngredientWeightJobStatus>(
+    return this.http.get<IngredientWeightJobStatus | { Body: IngredientWeightJobStatus }>(
       `${this.API_BASE}/admin/ingredient-weights/jobs/${jobId}`,
       { withCredentials: true }
     ).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   activeIngredientWeightJobIds(): Observable<IngredientWeightActiveJobsResponse> {
-    return this.http.get<IngredientWeightActiveJobsResponse>(
+    return this.http.get<IngredientWeightActiveJobsResponse | { Body: IngredientWeightActiveJobsResponse }>(
       `${this.API_BASE}/admin/ingredient-weights/jobs/active`,
       { withCredentials: true }
     ).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 
   ingredientWeightSettings(): Observable<IngredientWeightSettingsResponse> {
-    return this.http.get<IngredientWeightSettingsResponse>(
+    return this.http.get<IngredientWeightSettingsResponse | { Body: IngredientWeightSettingsResponse }>(
       `${this.API_BASE}/admin/ingredient-weights/settings`,
       { withCredentials: true }
     ).pipe(
-      map((response: any) => response?.Body || response)
+      map(response => 'Body' in response ? response.Body : response)
     );
   }
 }
