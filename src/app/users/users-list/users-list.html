@@ -1,7 +1,8 @@
-<div class="users-list-container">
+<div class="users-list-container page-shell collection-page">
   <div class="header">
+    <p class="eyebrow">The community</p>
     <h1>Users</h1>
-    <p class="subtitle">Browse and filter users</p>
+    <p class="subtitle">Meet the cooks behind the recipes.</p>
   </div>
 
   <!-- Filters Panel -->
@@ -18,7 +19,7 @@
       <div class="filter-row">
         <mat-form-field appearance="fill" class="filter-field">
           <mat-label>User ID</mat-label>
-          <input matInput formControlName="id" placeholder="Enter UUID">
+          <input matInput formControlName="id" placeholder="Enter UUID" />
           <mat-icon matPrefix>fingerprint</mat-icon>
         </mat-form-field>
       </div>
@@ -36,7 +37,7 @@
 
         <mat-form-field appearance="fill" class="filter-field">
           <mat-label>Name Value</mat-label>
-          <input matInput formControlName="nameValue" placeholder="Enter name">
+          <input matInput formControlName="nameValue" placeholder="Enter name" />
           <mat-icon matPrefix>person</mat-icon>
         </mat-form-field>
       </div>
@@ -54,7 +55,7 @@
 
         <mat-form-field appearance="fill" class="filter-field">
           <mat-label>Email Value</mat-label>
-          <input matInput formControlName="emailValue" placeholder="Enter email">
+          <input matInput formControlName="emailValue" placeholder="Enter email" />
           <mat-icon matPrefix>email</mat-icon>
         </mat-form-field>
       </div>
@@ -113,7 +114,11 @@
     <mat-card *ngFor="let user of users" class="user-card" (click)="viewUser(user.id)">
       <mat-card-header>
         <div mat-card-avatar class="user-avatar">
-          <img *ngIf="user.avatar?.thumbnail" [src]="user.avatar?.thumbnail" [alt]="user.name + ' avatar'">
+          <img
+            *ngIf="user.avatar?.thumbnail"
+            [src]="user.avatar?.thumbnail"
+            [alt]="user.name + ' avatar'"
+          />
           <mat-icon *ngIf="!user.avatar?.thumbnail">person</mat-icon>
         </div>
         <mat-card-title>{{ user.name }}</mat-card-title>
@@ -136,7 +141,7 @@
           <div class="info-row">
             <mat-icon>schedule</mat-icon>
             <span class="info-label">Created:</span>
-            <span class="info-value">{{ user.createdOn | date:'short' }}</span>
+            <span class="info-value">{{ user.createdOn | date: 'short' }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -155,9 +160,7 @@
       Previous
     </button>
 
-    <span class="page-info">
-      Page {{ currentPage + 1 }} • {{ users.length }} results
-    </span>
+    <span class="page-info"> Page {{ currentPage + 1 }} • {{ users.length }} results </span>
 
     <button mat-raised-button [disabled]="users.length < pageSize" (click)="nextPage()">
       Next

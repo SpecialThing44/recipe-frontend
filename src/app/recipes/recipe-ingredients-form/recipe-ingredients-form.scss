@@ -1,13 +1,16 @@
 .ingredient-row {
   display: grid;
-  grid-template-columns: 32px 40px minmax(170px, 1.6fr) minmax(110px, 1.5fr) minmax(120px, 1.1fr) minmax(180px, 2.2fr) 36px;
-  gap: 5px;
+  grid-template-columns: 24px 40px minmax(150px, 2fr) minmax(76px, 0.8fr) minmax(92px, 1fr) minmax(
+      100px,
+      1.3fr
+    ) 36px;
+  gap: 8px;
   align-items: center;
   margin-bottom: 12px;
   padding: 20px 8px 4px 8px;
-  border: 1px solid rgba(11, 61, 46, 0.14);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
-  background: rgba(11, 61, 46, 0.045);
+  background: var(--app-background);
 
   mat-form-field {
     align-self: start;
@@ -132,13 +135,17 @@
 .cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 10px;
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-              0 8px 10px 1px rgba(0, 0, 0, 0.14),
-              0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12);
   background: #f4f7f5;
   padding: 12px;
   display: grid;
-  grid-template-columns: 32px 40px minmax(170px, 1.6fr) minmax(110px, 1.5fr) minmax(120px, 1.1fr) minmax(180px, 2.2fr) 36px;
+  grid-template-columns: 24px 40px minmax(150px, 2fr) minmax(76px, 0.8fr) minmax(92px, 1fr) minmax(
+      100px,
+      1.3fr
+    ) 36px;
   gap: 10px;
   align-items: center;
 }

@@ -1,136 +1,110 @@
+:host {
+  display: block;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
+
+mat-toolbar {
+  height: 80px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+  color: var(--app-ink);
+  background: transparent;
+  gap: 16px;
+}
+
 .brand-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  color: inherit;
+  height: auto;
   padding: 0;
-  min-width: auto;
-  
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
-  }
-  
+  min-width: 0;
+  text-decoration: none;
+  color: var(--app-ink);
+
   mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 11px;
+    color: white;
+    background: var(--app-primary);
+    font-size: 20px;
   }
 }
 
 .brand {
-  font-weight: 600;
-  font-size: 1.125rem;
+  font-family: var(--app-heading-font);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: -0.04em;
 }
-
 .spacer {
-  flex: 1 1 auto;
+  flex: 1;
 }
-
-
-.account-bubble {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--md-sys-color-primary, #0d6812);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  overflow: hidden;
-
-  img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.account-button {
-  align-items: center;
-  display: inline-flex;
-  justify-content: center;
-  padding: 0;
-}
-
-.active-link {
-  background-color: #083024;
-  border-radius: 6px;
-  padding: 6px 10px;
-  transition: background-color 160ms linear;
-}
-
-mat-toolbar {
-  background-color: #beb1ab;
-  color: rgb(31, 31, 31);
-  display: flex;
-  align-items: center;
-  padding: 0 16px;
-}
-
-.account-bubble mat-icon {
-  font-size: 20px;
-  line-height: 20px;
-}
-
-/* Responsive Styles */
 .desktop-menu {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
-
+.desktop-menu a {
+  color: var(--app-muted);
+  padding: 0 18px;
+}
+.desktop-menu a.active-link {
+  color: var(--app-primary);
+  background: var(--app-soft);
+}
+.login-button {
+  margin-left: 16px;
+  border: 1px solid var(--app-border);
+}
 .mobile-menu-trigger {
   display: none;
 }
-
-@media (max-width: 768px) {
-  .desktop-menu {
-    display: none;
-  }
-
-  .mobile-menu-trigger {
-    display: inline-flex;
-  }
+.account-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin-left: 10px;
 }
-
-.mobile-active-link {
-  background-color: #d1dfdb;
-  border-radius: 6px;
-  padding: 6px 10px;
-  transition: background-color 160ms linear;
-}
-
+.account-bubble,
 .account-bubble-mini {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--md-sys-color-primary, #0d6812);
-  color: white;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  margin-right: 12px;
-  vertical-align: middle;
-
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--app-soft);
+  color: var(--app-primary);
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
-  mat-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    line-height: 16px;
-  }
+}
+.account-bubble-mini {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  vertical-align: middle;
+}
+.mobile-active-link {
+  background: var(--app-soft);
 }
 
-::ng-deep .mobile-active-link {
-  background-color: #2e7d32; /* Brighter green than desktop */
-  color: white;
+@media (max-width: 768px) {
+  mat-toolbar {
+    height: 72px;
+  }
+  .desktop-menu {
+    display: none;
+  }
+  .mobile-menu-trigger {
+    display: inline-flex;
+  }
 }

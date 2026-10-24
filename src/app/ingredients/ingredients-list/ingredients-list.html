@@ -1,15 +1,12 @@
-<div class="ingredients-list-container">
+<div class="ingredients-list-container page-shell collection-page">
   <div class="header">
     <div class="header-content">
       <div>
+        <p class="eyebrow">The pantry</p>
         <h1>Ingredients</h1>
-        <p class="subtitle">Browse and manage ingredients</p>
+        <p class="subtitle">The building blocks of something delicious.</p>
       </div>
-      <button 
-        *ngIf="isAdmin$ | async" 
-        mat-raised-button 
-        color="primary" 
-        (click)="openCreateDialog()">
+      <button *ngIf="isAdmin$ | async" mat-flat-button color="primary" (click)="openCreateDialog()">
         <mat-icon>add</mat-icon>
         Create Ingredient
       </button>
@@ -30,7 +27,7 @@
       <div class="filter-row">
         <mat-form-field appearance="fill" class="filter-field">
           <mat-label>Ingredient ID</mat-label>
-          <input matInput formControlName="id" placeholder="Enter UUID">
+          <input matInput formControlName="id" placeholder="Enter UUID" />
           <mat-icon matPrefix>fingerprint</mat-icon>
         </mat-form-field>
       </div>
@@ -48,7 +45,7 @@
 
         <mat-form-field appearance="fill" class="filter-field">
           <mat-label>Name Value</mat-label>
-          <input matInput formControlName="nameValue" placeholder="Enter ingredient name">
+          <input matInput formControlName="nameValue" placeholder="Enter ingredient name" />
           <mat-icon matPrefix>restaurant</mat-icon>
         </mat-form-field>
       </div>
@@ -121,12 +118,16 @@
           <div class="info-row" *ngIf="ingredient.wikiLink">
             <mat-icon>link</mat-icon>
             <span class="info-label">Wiki:</span>
-            <a [href]="ingredient.wikiLink" target="_blank" class="wiki-link">{{ ingredient.wikiLink }}</a>
+            <a [href]="ingredient.wikiLink" target="_blank" class="wiki-link">{{
+              ingredient.wikiLink
+            }}</a>
           </div>
 
           <div class="aliases" *ngIf="ingredient.aliases.length > 0">
             <label>Aliases:</label>
-            <mat-chip *ngFor="let alias of ingredient.aliases" class="alias-chip">{{ alias }}</mat-chip>
+            <mat-chip *ngFor="let alias of ingredient.aliases" class="alias-chip">{{
+              alias
+            }}</mat-chip>
           </div>
 
           <div class="tags" *ngIf="ingredient.tags.length > 0">
@@ -161,9 +162,7 @@
       Previous
     </button>
 
-    <span class="page-info">
-      Page {{ currentPage + 1 }} • {{ ingredients.length }} results
-    </span>
+    <span class="page-info"> Page {{ currentPage + 1 }} • {{ ingredients.length }} results </span>
 
     <button mat-raised-button [disabled]="ingredients.length < pageSize" (click)="nextPage()">
       Next

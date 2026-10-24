@@ -1,15 +1,17 @@
-<div class="recipes-list-container" [attr.aria-busy]="loading">
+<div class="recipes-list-container page-shell collection-page" [attr.aria-busy]="loading">
   <div class="header" *ngIf="showHeader">
     <div class="header-content">
       <div>
+        <p class="eyebrow">The recipe collection</p>
         <h1>Recipes</h1>
-        <p class="subtitle">Browse and filter recipes</p>
+        <p class="subtitle">A little inspiration for whatever you’re craving.</p>
       </div>
-      <button 
-        *ngIf="isLoggedIn$ | async" 
-        mat-raised-button 
-        color="primary" 
-        (click)="openCreateDialog()">
+      <button
+        *ngIf="isLoggedIn$ | async"
+        mat-flat-button
+        color="primary"
+        (click)="openCreateDialog()"
+      >
         <mat-icon>add</mat-icon>
         Create Recipe
       </button>
@@ -19,7 +21,12 @@
   <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="recipe-search">
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
       <mat-label>Search recipes</mat-label>
-      <input matInput type="search" formControlName="nameValue" placeholder="What would you like to cook?">
+      <input
+        matInput
+        type="search"
+        formControlName="nameValue"
+        placeholder="What would you like to cook?"
+      />
       <mat-icon matPrefix>search</mat-icon>
     </mat-form-field>
     <button mat-flat-button type="submit">Search</button>
@@ -45,13 +52,13 @@
       <div class="filter-row">
         <mat-form-field appearance="fill" class="filter-field">
           <mat-label>Max Prep Time (min)</mat-label>
-          <input matInput type="number" formControlName="prepTime" min="0">
+          <input matInput type="number" formControlName="prepTime" min="0" />
           <mat-icon matPrefix>schedule</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="filter-field">
           <mat-label>Max Cook Time (min)</mat-label>
-          <input matInput type="number" formControlName="cookTime" min="0">
+          <input matInput type="number" formControlName="cookTime" min="0" />
           <mat-icon matPrefix>timer</mat-icon>
         </mat-form-field>
       </div>
@@ -69,12 +76,14 @@
         <div class="filter-row">
           <mat-form-field appearance="fill" class="filter-field">
             <mat-label>Recipe ID</mat-label>
-            <input matInput formControlName="id" placeholder="Enter UUID">
+            <input matInput formControlName="id" placeholder="Enter UUID" />
           </mat-form-field>
           <mat-form-field appearance="fill" class="filter-field">
             <mat-label>Name matching</mat-label>
             <mat-select formControlName="nameFilterType">
-              <mat-option *ngFor="let type of filterTypes" [value]="type.value">{{ type.label }}</mat-option>
+              <mat-option *ngFor="let type of filterTypes" [value]="type.value">{{
+                type.label
+              }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -83,21 +92,31 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Include Ingredients</mat-label>
             <mat-chip-grid #ingredientList>
-              <mat-chip-row *ngFor="let ingredient of filterForm.get('ingredients')?.value" (removed)="removeIngredient(ingredient, 'ingredients')">
+              <mat-chip-row
+                *ngFor="let ingredient of filterForm.get('ingredients')?.value"
+                (removed)="removeIngredient(ingredient, 'ingredients')"
+              >
                 {{ ingredient }}
                 <button matChipRemove aria-label="Remove filter">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip-row>
-              <input 
+              <input
                 placeholder="Add ingredient..."
                 formControlName="ingredientInput"
                 #ingredientInputEl
                 [matChipInputFor]="ingredientList"
-                [matAutocomplete]="autoIngredient">
+                [matAutocomplete]="autoIngredient"
+              />
             </mat-chip-grid>
-            <mat-autocomplete #autoIngredient="matAutocomplete" (optionSelected)="addIngredient($event, 'ingredients', ingredientInputEl)">
-              <mat-option *ngFor="let suggestion of ingredientSuggestions | async" [value]="suggestion">
+            <mat-autocomplete
+              #autoIngredient="matAutocomplete"
+              (optionSelected)="addIngredient($event, 'ingredients', ingredientInputEl)"
+            >
+              <mat-option
+                *ngFor="let suggestion of ingredientSuggestions | async"
+                [value]="suggestion"
+              >
                 {{ suggestion.name }}
               </mat-option>
             </mat-autocomplete>
@@ -109,21 +128,31 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Exclude Ingredients</mat-label>
             <mat-chip-grid #notIngredientList>
-              <mat-chip-row *ngFor="let ingredient of filterForm.get('notIngredients')?.value" (removed)="removeIngredient(ingredient, 'notIngredients')">
+              <mat-chip-row
+                *ngFor="let ingredient of filterForm.get('notIngredients')?.value"
+                (removed)="removeIngredient(ingredient, 'notIngredients')"
+              >
                 {{ ingredient }}
                 <button matChipRemove aria-label="Remove filter">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip-row>
-              <input 
+              <input
                 placeholder="Exclude ingredient..."
                 formControlName="notIngredientInput"
                 #notIngredientInputEl
                 [matChipInputFor]="notIngredientList"
-                [matAutocomplete]="autoNotIngredient">
+                [matAutocomplete]="autoNotIngredient"
+              />
             </mat-chip-grid>
-            <mat-autocomplete #autoNotIngredient="matAutocomplete" (optionSelected)="addIngredient($event, 'notIngredients', notIngredientInputEl)">
-              <mat-option *ngFor="let suggestion of notIngredientSuggestions | async" [value]="suggestion">
+            <mat-autocomplete
+              #autoNotIngredient="matAutocomplete"
+              (optionSelected)="addIngredient($event, 'notIngredients', notIngredientInputEl)"
+            >
+              <mat-option
+                *ngFor="let suggestion of notIngredientSuggestions | async"
+                [value]="suggestion"
+              >
                 {{ suggestion.name }}
               </mat-option>
             </mat-autocomplete>
@@ -135,20 +164,27 @@
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Tags</mat-label>
             <mat-chip-grid #tagList>
-              <mat-chip-row *ngFor="let tag of filterForm.get('tags')?.value" (removed)="removeTag(tag)">
+              <mat-chip-row
+                *ngFor="let tag of filterForm.get('tags')?.value"
+                (removed)="removeTag(tag)"
+              >
                 {{ tag }}
                 <button matChipRemove aria-label="Remove filter">
                   <mat-icon>cancel</mat-icon>
                 </button>
               </mat-chip-row>
-              <input 
+              <input
                 placeholder="Add tag..."
                 formControlName="tagInput"
                 #tagInputEl
                 [matChipInputFor]="tagList"
-                [matAutocomplete]="autoTag">
+                [matAutocomplete]="autoTag"
+              />
             </mat-chip-grid>
-            <mat-autocomplete #autoTag="matAutocomplete" (optionSelected)="addTag($event, tagInputEl)">
+            <mat-autocomplete
+              #autoTag="matAutocomplete"
+              (optionSelected)="addTag($event, tagInputEl)"
+            >
               <mat-option *ngFor="let suggestion of tagSuggestions | async" [value]="suggestion">
                 {{ suggestion }}
               </mat-option>
@@ -193,6 +229,13 @@
     </form>
   </mat-expansion-panel>
 
+  <div class="collection-summary">
+    <h2>Find your next favourite</h2>
+    <span *ngIf="!loading && !error"
+      >{{ recipes.length }} {{ recipes.length === 1 ? 'recipe' : 'recipes' }} on this page</span
+    >
+  </div>
+
   <p *ngIf="loading" role="status" class="visually-hidden">Loading recipes…</p>
 
   <!-- Loading State -->
@@ -222,18 +265,19 @@
   <div *ngIf="!loading && !error" class="recipes-grid">
     <app-recipe-card
       *ngFor="let recipe of recipes; trackBy: trackRecipe; let recipeIndex = index"
-            [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
+      [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
       [recipe]="recipe"
       [canEdit]="canEditRecipe(recipe)"
       [isSaved]="savedRecipeIds.has(recipe.id)"
-            [saving]="savingRecipeIds.has(recipe.id)"
+      [saving]="savingRecipeIds.has(recipe.id)"
       [isLoggedIn]="(isLoggedIn$ | async) || false"
       (mouseenter)="prefetchRecipeDetail(recipe.id)"
       (focusin)="prefetchRecipeDetail(recipe.id)"
       (touchstart)="prefetchRecipeDetail(recipe.id)"
       (saveClick)="toggleSaveFromCard($event)"
       (editClick)="openEditDialogFromCard($event)"
-      (deleteClick)="deleteRecipeFromCard($event)">
+      (deleteClick)="deleteRecipeFromCard($event)"
+    >
     </app-recipe-card>
 
     <div *ngIf="recipes.length === 0" class="empty-state">
@@ -249,9 +293,7 @@
       Previous
     </button>
 
-    <span class="page-info">
-      Page {{ currentPage + 1 }} • {{ recipes.length }} results
-    </span>
+    <span class="page-info"> Page {{ currentPage + 1 }} • {{ recipes.length }} results </span>
 
     <button mat-raised-button [disabled]="recipes.length < pageSize" (click)="nextPage()">
       Next

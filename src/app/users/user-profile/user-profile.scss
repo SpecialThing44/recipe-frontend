@@ -1,22 +1,19 @@
-.profile-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
 .header {
   margin-bottom: 2rem;
 }
 
 .header h1 {
   margin: 0 0 0.5rem;
-  font-size: 2rem;
+  font-family: var(--app-heading-font);
+  font-size: clamp(36px, 5vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
 }
 
 .subtitle,
 .avatar-hint,
 .empty-state p {
-  color: #666;
+  color: var(--app-muted);
 }
 
 .loading-container,
@@ -50,6 +47,17 @@
 .profile-card {
   width: 100%;
   max-width: 800px;
+  mat-card-header {
+    padding: 24px 28px 20px;
+  }
+  mat-card-content {
+    padding: 0 28px 28px;
+  }
+  mat-card-title {
+    font-family: var(--app-heading-font);
+    font-size: 28px;
+    font-weight: 400;
+  }
   margin-bottom: 3rem;
 }
 
@@ -58,8 +66,8 @@
   gap: 1.5rem;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  background: #f5f5f5;
-  border-radius: 8px;
+  background: var(--app-soft);
+  border-radius: 16px;
 }
 
 .avatar-image,
@@ -80,7 +88,7 @@
 }
 
 .avatar-placeholder {
-  background: #e0e0e0;
+  background: #dce6d5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,7 +108,7 @@
 .user-metadata {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--app-border);
 }
 
 .metadata-item {
@@ -127,7 +135,10 @@
 
 .section-header h2 {
   margin: 0;
-  color: var(--app-primary, #0b3d2e);
+  color: var(--app-ink);
+  font-family: var(--app-heading-font);
+  font-size: 30px;
+  font-weight: 400;
 }
 
 .recipe-scroll-container {
@@ -140,27 +151,23 @@
 }
 
 .recipe-row app-recipe-card {
-  flex: 0 0 280px;
+  flex: 0 0 auto;
 }
 
 .empty-state {
   padding: 2rem 1rem;
   text-align: center;
-  background: #f5f5f5;
-  border-radius: 8px;
+  background: var(--app-soft);
+  border-radius: 16px;
 }
 
 @media (max-width: 768px) {
-  .profile-container {
-    padding: 1rem;
-  }
-
   .avatar-section {
     flex-direction: column;
     text-align: center;
   }
 
   .recipe-row app-recipe-card {
-    flex-basis: 240px;
+    flex-basis: auto;
   }
 }
