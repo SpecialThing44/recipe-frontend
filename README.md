@@ -72,7 +72,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now recipe-autodeploy.timer
 ```
 
-Lingering starts the user manager at boot and keeps the timer running after logout. The `spencer` user must already have Docker access and any required registry login.
+Lingering starts the user manager at boot and keeps the timer running after logout. The `spencer` user must already belong to the `docker` group and have any required registry login. The service selects that group explicitly so an older user manager can access the Docker socket.
 
 Inspect deployments or trigger a check immediately:
 

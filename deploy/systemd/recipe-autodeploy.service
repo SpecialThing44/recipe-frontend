@@ -4,5 +4,5 @@ Description=Deploy the latest recipe frontend image
 [Service]
 Type=oneshot
 WorkingDirectory=%h/server
-ExecStart=/usr/bin/docker compose up --detach --no-deps --pull always --wait --wait-timeout 60 recipe-frontend
+ExecStart=/usr/bin/sg docker -c "/usr/bin/docker compose up --detach --no-deps --pull always --wait --wait-timeout 60 recipe-frontend"
 TimeoutStartSec=10min
