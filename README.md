@@ -57,3 +57,33 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Automatic deployment
+
+Pull requests run the frontend tests. Updates to `main` publish the Docker image only after those tests pass.
+
+The server uses a user systemd timer to check for a new `recipe-frontend:latest` image every two minutes. Compose runs from `~/server` and recreates the frontend when its image or configuration changes.
+
+Install the files from `deploy/systemd/` under `~/.config/systemd/user/` on the server, then run:
+
+```bash
+sudo loginctl enable-linger spencer
+systemctl --user daemon-reload
+systemctl --user enable --now recipe-autodeploy.timer
+```
+
+Lingering starts the user manager at boot and keeps the timer running after logout. The `spencer` user must already have Docker access and any required registry login.
+
+Inspect deployments or trigger a check immediately:
+
+```bash
+systemctl --user list-timers recipe-autodeploy.timer
+journalctl --user -u recipe-autodeploy.service
+systemctl --user start recipe-autodeploy.service
+```
+
+Pause automatic deployments:
+
+```bash
+systemctl --user disable --now recipe-autodeploy.timer
+```
