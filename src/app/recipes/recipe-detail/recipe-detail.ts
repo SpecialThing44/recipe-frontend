@@ -1,6 +1,6 @@
 import { instructionsToHtml } from '../../shared/quill/instructions-html';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -201,6 +201,14 @@ export class RecipeDetailComponent implements OnInit {
       ...(this.recipe ? [this.recipe.id] : []),
       ...this.recommendedRecipes.map(recipe => recipe.id)
     ])));
+  }
+
+  openImagePreview(template: TemplateRef<unknown>): void {
+    this.dialog.open(template, {
+      maxWidth: '96vw',
+      maxHeight: '96dvh',
+      ariaLabel: `${this.recipe?.name} image preview`
+    });
   }
 
   printRecipe(): void {

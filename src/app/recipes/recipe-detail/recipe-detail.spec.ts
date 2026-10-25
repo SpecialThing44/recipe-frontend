@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router, provideRouter } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject, of, Subject } from 'rxjs';
@@ -69,4 +69,68 @@ describe('RecipeDetailComponent', () => {
     expect(component.getFormattedSubRecipeScaledAmount(entry, 100, 'gram')).toBe('75');
   });
 
+});
+
+describe('Recipe detail image preview', () => {
+  let fixture: import('@angular/core/testing').ComponentFixture<RecipeDetailComponent>;
+  let dialog: MatDialog;
+  const image = {
+    thumbnail: '/test-thumbnail.jpg',
+    medium: '/test-medium.jpg',
+    large: '/test-large.jpg'
+  };
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [RecipeDetailComponent],
+      providers: [
+        provideRouter([]),
+        { provide: ActivatedRoute, useValue: {
+          paramMap: of(convertToParamMap({ id: recipeFixture.id }))
+        } },
+        { provide: RecipesService, useValue: {
+          getRecipe: () => of({ ...recipeFixture, image }),
+          listRecipes: () => of([])
+        } },
+        { provide: AuthService, useValue: { currentUser$: of(null) } }
+      ]
+    }).compileComponents();
+    fixture = TestBed.createComponent(RecipeDetailComponent);
+    dialog = TestBed.inject(MatDialog);
+    fixture.detectChanges();
+  });
+
+  afterEach(() => dialog.closeAll());
+
+  it('groups an image with all four recipe attributes', () => {
+    const overview = fixture.nativeElement.querySelector('.recipe-overview');
+    expect(overview.classList.contains('has-image')).toBeTrue();
+    expect(overview.querySelectorAll('.info-card').length).toBe(4);
+    expect(overview.querySelector('img').getAttribute('src')).toBe(image.large);
+    expect(overview.querySelector('source').getAttribute('srcset')).toBe(image.medium);
+  });
+
+  it('opens a labelled full-size preview and closes it with the close button', () => {
+    const button = fixture.nativeElement.querySelector('.recipe-image-section') as HTMLButtonElement;
+    expect(button.getAttribute('aria-label')).toBe('Zoom image of Vegetable Soup');
+    button.click();
+    fixture.detectChanges();
+    expect(dialog.openDialogs.length).toBe(1);
+    expect(document.querySelector('[role="dialog"]')?.getAttribute('aria-label'))
+      .toBe('Vegetable Soup image preview');
+    expect(document.querySelector('.image-preview img')?.getAttribute('src')).toBe(image.large);
+    const preview = dialog.openDialogs[0];
+    spyOn(preview, 'close').and.callThrough();
+    (document.querySelector('[aria-label="Close image preview"]') as HTMLButtonElement).click();
+    expect(preview.close).toHaveBeenCalled();
+  });
+
+  it('keeps the overview without an image in its existing layout', () => {
+    fixture.componentInstance.recipe = { ...recipeFixture };
+    fixture.detectChanges();
+    const overview = fixture.nativeElement.querySelector('.recipe-overview');
+    expect(overview.classList.contains('has-image')).toBeFalse();
+    expect(overview.querySelector('.recipe-image-section')).toBeNull();
+    expect(overview.querySelectorAll('.info-card').length).toBe(4);
+  });
 });

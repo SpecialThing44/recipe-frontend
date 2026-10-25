@@ -44,60 +44,68 @@
   </div>
 
   <div class="recipe-content">
-    <!-- Recipe Image -->
-    <div class="recipe-image-section" *ngIf="recipe.image?.large">
-      <picture>
-        <source media="(max-width: 548px)" [srcset]="recipe.image!.medium" />
-        <img
-          [src]="recipe.image!.large"
-          [alt]="recipe.name"
-          fetchpriority="high"
-          decoding="async"
-        />
-      </picture>
-    </div>
+    <div class="recipe-overview" [class.has-image]="recipe.image?.large">
+      <button
+        class="recipe-image-section"
+        *ngIf="recipe.image?.large"
+        type="button"
+        (click)="openImagePreview(imagePreview)"
+        [attr.aria-label]="'Zoom image of ' + recipe.name"
+        aria-haspopup="dialog"
+      >
+        <picture>
+          <source media="(max-width: 548px)" [srcset]="recipe.image!.medium" />
+          <img
+            [src]="recipe.image!.large"
+            [alt]="recipe.name"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
+        <span class="image-zoom-hint" aria-hidden="true"><mat-icon>zoom_in</mat-icon></span>
+      </button>
 
-    <!-- Recipe Info Cards -->
-    <div class="info-cards">
-      <mat-card class="info-card">
-        <mat-card-content>
-          <mat-icon>schedule</mat-icon>
-          <div>
-            <div class="label">Prep Time</div>
-            <div class="value">{{ recipe.prepTime }} min</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+      <div class="info-cards">
+        <mat-card class="info-card">
+          <mat-card-content>
+            <mat-icon>schedule</mat-icon>
+            <div>
+              <div class="label">Prep Time</div>
+              <div class="value">{{ recipe.prepTime }} min</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card class="info-card">
-        <mat-card-content>
-          <mat-icon>timer</mat-icon>
-          <div>
-            <div class="label">Cook Time</div>
-            <div class="value">{{ recipe.cookTime }} min</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        <mat-card class="info-card">
+          <mat-card-content>
+            <mat-icon>timer</mat-icon>
+            <div>
+              <div class="label">Cook Time</div>
+              <div class="value">{{ recipe.cookTime }} min</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card class="info-card">
-        <mat-card-content>
-          <mat-icon>restaurant</mat-icon>
-          <div>
-            <div class="label">Total Time</div>
-            <div class="value">{{ recipe.prepTime + recipe.cookTime }} min</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        <mat-card class="info-card">
+          <mat-card-content>
+            <mat-icon>restaurant</mat-icon>
+            <div>
+              <div class="label">Total Time</div>
+              <div class="value">{{ recipe.prepTime + recipe.cookTime }} min</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
 
-      <mat-card class="info-card">
-        <mat-card-content>
-          <mat-icon>people</mat-icon>
-          <div>
-            <div class="label">Servings</div>
-            <div class="value">{{ displayServings }}</div>
-          </div>
-        </mat-card-content>
-      </mat-card>
+        <mat-card class="info-card">
+          <mat-card-content>
+            <mat-icon>people</mat-icon>
+            <div>
+              <div class="label">Servings</div>
+              <div class="value">{{ displayServings }}</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
 
     <!-- Dietary Info & Tags -->
@@ -311,3 +319,12 @@
   <button mat-raised-button color="primary" (click)="loadRecipe()">Retry</button>
   <button mat-stroked-button routerLink="/recipes">Back to Recipes</button>
 </div>
+
+<ng-template #imagePreview>
+  <div class="image-preview">
+    <button mat-icon-button mat-dialog-close type="button" aria-label="Close image preview">
+      <mat-icon>close</mat-icon>
+    </button>
+    <img [src]="recipe?.image?.large" [alt]="recipe?.name" />
+  </div>
+</ng-template>
