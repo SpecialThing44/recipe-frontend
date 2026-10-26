@@ -6,8 +6,8 @@
   >
   </a>
 
-  <div class="recipe-image" *ngIf="recipe.image as image">
-    <picture>
+  <div class="recipe-image">
+    <picture *ngIf="recipe.image as image">
       <source media="(max-width: 348px)" [srcset]="image.thumbnail" />
       <img [src]="image.medium" [alt]="recipe.name" [loading]="imageLoading" decoding="async" />
     </picture>

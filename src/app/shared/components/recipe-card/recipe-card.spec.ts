@@ -63,4 +63,31 @@ describe('RecipeCardComponent', () => {
     expect(button.textContent).toContain('Saved');
   });
 
+  for (const layout of ['grid', 'scroll'] as const) {
+    it(`keeps titles and details aligned with and without an image in ${layout} cards`, () => {
+      fixture.componentInstance.layout = layout;
+      fixture.detectChanges();
+      const card = fixture.nativeElement as HTMLElement;
+      const imageRegion = card.querySelector('.recipe-image') as HTMLElement;
+      const title = card.querySelector('mat-card-title') as HTMLElement;
+      const details = card.querySelector('.recipe-info') as HTMLElement;
+      const titleTopWithoutImage = title.getBoundingClientRect().top;
+      const detailsTopWithoutImage = details.getBoundingClientRect().top;
+
+      expect(imageRegion.getBoundingClientRect().height).toBe(120);
+      expect(imageRegion.querySelector('img')).toBeNull();
+
+      const imageUrl = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>';
+      fixture.componentInstance.recipe = {
+        ...fixture.componentInstance.recipe,
+        image: { thumbnail: imageUrl, medium: imageUrl, large: imageUrl }
+      };
+      fixture.detectChanges();
+
+      expect(imageRegion.querySelector('img')?.getAttribute('src')).toBe(imageUrl);
+      expect(title.getBoundingClientRect().top).toBe(titleTopWithoutImage);
+      expect(details.getBoundingClientRect().top).toBe(detailsTopWithoutImage);
+    });
+  }
+
 });
