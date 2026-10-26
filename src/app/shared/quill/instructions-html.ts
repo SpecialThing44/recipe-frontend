@@ -37,11 +37,19 @@ function inlineHtml(text: string, attributes: InstructionAttributes): string {
   return html;
 }
 
+function parseInstructions(instructions: string): unknown {
+  try {
+    return JSON.parse(instructions);
+  } catch {
+    return JSON.parse(instructions.replace(/\n/g, '\\n'));
+  }
+}
+
 export function instructionsToHtml(instructions: unknown): string {
   let delta = instructions;
   if (typeof delta === 'string') {
     try {
-      delta = JSON.parse(delta);
+      delta = parseInstructions(delta);
     } catch {
       return `<p>${escapeHtml(delta as string)}</p>`;
     }

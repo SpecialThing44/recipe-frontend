@@ -40,4 +40,29 @@ describe('instructionsToHtml', () => {
     expect(html).toContain('<pre><code>one\ntwo</code></pre>');
     expect(html).toContain('src="/image.png"');
   });
+
+  it('renders stored deltas with literal newlines as numbered steps', () => {
+    const instructions = JSON.stringify({ ops: [
+      { insert: 'Preheat oven to 300 degrees F.' },
+      { insert: '\n', attributes: { list: 'ordered' } },
+      { insert: 'Mix the ingredients.', attributes: { bold: true } },
+      { insert: '\n', attributes: { list: 'ordered' } }
+    ] }).replace(/\\n/g, '\n');
+
+    expect(instructionsToHtml(instructions)).toBe(
+      '<ol><li>Preheat oven to 300 degrees F.</li><li><strong>Mix the ingredients.</strong></li></ol>'
+    );
+  });
+
+  it('supports formatted JSON with whitespace between operations', () => {
+    const instructions = JSON.stringify({ ops: [{ insert: 'Cook\n' }] }, null, 2);
+    expect(instructionsToHtml(instructions)).toBe('<p>Cook</p>');
+  });
+
+  it('keeps plain text and malformed JSON escaped', () => {
+    expect(instructionsToHtml('Cook <slowly>')).toBe('<p>Cook &lt;slowly&gt;</p>');
+    expect(instructionsToHtml('{"ops": [<invalid>]}'))
+      .toBe('<p>{&quot;ops&quot;: [&lt;invalid&gt;]}</p>');
+  });
+
 });
