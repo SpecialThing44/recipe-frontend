@@ -6,29 +6,38 @@
     </button>
   </div>
   <div>
-    <div *ngFor="let tag of tags.controls; let i = index" class="row">
-      <mat-form-field appearance="fill" class="field" floatLabel="always" subscriptSizing="dynamic">
-        <mat-label>Tag {{ i + 1 }}</mat-label>
-        <input
-          matInput
-          [formControl]="getAsFormControl(tag)"
-          [placeholder]="placeholder"
-          [matAutocomplete]="autoTag"
-        />
-        <mat-autocomplete #autoTag="matAutocomplete">
-          <mat-option *ngFor="let suggestion of tagSuggestions[i] | async" [value]="suggestion">
-            {{ suggestion }}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-      <button
-        mat-icon-button
-        type="button"
-        (click)="removeTag(i)"
-        [attr.aria-label]="'Remove tag ' + (i + 1)"
-      >
-        <mat-icon class="green">delete</mat-icon>
-      </button>
-    </div>
+    @for (tag of tags.controls; track tag; let i = $index) {
+      <div class="row">
+        <mat-form-field
+          appearance="fill"
+          class="field"
+          floatLabel="always"
+          subscriptSizing="dynamic"
+        >
+          <mat-label>Tag {{ i + 1 }}</mat-label>
+          <input
+            matInput
+            [formControl]="getAsFormControl(tag)"
+            [placeholder]="placeholder"
+            [matAutocomplete]="autoTag"
+          />
+          <mat-autocomplete #autoTag="matAutocomplete">
+            @for (suggestion of tagSuggestions[i] | async; track suggestion) {
+              <mat-option [value]="suggestion">
+                {{ suggestion }}
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+        <button
+          mat-icon-button
+          type="button"
+          (click)="removeTag(i)"
+          [attr.aria-label]="'Remove tag ' + (i + 1)"
+        >
+          <mat-icon class="green">delete</mat-icon>
+        </button>
+      </div>
+    }
   </div>
 </div>

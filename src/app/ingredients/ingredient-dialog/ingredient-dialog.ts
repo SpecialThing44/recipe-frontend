@@ -1,4 +1,4 @@
-import { Component, Inject, Optional } from '@angular/core';
+import { Component, Inject, Optional, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, FormControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +19,7 @@ import { AuthService } from '../../core/auth.service';
 import { map, Observable } from 'rxjs';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-ingredient-dialog',
   standalone: true,
   imports: [

@@ -1,20 +1,19 @@
 import { Subscription } from 'rxjs';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { CommonModule } from '@angular/common';
 import { AuthService, User } from '../core/auth.service';
 import { RoutePrefetchService } from '../core/route-prefetch.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-navbar',
   standalone: true,
   imports: [
-    CommonModule,
     MatToolbarModule,
     MatButtonModule,
     MatMenuModule,

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, Input } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -26,6 +26,7 @@ import { debounceTime, distinctUntilChanged, map, switchMap, startWith, filter, 
 import { combineLatest, Observable, of, Subject } from 'rxjs';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-recipes-list',
   standalone: true,
   imports: [

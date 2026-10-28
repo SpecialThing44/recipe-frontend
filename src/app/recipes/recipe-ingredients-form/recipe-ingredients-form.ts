@@ -1,5 +1,5 @@
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Component, DestroyRef, inject, Input } from '@angular/core';
+import { Component, DestroyRef, inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +19,7 @@ import { availableRecipeUnits, availableUnits } from '../../shared/units/availab
 import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-recipe-ingredients-form',
   standalone: true,
   imports: [

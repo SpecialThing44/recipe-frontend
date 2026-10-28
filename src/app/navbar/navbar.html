@@ -13,7 +13,7 @@
 
   <!-- Desktop Menu -->
   <div class="desktop-menu">
-    <ng-container *ngIf="user as user; else anonLinks">
+    @if (user; as user) {
       <a
         mat-button
         routerLink="/recipes"
@@ -41,17 +41,17 @@
         (focus)="prefetch('/users')"
         >Users</a
       >
-      <a
-        *ngIf="user.admin"
-        mat-button
-        routerLink="/admin/ingredient-weights"
-        routerLinkActive="active-link"
-        ariaCurrentWhenActive="page"
-        (mouseenter)="prefetch('/admin/ingredient-weights')"
-        (focus)="prefetch('/admin/ingredient-weights')"
-        >Admin</a
-      >
-
+      @if (user.admin) {
+        <a
+          mat-button
+          routerLink="/admin/ingredient-weights"
+          routerLinkActive="active-link"
+          ariaCurrentWhenActive="page"
+          (mouseenter)="prefetch('/admin/ingredient-weights')"
+          (focus)="prefetch('/admin/ingredient-weights')"
+          >Admin</a
+        >
+      }
       <button
         mat-icon-button
         [matMenuTriggerFor]="accountMenu"
@@ -59,17 +59,17 @@
         class="account-button"
       >
         <div class="account-bubble">
-          <img
-            *ngIf="user.avatar?.thumbnail"
-            [src]="user.avatar?.thumbnail"
-            [alt]="user.name + ' avatar'"
-          />
-          <mat-icon *ngIf="!user.avatar?.thumbnail" aria-hidden="false" aria-label="Account"
-            >person</mat-icon
-          >
+          @if (user.avatar?.thumbnail) {
+            <img
+              [src]="$safeNavigationMigration(user.avatar?.thumbnail)"
+              [alt]="user.name + ' avatar'"
+            />
+          }
+          @if (!user.avatar?.thumbnail) {
+            <mat-icon aria-hidden="false" aria-label="Account">person</mat-icon>
+          }
         </div>
       </button>
-
       <mat-menu #accountMenu="matMenu">
         <button mat-menu-item [routerLink]="['/users', user.id]">
           <mat-icon>account_circle</mat-icon>
@@ -80,9 +80,7 @@
           <span>Logout</span>
         </button>
       </mat-menu>
-    </ng-container>
-
-    <ng-template #anonLinks>
+    } @else {
       <a
         mat-button
         routerLink="/recipes"
@@ -111,7 +109,7 @@
         >Users</a
       >
       <button mat-button class="login-button" (click)="login()">Log in / Sign up</button>
-    </ng-template>
+    }
   </div>
 
   <!-- Mobile Menu -->
@@ -152,30 +150,32 @@
       (focus)="prefetch('/users')"
       >Users</a
     >
-    <a
-      *ngIf="user?.admin"
-      mat-menu-item
-      routerLink="/admin/ingredient-weights"
-      routerLinkActive="mobile-active-link"
-      ariaCurrentWhenActive="page"
-      (mouseenter)="prefetch('/admin/ingredient-weights')"
-      (focus)="prefetch('/admin/ingredient-weights')"
-      >Admin</a
-    >
+    @if (user?.admin) {
+      <a
+        mat-menu-item
+        routerLink="/admin/ingredient-weights"
+        routerLinkActive="mobile-active-link"
+        ariaCurrentWhenActive="page"
+        (mouseenter)="prefetch('/admin/ingredient-weights')"
+        (focus)="prefetch('/admin/ingredient-weights')"
+        >Admin</a
+      >
+    }
 
     <mat-divider></mat-divider>
 
-    <ng-container *ngIf="user as user; else anonMobile">
+    @if (user; as user) {
       <button mat-menu-item [routerLink]="['/users', user.id]">
         <div class="account-bubble-mini">
-          <img
-            *ngIf="user.avatar?.thumbnail"
-            [src]="user.avatar?.thumbnail"
-            [alt]="user.name + ' avatar'"
-          />
-          <mat-icon *ngIf="!user.avatar?.thumbnail" aria-hidden="false" aria-label="Account"
-            >person</mat-icon
-          >
+          @if (user.avatar?.thumbnail) {
+            <img
+              [src]="$safeNavigationMigration(user.avatar?.thumbnail)"
+              [alt]="user.name + ' avatar'"
+            />
+          }
+          @if (!user.avatar?.thumbnail) {
+            <mat-icon aria-hidden="false" aria-label="Account">person</mat-icon>
+          }
         </div>
         <span>Account ({{ user.name }})</span>
       </button>
@@ -183,13 +183,11 @@
         <mat-icon>logout</mat-icon>
         <span>Logout</span>
       </button>
-    </ng-container>
-
-    <ng-template #anonMobile>
+    } @else {
       <button mat-menu-item (click)="login()">
         <mat-icon>login</mat-icon>
         <span>Login/Signup</span>
       </button>
-    </ng-template>
+    }
   </mat-menu>
 </mat-toolbar>

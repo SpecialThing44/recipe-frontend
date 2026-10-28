@@ -1,5 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, finalize } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -10,10 +9,10 @@ import { AuthService, User } from '../../core/auth.service';
 import { AdminService } from '../../core/admin.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-admin-ingredient-weight-settings',
   standalone: true,
   imports: [
-    CommonModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule

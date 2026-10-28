@@ -7,10 +7,12 @@
   </a>
 
   <div class="recipe-image">
-    <picture *ngIf="recipe.image as image">
-      <source media="(max-width: 348px)" [srcset]="image.thumbnail" />
-      <img [src]="image.medium" [alt]="recipe.name" [loading]="imageLoading" decoding="async" />
-    </picture>
+    @if (recipe.image; as image) {
+      <picture>
+        <source media="(max-width: 348px)" [srcset]="image.thumbnail" />
+        <img [src]="image.medium" [alt]="recipe.name" [loading]="imageLoading" decoding="async" />
+      </picture>
+    }
   </div>
 
   <mat-card-header>
@@ -30,38 +32,45 @@
         <span>{{ recipe.servings }} servings</span>
       </div>
 
-      <div class="tags" *ngIf="recipe.tags.length > 0">
-        <mat-chip *ngFor="let tag of recipe.tags | slice: 0 : 3">{{ tag }}</mat-chip>
-        <span *ngIf="recipe.tags.length > 3" class="more-tags"
-          >+{{ recipe.tags.length - 3 }} more</span
-        >
-      </div>
+      @if (recipe.tags.length > 0) {
+        <div class="tags">
+          @for (tag of recipe.tags | slice: 0 : 3; track tag) {
+            <mat-chip>{{ tag }}</mat-chip>
+          }
+          @if (recipe.tags.length > 3) {
+            <span class="more-tags">+{{ recipe.tags.length - 3 }} more</span>
+          }
+        </div>
+      }
     </div>
   </mat-card-content>
 
-  <mat-card-actions *ngIf="canEdit || isLoggedIn" align="end">
-    <button
-      *ngIf="isLoggedIn && !canEdit"
-      mat-stroked-button
-      [color]="isSaved ? 'accent' : 'primary'"
-      (click)="onSaveClick($event)"
-      [disabled]="saving"
-      [attr.aria-pressed]="isSaved"
-      [matTooltip]="isSaved ? 'Remove from saved recipes' : 'Save recipe'"
-      class="save-button"
-    >
-      <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-      {{ saving ? 'Saving…' : isSaved ? 'Saved' : 'Save' }}
-    </button>
-    <ng-container *ngIf="canEdit">
-      <button mat-stroked-button color="primary" (click)="onEditClick($event)">
-        <mat-icon>edit</mat-icon>
-        Edit
-      </button>
-      <button mat-stroked-button color="warn" (click)="onDeleteClick($event)">
-        <mat-icon>delete</mat-icon>
-        Delete
-      </button>
-    </ng-container>
-  </mat-card-actions>
+  @if (canEdit || isLoggedIn) {
+    <mat-card-actions align="end">
+      @if (isLoggedIn && !canEdit) {
+        <button
+          mat-stroked-button
+          [color]="isSaved ? 'accent' : 'primary'"
+          (click)="onSaveClick($event)"
+          [disabled]="saving"
+          [attr.aria-pressed]="isSaved"
+          [matTooltip]="isSaved ? 'Remove from saved recipes' : 'Save recipe'"
+          class="save-button"
+        >
+          <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+          {{ saving ? 'Saving…' : isSaved ? 'Saved' : 'Save' }}
+        </button>
+      }
+      @if (canEdit) {
+        <button mat-stroked-button color="primary" (click)="onEditClick($event)">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+        <button mat-stroked-button color="warn" (click)="onDeleteClick($event)">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      }
+    </mat-card-actions>
+  }
 </mat-card>

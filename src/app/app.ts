@@ -1,8 +1,9 @@
-import { Component, ElementRef, OnInit, Type, ViewChild, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, Type, ViewChild, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet],
   templateUrl: './app.html',
