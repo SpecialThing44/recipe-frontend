@@ -3,109 +3,136 @@
   <form [formGroup]="ingredientForm" class="ingredient-form">
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Name</mat-label>
-      <input matInput formControlName="name" placeholder="e.g., Tomato">
+      <input matInput formControlName="name" placeholder="e.g., Tomato" />
       <mat-icon matPrefix>restaurant</mat-icon>
-      <mat-error *ngIf="ingredientForm.get('name')?.hasError('required')">
-        Name is required
-      </mat-error>
+      @if (ingredientForm.get('name')?.hasError('required')) {
+        <mat-error> Name is required </mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Wikipedia Link</mat-label>
-      <input matInput formControlName="wikiLink" placeholder="https://en.wikipedia.org/wiki/...">
+      <input matInput formControlName="wikiLink" placeholder="https://en.wikipedia.org/wiki/..." />
       <mat-icon matPrefix>link</mat-icon>
-      <mat-error *ngIf="ingredientForm.get('wikiLink')?.hasError('required')">
-        Wikipedia link is required
-      </mat-error>
-      <mat-error *ngIf="ingredientForm.get('wikiLink')?.hasError('invalidWikipediaUrl')">
-        Must be a valid Wikipedia URL (e.g., https://en.wikipedia.org/wiki/...)
-      </mat-error>
+      @if (ingredientForm.get('wikiLink')?.hasError('required')) {
+        <mat-error> Wikipedia link is required </mat-error>
+      }
+      @if (ingredientForm.get('wikiLink')?.hasError('invalidWikipediaUrl')) {
+        <mat-error>
+          Must be a valid Wikipedia URL (e.g., https://en.wikipedia.org/wiki/...)
+        </mat-error>
+      }
     </mat-form-field>
 
     <app-aliases-form [aliases]="aliases"></app-aliases-form>
 
     <app-tags-form [tags]="tags" placeholder="e.g., fruit, vegetable"></app-tags-form>
 
-    <div class="substitutes-section" *ngIf="isEditMode">
-      <div class="substitutes-header">
-        <h3>Substitutes</h3>
-        <button mat-stroked-button type="button" (click)="loadSubstitutes()">
-          <mat-icon>sync</mat-icon>
-          Refresh
-        </button>
-      </div>
-
-      <div class="substitutes-loading" *ngIf="loadingSubstitutes">
-        <span>Loading substitutes...</span>
-      </div>
-
-      <div class="substitutes-list" *ngIf="!loadingSubstitutes && substitutes.length > 0">
-        <div class="substitute-row" *ngFor="let substitute of substitutes">
-          <mat-chip class="substitute-chip">
-            {{ substitute.name }}
-          </mat-chip>
-          <button
-            *ngIf="isAdmin$ | async"
-            mat-stroked-button
-            color="warn"
-            type="button"
-            [disabled]="removingSubstituteId === substitute.id"
-            (click)="removeSubstitute(substitute)">
-            Remove
+    @if (isEditMode) {
+      <div class="substitutes-section">
+        <div class="substitutes-header">
+          <h3>Substitutes</h3>
+          <button mat-stroked-button type="button" (click)="loadSubstitutes()">
+            <mat-icon>sync</mat-icon>
+            Refresh
           </button>
         </div>
-      </div>
-
-      <p class="substitutes-empty" *ngIf="!loadingSubstitutes && substitutes.length === 0">
-        No substitutes registered yet.
-      </p>
-
-      <div class="manual-substitute-section" *ngIf="isAdmin$ | async">
-        <h4>Add Substitute Manually</h4>
-        <div class="candidate-search-row">
-          <mat-form-field appearance="fill" class="candidate-search-field">
-            <mat-label>Search by ingredient name or alias</mat-label>
-            <input matInput [formControl]="candidateSearchControl" placeholder="e.g., bread flour">
-          </mat-form-field>
-
-          <button mat-raised-button type="button" (click)="searchSubstituteCandidates()">
-            <mat-icon>search</mat-icon>
-            Search
-          </button>
-        </div>
-
-        <div class="substitutes-loading" *ngIf="loadingCandidates">
-          <span>Searching ingredients...</span>
-        </div>
-
-        <div class="candidate-results" *ngIf="!loadingCandidates && candidateResults.length > 0">
-          <div class="candidate-row" *ngFor="let candidate of candidateResults">
-            <div class="candidate-details">
-              <div class="candidate-name">{{ candidate.name }}</div>
-              <div class="candidate-link" *ngIf="candidate.wikiLink">{{ candidate.wikiLink }}</div>
-            </div>
-            <button
-              mat-stroked-button
-              color="primary"
-              type="button"
-              [disabled]="addingSubstitute"
-              (click)="addSubstitute(candidate)">
-              Add
-            </button>
+        @if (loadingSubstitutes) {
+          <div class="substitutes-loading">
+            <span>Loading substitutes...</span>
           </div>
-        </div>
+        }
+        @if (!loadingSubstitutes && substitutes.length > 0) {
+          <div class="substitutes-list">
+            @for (substitute of substitutes; track substitute) {
+              <div class="substitute-row">
+                <mat-chip class="substitute-chip">
+                  {{ substitute.name }}
+                </mat-chip>
+                @if (isAdmin$ | async) {
+                  <button
+                    mat-stroked-button
+                    color="warn"
+                    type="button"
+                    [disabled]="removingSubstituteId === substitute.id"
+                    (click)="removeSubstitute(substitute)"
+                  >
+                    Remove
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+        @if (!loadingSubstitutes && substitutes.length === 0) {
+          <p class="substitutes-empty">No substitutes registered yet.</p>
+        }
+        @if (isAdmin$ | async) {
+          <div class="manual-substitute-section">
+            <h4>Add Substitute Manually</h4>
+            <div class="candidate-search-row">
+              <mat-form-field appearance="fill" class="candidate-search-field">
+                <mat-label>Search by ingredient name or alias</mat-label>
+                <input
+                  matInput
+                  [formControl]="candidateSearchControl"
+                  placeholder="e.g., bread flour"
+                />
+              </mat-form-field>
+              <button mat-raised-button type="button" (click)="searchSubstituteCandidates()">
+                <mat-icon>search</mat-icon>
+                Search
+              </button>
+            </div>
+            @if (loadingCandidates) {
+              <div class="substitutes-loading">
+                <span>Searching ingredients...</span>
+              </div>
+            }
+            @if (!loadingCandidates && candidateResults.length > 0) {
+              <div class="candidate-results">
+                @for (candidate of candidateResults; track candidate) {
+                  <div class="candidate-row">
+                    <div class="candidate-details">
+                      <div class="candidate-name">{{ candidate.name }}</div>
+                      @if (candidate.wikiLink) {
+                        <div class="candidate-link">{{ candidate.wikiLink }}</div>
+                      }
+                    </div>
+                    <button
+                      mat-stroked-button
+                      color="primary"
+                      type="button"
+                      [disabled]="addingSubstitute"
+                      (click)="addSubstitute(candidate)"
+                    >
+                      Add
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
       </div>
-    </div>
+    }
 
-    <p class="create-mode-note" *ngIf="!isEditMode">
-      Substitutes can be managed after creating the ingredient.
-    </p>
+    @if (!isEditMode) {
+      <p class="create-mode-note">Substitutes can be managed after creating the ingredient.</p>
+    }
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-raised-button mat-dialog-close>Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="ingredientForm.invalid || saving">
-    <mat-icon *ngIf="!saving">save</mat-icon>
-    {{ saving ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update' : 'Create') }}
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="ingredientForm.invalid || saving"
+  >
+    @if (!saving) {
+      <mat-icon>save</mat-icon>
+    }
+    {{ saving ? (isEditMode ? 'Updating...' : 'Creating...') : isEditMode ? 'Update' : 'Create' }}
   </button>
 </mat-dialog-actions>

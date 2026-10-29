@@ -4,51 +4,57 @@
     <p>View the k constant used by ingredient-weight scoring.</p>
   </div>
 
-  <mat-card *ngIf="!currentUser" class="state-card">
-    <mat-card-content>
-      <p>You must be signed in to access admin tools.</p>
-      <button mat-raised-button color="primary" (click)="login()">Login</button>
-    </mat-card-content>
-  </mat-card>
+  @if (!currentUser) {
+    <mat-card class="state-card">
+      <mat-card-content>
+        <p>You must be signed in to access admin tools.</p>
+        <button mat-raised-button color="primary" (click)="login()">Login</button>
+      </mat-card-content>
+    </mat-card>
+  }
 
-  <mat-card *ngIf="currentUser && !isAdmin" class="state-card">
-    <mat-card-content>
-      <p>Admin privileges are required.</p>
-    </mat-card-content>
-  </mat-card>
+  @if (currentUser && !isAdmin) {
+    <mat-card class="state-card">
+      <mat-card-content>
+        <p>Admin privileges are required.</p>
+      </mat-card-content>
+    </mat-card>
+  }
 
-  <ng-container *ngIf="currentUser && isAdmin">
-    <div class="message success" *ngIf="successMessage">
-      <mat-icon>check_circle</mat-icon>
-      <span>{{ successMessage }}</span>
-    </div>
-
-    <div class="message error" *ngIf="errorMessage">
-      <mat-icon>error</mat-icon>
-      <span>{{ errorMessage }}</span>
-    </div>
-
+  @if (currentUser && isAdmin) {
+    @if (successMessage) {
+      <div class="message success">
+        <mat-icon>check_circle</mat-icon>
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+    @if (errorMessage) {
+      <div class="message error">
+        <mat-icon>error</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
     <mat-card>
       <mat-card-header>
         <mat-card-title>k Constant</mat-card-title>
-        <mat-card-subtitle>GET /admin/ingredient-weights/settings (configured by INGREDIENT_WEIGHT_MEAN_RAW_FACTOR)</mat-card-subtitle>
+        <mat-card-subtitle
+          >GET /admin/ingredient-weights/settings (configured by
+          INGREDIENT_WEIGHT_MEAN_RAW_FACTOR)</mat-card-subtitle
+        >
       </mat-card-header>
-
       <mat-card-content>
         <p><strong>k (meanRawPenaltyFactor):</strong> {{ meanRawPenaltyFactor ?? 'N/A' }}</p>
       </mat-card-content>
-
       <mat-card-actions align="end">
         <button mat-stroked-button type="button" (click)="backToJobs()">
           <mat-icon>arrow_back</mat-icon>
           Back to Jobs
         </button>
-
         <button mat-stroked-button type="button" (click)="loadSettings()" [disabled]="isLoading">
           <mat-icon>refresh</mat-icon>
           {{ isLoading ? 'Loading...' : 'Reload' }}
         </button>
       </mat-card-actions>
     </mat-card>
-  </ng-container>
+  }
 </div>

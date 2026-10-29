@@ -1,11 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-callback',
   standalone: true,
-  imports: [CommonModule, MatProgressSpinnerModule],
+  imports: [MatProgressSpinnerModule],
   template: `
     <div class="callback-container">
       <mat-spinner diameter="50"></mat-spinner>

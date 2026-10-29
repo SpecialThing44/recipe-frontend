@@ -1,3 +1,5 @@
 <a class="skip-link" href="#main-content" (click)="skipToContent($event)">Skip to content</a>
-<ng-container *ngIf="navbarComponent" [ngComponentOutlet]="navbarComponent"></ng-container>
+@if (navbarComponent) {
+  <ng-container [ngComponentOutlet]="navbarComponent"></ng-container>
+}
 <main #mainContent id="main-content" tabindex="-1"><router-outlet></router-outlet></main>

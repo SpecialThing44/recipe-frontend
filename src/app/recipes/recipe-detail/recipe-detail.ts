@@ -1,6 +1,6 @@
 import { instructionsToHtml } from '../../shared/quill/instructions-html';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Component, DestroyRef, inject, OnInit, TemplateRef } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +20,7 @@ import { catchError, map, switchMap, finalize } from 'rxjs/operators';
 import { formatQuantityAmount } from '../../shared/utils/quantity-format';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-recipe-detail',
   standalone: true,
   imports: [

@@ -1,330 +1,368 @@
-<p *ngIf="loading" role="status" class="visually-hidden">Loading recipe…</p>
-<div class="recipe-detail-container page-shell" *ngIf="recipe && !loading">
-  <div class="recipe-header">
-    <div class="header-content">
-      <div>
-        <h1>{{ recipe.name }}</h1>
-        <p class="subtitle">
-          by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a>
-        </p>
-      </div>
-      <div class="header-actions">
-        <button
-          mat-raised-button
-          type="button"
-          (click)="printRecipe()"
-          [disabled]="loadingSubRecipes"
-        >
-          <mat-icon>print</mat-icon>
-          Print
-        </button>
-        <button
-          *ngIf="(isLoggedIn$ | async) && !(canEdit$ | async)"
-          mat-raised-button
-          [color]="isSaved ? 'accent' : 'primary'"
-          (click)="toggleSave()"
-          [disabled]="saving"
-          [attr.aria-pressed]="isSaved"
-        >
-          <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-          {{ saving ? 'Saving…' : isSaved ? 'Saved' : 'Save' }}
-        </button>
-        <ng-container *ngIf="canEdit$ | async">
-          <button mat-raised-button color="primary" (click)="openEditDialog()">
-            <mat-icon>edit</mat-icon>
-            Edit
-          </button>
-          <button mat-raised-button color="warn" (click)="deleteRecipe()">
-            <mat-icon>delete</mat-icon>
-            Delete
-          </button>
-        </ng-container>
-      </div>
-    </div>
-  </div>
-
-  <div class="recipe-content">
-    <div class="recipe-overview" [class.has-image]="recipe.image?.large">
-      <button
-        class="recipe-image-section"
-        *ngIf="recipe.image?.large"
-        type="button"
-        (click)="openImagePreview(imagePreview)"
-        [attr.aria-label]="'Zoom image of ' + recipe.name"
-        aria-haspopup="dialog"
-      >
-        <picture>
-          <source media="(max-width: 548px)" [srcset]="recipe.image!.medium" />
-          <img
-            [src]="recipe.image!.large"
-            [alt]="recipe.name"
-            fetchpriority="high"
-            decoding="async"
-          />
-        </picture>
-        <span class="image-zoom-hint" aria-hidden="true"><mat-icon>zoom_in</mat-icon></span>
-      </button>
-
-      <div class="info-cards">
-        <mat-card class="info-card">
-          <mat-card-content>
-            <mat-icon>schedule</mat-icon>
-            <div>
-              <div class="label">Prep Time</div>
-              <div class="value">{{ recipe.prepTime }} min</div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="info-card">
-          <mat-card-content>
-            <mat-icon>timer</mat-icon>
-            <div>
-              <div class="label">Cook Time</div>
-              <div class="value">{{ recipe.cookTime }} min</div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="info-card">
-          <mat-card-content>
-            <mat-icon>restaurant</mat-icon>
-            <div>
-              <div class="label">Total Time</div>
-              <div class="value">{{ recipe.prepTime + recipe.cookTime }} min</div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="info-card">
-          <mat-card-content>
-            <mat-icon>people</mat-icon>
-            <div>
-              <div class="label">Servings</div>
-              <div class="value">{{ displayServings }}</div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </div>
-
-    <!-- Dietary Info & Tags -->
-    <div class="badges-section">
-      <div class="tags" *ngIf="recipe.tags.length > 0">
-        <mat-chip *ngFor="let tag of recipe.tags">{{ tag }}</mat-chip>
-      </div>
-
-      <div class="metadata" *ngIf="recipe.countryOfOrigin">
-        <mat-icon>flag</mat-icon>
-        <span>{{ recipe.countryOfOrigin }}</span>
-      </div>
-
-      <div class="metadata" *ngIf="recipe.wikiLink">
-        <mat-icon>link</mat-icon>
-        <a [href]="recipe.wikiLink" target="_blank">Wikipedia</a>
-      </div>
-    </div>
-
-    <!-- Ingredients -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>shopping_cart</mat-icon>
-          Ingredients
-        </mat-card-title>
-        <div class="ingredients-actions">
-          <button mat-stroked-button type="button" (click)="copyIngredientsCsv()">
-            <mat-icon>content_copy</mat-icon>
-            Copy CSV
-          </button>
-          <mat-form-field appearance="outline" class="servings-input" subscriptSizing="dynamic">
-            <mat-label>Servings</mat-label>
-            <input
-              matInput
-              type="number"
-              min="1"
-              [(ngModel)]="displayServings"
-              (ngModelChange)="onServingsChange()"
-            />
-          </mat-form-field>
+@if (loading) {
+  <p role="status" class="visually-hidden">Loading recipe…</p>
+}
+@if (recipe && !loading) {
+  <div class="recipe-detail-container page-shell">
+    <div class="recipe-header">
+      <div class="header-content">
+        <div>
+          <h1>{{ recipe.name }}</h1>
+          <p class="subtitle">
+            by <a [routerLink]="['/users', recipe.createdBy.id]">{{ recipe.createdBy.name }}</a>
+          </p>
         </div>
-      </mat-card-header>
-      <mat-card-content>
-        <ul class="ingredients-list">
-          <li *ngFor="let ingredient of recipe.ingredients">
-            <strong
-              >{{ getFormattedScaledAmount(ingredient.quantity.amount, ingredient.quantity.unit) }}
-              {{ getUnitName(ingredient.quantity.unit) }}</strong
+        <div class="header-actions">
+          <button
+            mat-raised-button
+            type="button"
+            (click)="printRecipe()"
+            [disabled]="loadingSubRecipes"
+          >
+            <mat-icon>print</mat-icon>
+            Print
+          </button>
+          @if ((isLoggedIn$ | async) && !(canEdit$ | async)) {
+            <button
+              mat-raised-button
+              [color]="isSaved ? 'accent' : 'primary'"
+              (click)="toggleSave()"
+              [disabled]="saving"
+              [attr.aria-pressed]="isSaved"
             >
-            {{ ingredient.ingredient.name }}
-            <span *ngIf="ingredient.description" class="ingredient-description">
-              ({{ ingredient.description }})
-            </span>
-          </li>
-          <li *ngFor="let component of recipe.recipeIngredients">
-            <strong
-              >{{ getFormattedScaledAmount(component.quantity.amount, component.quantity.unit) }}
-              {{ getUnitName(component.quantity.unit) }}</strong
-            >
-            <a [routerLink]="['/recipes', component.recipe.id]">{{ component.recipe.name }}</a>
-            <span *ngIf="component.description" class="ingredient-description">
-              ({{ component.description }})
-            </span>
-          </li>
-        </ul>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Instructions -->
-    <mat-card class="section-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>description</mat-icon>
-          Instructions
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="instructions-content" [innerHTML]="instructionsHtml"></div>
-      </mat-card-content>
-    </mat-card>
-
-    <p *ngIf="loadingSubRecipes" role="status">Loading component recipes…</p>
-
-    <section class="sub-recipes" *ngIf="subRecipes.length > 0">
-      <h2>Recipes used in this recipe</h2>
-      <mat-card class="section-card sub-recipe-card" *ngFor="let entry of subRecipes">
+              <mat-icon>{{ isSaved ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+              {{ saving ? 'Saving…' : isSaved ? 'Saved' : 'Save' }}
+            </button>
+          }
+          @if (canEdit$ | async) {
+            <button mat-raised-button color="primary" (click)="openEditDialog()">
+              <mat-icon>edit</mat-icon>
+              Edit
+            </button>
+            <button mat-raised-button color="warn" (click)="deleteRecipe()">
+              <mat-icon>delete</mat-icon>
+              Delete
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="recipe-content">
+      <div class="recipe-overview" [class.has-image]="recipe.image?.large">
+        @if (recipe.image?.large) {
+          <button
+            class="recipe-image-section"
+            type="button"
+            (click)="openImagePreview(imagePreview)"
+            [attr.aria-label]="'Zoom image of ' + recipe.name"
+            aria-haspopup="dialog"
+          >
+            <picture>
+              <source media="(max-width: 548px)" [srcset]="recipe.image!.medium" />
+              <img
+                [src]="recipe.image!.large"
+                [alt]="recipe.name"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </picture>
+            <span class="image-zoom-hint" aria-hidden="true"><mat-icon>zoom_in</mat-icon></span>
+          </button>
+        }
+        <div class="info-cards">
+          <mat-card class="info-card">
+            <mat-card-content>
+              <mat-icon>schedule</mat-icon>
+              <div>
+                <div class="label">Prep Time</div>
+                <div class="value">{{ recipe.prepTime }} min</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="info-card">
+            <mat-card-content>
+              <mat-icon>timer</mat-icon>
+              <div>
+                <div class="label">Cook Time</div>
+                <div class="value">{{ recipe.cookTime }} min</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="info-card">
+            <mat-card-content>
+              <mat-icon>restaurant</mat-icon>
+              <div>
+                <div class="label">Total Time</div>
+                <div class="value">{{ recipe.prepTime + recipe.cookTime }} min</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+          <mat-card class="info-card">
+            <mat-card-content>
+              <mat-icon>people</mat-icon>
+              <div>
+                <div class="label">Servings</div>
+                <div class="value">{{ displayServings }}</div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+      <!-- Dietary Info & Tags -->
+      <div class="badges-section">
+        @if (recipe.tags.length > 0) {
+          <div class="tags">
+            @for (tag of recipe.tags; track tag) {
+              <mat-chip>{{ tag }}</mat-chip>
+            }
+          </div>
+        }
+        @if (recipe.countryOfOrigin) {
+          <div class="metadata">
+            <mat-icon>flag</mat-icon>
+            <span>{{ recipe.countryOfOrigin }}</span>
+          </div>
+        }
+        @if (recipe.wikiLink) {
+          <div class="metadata">
+            <mat-icon>link</mat-icon>
+            <a [href]="recipe.wikiLink" target="_blank">Wikipedia</a>
+          </div>
+        }
+      </div>
+      <!-- Ingredients -->
+      <mat-card class="section-card">
         <mat-card-header>
           <mat-card-title>
-            <mat-icon>menu_book</mat-icon>
-            <a [routerLink]="['/recipes', entry.recipe.id]">{{ entry.recipe.name }}</a>
+            <mat-icon>shopping_cart</mat-icon>
+            Ingredients
+          </mat-card-title>
+          <div class="ingredients-actions">
+            <button mat-stroked-button type="button" (click)="copyIngredientsCsv()">
+              <mat-icon>content_copy</mat-icon>
+              Copy CSV
+            </button>
+            <mat-form-field appearance="outline" class="servings-input" subscriptSizing="dynamic">
+              <mat-label>Servings</mat-label>
+              <input
+                matInput
+                type="number"
+                min="1"
+                [(ngModel)]="displayServings"
+                (ngModelChange)="onServingsChange()"
+              />
+            </mat-form-field>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <ul class="ingredients-list">
+            @for (ingredient of recipe.ingredients; track ingredient) {
+              <li>
+                <strong
+                  >{{
+                    getFormattedScaledAmount(ingredient.quantity.amount, ingredient.quantity.unit)
+                  }}
+                  {{ getUnitName(ingredient.quantity.unit) }}</strong
+                >
+                {{ ingredient.ingredient.name }}
+                @if (ingredient.description) {
+                  <span class="ingredient-description"> ({{ ingredient.description }}) </span>
+                }
+              </li>
+            }
+            @for (component of recipe.recipeIngredients; track component) {
+              <li>
+                <strong
+                  >{{
+                    getFormattedScaledAmount(component.quantity.amount, component.quantity.unit)
+                  }}
+                  {{ getUnitName(component.quantity.unit) }}</strong
+                >
+                <a [routerLink]="['/recipes', component.recipe.id]">{{ component.recipe.name }}</a>
+                @if (component.description) {
+                  <span class="ingredient-description"> ({{ component.description }}) </span>
+                }
+              </li>
+            }
+          </ul>
+        </mat-card-content>
+      </mat-card>
+      <!-- Instructions -->
+      <mat-card class="section-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>description</mat-icon>
+            Instructions
           </mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <h3>Ingredients</h3>
-          <ul class="ingredients-list">
-            <li *ngFor="let ingredient of entry.recipe.ingredients">
-              <strong
-                >{{
-                  getFormattedSubRecipeScaledAmount(
-                    entry,
-                    ingredient.quantity.amount,
-                    ingredient.quantity.unit
-                  )
-                }}
-                {{ getUnitName(ingredient.quantity.unit) }}</strong
-              >
-              {{ ingredient.ingredient.name }}
-              <span *ngIf="ingredient.description" class="ingredient-description"
-                >({{ ingredient.description }})</span
-              >
-            </li>
-            <li *ngFor="let component of entry.recipe.recipeIngredients">
-              <strong
-                >{{
-                  getFormattedSubRecipeScaledAmount(
-                    entry,
-                    component.quantity.amount,
-                    component.quantity.unit
-                  )
-                }}
-                {{ getUnitName(component.quantity.unit) }}</strong
-              >
-              <a [routerLink]="['/recipes', component.recipe.id]">{{ component.recipe.name }}</a>
-            </li>
-          </ul>
-          <h3>Instructions</h3>
-          <div class="instructions-content" [innerHTML]="entry.instructionsHtml"></div>
-          <a mat-stroked-button color="primary" [routerLink]="['/recipes', entry.recipe.id]">
-            Open {{ entry.recipe.name }}
-          </a>
+          <div class="instructions-content" [innerHTML]="instructionsHtml"></div>
         </mat-card-content>
       </mat-card>
-    </section>
-
-    <!-- Recipe Metadata -->
-    <div class="recipe-metadata">
-      <p class="metadata-item">
-        <mat-icon>fingerprint</mat-icon>
-        <span>ID: {{ recipe.id }}</span>
-      </p>
-      <p class="metadata-item">
-        <mat-icon>event</mat-icon>
-        <span>Created: {{ recipe.createdOn | date: 'medium' }}</span>
-      </p>
-      <p class="metadata-item">
-        <mat-icon>update</mat-icon>
-        <span>Updated: {{ recipe.updatedOn | date: 'medium' }}</span>
-      </p>
-    </div>
-
-    <!-- Recommended Recipes -->
-    <div
-      class="recommended-section"
-      *ngIf="loadingRecommendedRecipes || recommendedRecipes.length > 0"
-    >
-      <h2 class="recommended-title">Similar Recipes</h2>
-
-      <div class="recommended-skeleton" *ngIf="loadingRecommendedRecipes" aria-hidden="true">
-        <div class="recommended-skeleton-card" *ngFor="let _ of [1, 2, 3]">
-          <div class="recommended-skeleton-block image"></div>
-          <div class="recommended-skeleton-content">
-            <div class="recommended-skeleton-block title"></div>
-            <div class="recommended-skeleton-block subtitle"></div>
-            <div class="recommended-skeleton-block meta"></div>
+      @if (loadingSubRecipes) {
+        <p role="status">Loading component recipes…</p>
+      }
+      @if (subRecipes.length > 0) {
+        <section class="sub-recipes">
+          <h2>Recipes used in this recipe</h2>
+          @for (entry of subRecipes; track entry) {
+            <mat-card class="section-card sub-recipe-card">
+              <mat-card-header>
+                <mat-card-title>
+                  <mat-icon>menu_book</mat-icon>
+                  <a [routerLink]="['/recipes', entry.recipe.id]">{{ entry.recipe.name }}</a>
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <h3>Ingredients</h3>
+                <ul class="ingredients-list">
+                  @for (ingredient of entry.recipe.ingredients; track ingredient) {
+                    <li>
+                      <strong
+                        >{{
+                          getFormattedSubRecipeScaledAmount(
+                            entry,
+                            ingredient.quantity.amount,
+                            ingredient.quantity.unit
+                          )
+                        }}
+                        {{ getUnitName(ingredient.quantity.unit) }}</strong
+                      >
+                      {{ ingredient.ingredient.name }}
+                      @if (ingredient.description) {
+                        <span class="ingredient-description">({{ ingredient.description }})</span>
+                      }
+                    </li>
+                  }
+                  @for (component of entry.recipe.recipeIngredients; track component) {
+                    <li>
+                      <strong
+                        >{{
+                          getFormattedSubRecipeScaledAmount(
+                            entry,
+                            component.quantity.amount,
+                            component.quantity.unit
+                          )
+                        }}
+                        {{ getUnitName(component.quantity.unit) }}</strong
+                      >
+                      <a [routerLink]="['/recipes', component.recipe.id]">{{
+                        component.recipe.name
+                      }}</a>
+                    </li>
+                  }
+                </ul>
+                <h3>Instructions</h3>
+                <div class="instructions-content" [innerHTML]="entry.instructionsHtml"></div>
+                <a mat-stroked-button color="primary" [routerLink]="['/recipes', entry.recipe.id]">
+                  Open {{ entry.recipe.name }}
+                </a>
+              </mat-card-content>
+            </mat-card>
+          }
+        </section>
+      }
+      <!-- Recipe Metadata -->
+      <div class="recipe-metadata">
+        <p class="metadata-item">
+          <mat-icon>fingerprint</mat-icon>
+          <span>ID: {{ recipe.id }}</span>
+        </p>
+        <p class="metadata-item">
+          <mat-icon>event</mat-icon>
+          <span>Created: {{ recipe.createdOn | date: 'medium' }}</span>
+        </p>
+        <p class="metadata-item">
+          <mat-icon>update</mat-icon>
+          <span>Updated: {{ recipe.updatedOn | date: 'medium' }}</span>
+        </p>
+      </div>
+      <!-- Recommended Recipes -->
+      @if (loadingRecommendedRecipes || recommendedRecipes.length > 0) {
+        <div class="recommended-section">
+          <h2 class="recommended-title">Similar Recipes</h2>
+          @if (loadingRecommendedRecipes) {
+            <div class="recommended-skeleton" aria-hidden="true">
+              @for (_ of [1, 2, 3]; track _) {
+                <div class="recommended-skeleton-card">
+                  <div class="recommended-skeleton-block image"></div>
+                  <div class="recommended-skeleton-content">
+                    <div class="recommended-skeleton-block title"></div>
+                    <div class="recommended-skeleton-block subtitle"></div>
+                    <div class="recommended-skeleton-block meta"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+          <div class="recipes-scroll-container">
+            @if (!loadingRecommendedRecipes) {
+              <div class="recipes-scroll">
+                @for (
+                  rec of recommendedRecipes;
+                  track trackRecipe(recipeIndex, rec);
+                  let recipeIndex = $index
+                ) {
+                  <app-recipe-card
+                    [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
+                    [recipe]="rec"
+                    [layout]="'scroll'"
+                    [isSaved]="savedRecipeIds.has(rec.id)"
+                    [canEdit]="false"
+                  >
+                  </app-recipe-card>
+                }
+              </div>
+            }
           </div>
         </div>
-      </div>
+      }
+    </div>
+  </div>
+}
 
-      <div class="recipes-scroll-container">
-        <div class="recipes-scroll" *ngIf="!loadingRecommendedRecipes">
-          <app-recipe-card
-            *ngFor="let rec of recommendedRecipes; trackBy: trackRecipe; let recipeIndex = index"
-            [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
-            [recipe]="rec"
-            [layout]="'scroll'"
-            [isSaved]="savedRecipeIds.has(rec.id)"
-            [canEdit]="false"
-          >
-          </app-recipe-card>
+@if (loading) {
+  <div class="recipe-detail-skeleton" aria-hidden="true">
+    <div class="skeleton-block skeleton-heading"></div>
+    <div class="skeleton-block skeleton-subheading"></div>
+    <div class="detail-skeleton-info-cards">
+      @for (_ of [1, 2, 3, 4]; track _) {
+        <div class="skeleton-card">
+          <div class="skeleton-block skeleton-icon"></div>
+          <div class="skeleton-card-copy">
+            <div class="skeleton-block skeleton-label"></div>
+            <div class="skeleton-block skeleton-value"></div>
+          </div>
         </div>
-      </div>
+      }
     </div>
+    <div class="skeleton-block skeleton-section-title"></div>
+    @for (_ of [1, 2, 3, 4, 5]; track _) {
+      <div class="skeleton-block skeleton-line"></div>
+    }
+    <div class="skeleton-block skeleton-section-title"></div>
+    @for (_ of [1, 2, 3, 4]; track _) {
+      <div class="skeleton-block skeleton-paragraph"></div>
+    }
   </div>
-</div>
+}
 
-<div *ngIf="loading" class="recipe-detail-skeleton" aria-hidden="true">
-  <div class="skeleton-block skeleton-heading"></div>
-  <div class="skeleton-block skeleton-subheading"></div>
-
-  <div class="detail-skeleton-info-cards">
-    <div class="skeleton-card" *ngFor="let _ of [1, 2, 3, 4]">
-      <div class="skeleton-block skeleton-icon"></div>
-      <div class="skeleton-card-copy">
-        <div class="skeleton-block skeleton-label"></div>
-        <div class="skeleton-block skeleton-value"></div>
-      </div>
-    </div>
+@if (error && !loading) {
+  <div class="error-container" role="alert">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadRecipe()">Retry</button>
+    <button mat-stroked-button routerLink="/recipes">Back to Recipes</button>
   </div>
-
-  <div class="skeleton-block skeleton-section-title"></div>
-  <div class="skeleton-block skeleton-line" *ngFor="let _ of [1, 2, 3, 4, 5]"></div>
-
-  <div class="skeleton-block skeleton-section-title"></div>
-  <div class="skeleton-block skeleton-paragraph" *ngFor="let _ of [1, 2, 3, 4]"></div>
-</div>
-
-<div *ngIf="error && !loading" class="error-container" role="alert">
-  <mat-icon color="warn">error</mat-icon>
-  <p>{{ error }}</p>
-  <button mat-raised-button color="primary" (click)="loadRecipe()">Retry</button>
-  <button mat-stroked-button routerLink="/recipes">Back to Recipes</button>
-</div>
+}
 
 <ng-template #imagePreview>
   <div class="image-preview">
     <button mat-icon-button mat-dialog-close type="button" aria-label="Close image preview">
       <mat-icon>close</mat-icon>
     </button>
-    <img [src]="recipe?.image?.large" [alt]="recipe?.name" />
+    <img
+      [src]="$safeNavigationMigration(recipe?.image?.large)"
+      [alt]="$safeNavigationMigration(recipe?.name)"
+    />
   </div>
 </ng-template>

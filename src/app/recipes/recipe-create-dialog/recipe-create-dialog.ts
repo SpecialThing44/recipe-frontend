@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray, AbstractControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,6 +31,7 @@ function minLengthArray(min: number) {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-recipe-create-dialog',
   standalone: true,
   imports: [

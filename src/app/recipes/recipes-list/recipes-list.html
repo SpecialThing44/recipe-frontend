@@ -1,21 +1,20 @@
 <div class="recipes-list-container page-shell collection-page" [attr.aria-busy]="loading">
-  <div class="header" *ngIf="showHeader">
-    <div class="header-content">
-      <div>
-        <h1>Recipes</h1>
-        <p class="subtitle">Search and filter recipes.</p>
+  @if (showHeader) {
+    <div class="header">
+      <div class="header-content">
+        <div>
+          <h1>Recipes</h1>
+          <p class="subtitle">Search and filter recipes.</p>
+        </div>
+        @if (isLoggedIn$ | async) {
+          <button mat-flat-button color="primary" (click)="openCreateDialog()">
+            <mat-icon>add</mat-icon>
+            Create Recipe
+          </button>
+        }
       </div>
-      <button
-        *ngIf="isLoggedIn$ | async"
-        mat-flat-button
-        color="primary"
-        (click)="openCreateDialog()"
-      >
-        <mat-icon>add</mat-icon>
-        Create Recipe
-      </button>
     </div>
-  </div>
+  }
 
   <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="recipe-search">
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -37,10 +36,12 @@
 
     <form [formGroup]="filterForm" class="filters-form" (ngSubmit)="applyFilters()">
       <!-- User Filters (Only for logged in users) -->
-      <div class="filter-row checkbox-row" *ngIf="showUserFilters && (isLoggedIn$ | async)">
-        <mat-checkbox formControlName="myRecipes">My Recipes</mat-checkbox>
-        <mat-checkbox formControlName="savedRecipes">Saved Recipes</mat-checkbox>
-      </div>
+      @if (showUserFilters && (isLoggedIn$ | async)) {
+        <div class="filter-row checkbox-row">
+          <mat-checkbox formControlName="myRecipes">My Recipes</mat-checkbox>
+          <mat-checkbox formControlName="savedRecipes">Saved Recipes</mat-checkbox>
+        </div>
+      }
 
       <!-- Time Filters -->
       <div class="filter-row">
@@ -66,135 +67,134 @@
       </div>
 
       <!-- Advanced Filters Section -->
-      <div class="advanced-filters" *ngIf="showAdvancedFilters">
-        <div class="filter-row">
-          <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
-            <mat-label>Recipe ID</mat-label>
-            <input matInput formControlName="id" placeholder="Enter UUID" />
-          </mat-form-field>
-          <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
-            <mat-label>Name matching</mat-label>
-            <mat-select formControlName="nameFilterType">
-              <mat-option *ngFor="let type of filterTypes" [value]="type.value">{{
-                type.label
-              }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+      @if (showAdvancedFilters) {
+        <div class="advanced-filters">
+          <div class="filter-row">
+            <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
+              <mat-label>Recipe ID</mat-label>
+              <input matInput formControlName="id" placeholder="Enter UUID" />
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
+              <mat-label>Name matching</mat-label>
+              <mat-select formControlName="nameFilterType">
+                @for (type of filterTypes; track type) {
+                  <mat-option [value]="type.value">{{ type.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <!-- Ingredients Filter -->
+          <div class="filter-row full-width">
+            <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
+              <mat-label>Include Ingredients</mat-label>
+              <mat-chip-grid #ingredientList>
+                @for (ingredient of filterForm.get('ingredients')?.value; track ingredient) {
+                  <mat-chip-row (removed)="removeIngredient(ingredient, 'ingredients')">
+                    {{ ingredient }}
+                    <button matChipRemove aria-label="Remove filter">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip-row>
+                }
+                <input
+                  placeholder="Add ingredient..."
+                  formControlName="ingredientInput"
+                  #ingredientInputEl
+                  [matChipInputFor]="ingredientList"
+                  [matAutocomplete]="autoIngredient"
+                />
+              </mat-chip-grid>
+              <mat-autocomplete
+                #autoIngredient="matAutocomplete"
+                (optionSelected)="addIngredient($event, 'ingredients', ingredientInputEl)"
+              >
+                @for (suggestion of ingredientSuggestions | async; track suggestion) {
+                  <mat-option [value]="suggestion">
+                    {{ suggestion.name }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <!-- Not Ingredients Filter -->
+          <div class="filter-row full-width">
+            <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
+              <mat-label>Exclude Ingredients</mat-label>
+              <mat-chip-grid #notIngredientList>
+                @for (ingredient of filterForm.get('notIngredients')?.value; track ingredient) {
+                  <mat-chip-row (removed)="removeIngredient(ingredient, 'notIngredients')">
+                    {{ ingredient }}
+                    <button matChipRemove aria-label="Remove filter">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip-row>
+                }
+                <input
+                  placeholder="Exclude ingredient..."
+                  formControlName="notIngredientInput"
+                  #notIngredientInputEl
+                  [matChipInputFor]="notIngredientList"
+                  [matAutocomplete]="autoNotIngredient"
+                />
+              </mat-chip-grid>
+              <mat-autocomplete
+                #autoNotIngredient="matAutocomplete"
+                (optionSelected)="addIngredient($event, 'notIngredients', notIngredientInputEl)"
+              >
+                @for (suggestion of notIngredientSuggestions | async; track suggestion) {
+                  <mat-option [value]="suggestion">
+                    {{ suggestion.name }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+          <!-- Tags Filter -->
+          <div class="filter-row full-width">
+            <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
+              <mat-label>Tags</mat-label>
+              <mat-chip-grid #tagList>
+                @for (tag of filterForm.get('tags')?.value; track tag) {
+                  <mat-chip-row (removed)="removeTag(tag)">
+                    {{ tag }}
+                    <button matChipRemove aria-label="Remove filter">
+                      <mat-icon>cancel</mat-icon>
+                    </button>
+                  </mat-chip-row>
+                }
+                <input
+                  placeholder="Add tag..."
+                  formControlName="tagInput"
+                  #tagInputEl
+                  [matChipInputFor]="tagList"
+                  [matAutocomplete]="autoTag"
+                />
+              </mat-chip-grid>
+              <mat-autocomplete
+                #autoTag="matAutocomplete"
+                (optionSelected)="addTag($event, tagInputEl)"
+              >
+                @for (suggestion of tagSuggestions | async; track suggestion) {
+                  <mat-option [value]="suggestion">
+                    {{ suggestion }}
+                  </mat-option>
+                }
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
         </div>
-        <!-- Ingredients Filter -->
-        <div class="filter-row full-width">
-          <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
-            <mat-label>Include Ingredients</mat-label>
-            <mat-chip-grid #ingredientList>
-              <mat-chip-row
-                *ngFor="let ingredient of filterForm.get('ingredients')?.value"
-                (removed)="removeIngredient(ingredient, 'ingredients')"
-              >
-                {{ ingredient }}
-                <button matChipRemove aria-label="Remove filter">
-                  <mat-icon>cancel</mat-icon>
-                </button>
-              </mat-chip-row>
-              <input
-                placeholder="Add ingredient..."
-                formControlName="ingredientInput"
-                #ingredientInputEl
-                [matChipInputFor]="ingredientList"
-                [matAutocomplete]="autoIngredient"
-              />
-            </mat-chip-grid>
-            <mat-autocomplete
-              #autoIngredient="matAutocomplete"
-              (optionSelected)="addIngredient($event, 'ingredients', ingredientInputEl)"
-            >
-              <mat-option
-                *ngFor="let suggestion of ingredientSuggestions | async"
-                [value]="suggestion"
-              >
-                {{ suggestion.name }}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-        </div>
-
-        <!-- Not Ingredients Filter -->
-        <div class="filter-row full-width">
-          <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
-            <mat-label>Exclude Ingredients</mat-label>
-            <mat-chip-grid #notIngredientList>
-              <mat-chip-row
-                *ngFor="let ingredient of filterForm.get('notIngredients')?.value"
-                (removed)="removeIngredient(ingredient, 'notIngredients')"
-              >
-                {{ ingredient }}
-                <button matChipRemove aria-label="Remove filter">
-                  <mat-icon>cancel</mat-icon>
-                </button>
-              </mat-chip-row>
-              <input
-                placeholder="Exclude ingredient..."
-                formControlName="notIngredientInput"
-                #notIngredientInputEl
-                [matChipInputFor]="notIngredientList"
-                [matAutocomplete]="autoNotIngredient"
-              />
-            </mat-chip-grid>
-            <mat-autocomplete
-              #autoNotIngredient="matAutocomplete"
-              (optionSelected)="addIngredient($event, 'notIngredients', notIngredientInputEl)"
-            >
-              <mat-option
-                *ngFor="let suggestion of notIngredientSuggestions | async"
-                [value]="suggestion"
-              >
-                {{ suggestion.name }}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-        </div>
-
-        <!-- Tags Filter -->
-        <div class="filter-row full-width">
-          <mat-form-field appearance="fill" class="full-width" subscriptSizing="dynamic">
-            <mat-label>Tags</mat-label>
-            <mat-chip-grid #tagList>
-              <mat-chip-row
-                *ngFor="let tag of filterForm.get('tags')?.value"
-                (removed)="removeTag(tag)"
-              >
-                {{ tag }}
-                <button matChipRemove aria-label="Remove filter">
-                  <mat-icon>cancel</mat-icon>
-                </button>
-              </mat-chip-row>
-              <input
-                placeholder="Add tag..."
-                formControlName="tagInput"
-                #tagInputEl
-                [matChipInputFor]="tagList"
-                [matAutocomplete]="autoTag"
-              />
-            </mat-chip-grid>
-            <mat-autocomplete
-              #autoTag="matAutocomplete"
-              (optionSelected)="addTag($event, tagInputEl)"
-            >
-              <mat-option *ngFor="let suggestion of tagSuggestions | async" [value]="suggestion">
-                {{ suggestion }}
-              </mat-option>
-            </mat-autocomplete>
-          </mat-form-field>
-        </div>
-      </div>
+      }
 
       <!-- Sorting & Page Size -->
       <div class="filter-row">
         <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Sort By</mat-label>
           <mat-select formControlName="sort">
-            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
-              {{ option.label }}
-            </mat-option>
+            @for (option of sortOptions; track option) {
+              <mat-option [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            }
           </mat-select>
           <mat-icon matPrefix>sort</mat-icon>
         </mat-form-field>
@@ -202,9 +202,11 @@
         <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Results Per Page</mat-label>
           <mat-select formControlName="pageSize" (selectionChange)="onPageSizeChange()">
-            <mat-option *ngFor="let size of pageSizes" [value]="size">
-              {{ size }}
-            </mat-option>
+            @for (size of pageSizes; track size) {
+              <mat-option [value]="size">
+                {{ size }}
+              </mat-option>
+            }
           </mat-select>
           <mat-icon matPrefix>view_list</mat-icon>
         </mat-form-field>
@@ -224,73 +226,87 @@
   </mat-expansion-panel>
 
   <div class="collection-summary">
-    <span *ngIf="!loading && !error"
-      >{{ recipes.length }} {{ recipes.length === 1 ? 'recipe' : 'recipes' }} on this page</span
-    >
+    @if (!loading && !error) {
+      <span
+        >{{ recipes.length }} {{ recipes.length === 1 ? 'recipe' : 'recipes' }} on this page</span
+      >
+    }
   </div>
 
-  <p *ngIf="loading" role="status" class="visually-hidden">Loading recipes…</p>
+  @if (loading) {
+    <p role="status" class="visually-hidden">Loading recipes…</p>
+  }
 
   <!-- Loading State -->
-  <div *ngIf="loading" class="recipes-skeleton-grid" aria-hidden="true">
-    <div class="recipe-skeleton-card" *ngFor="let _ of [1, 2, 3, 4, 5, 6]">
-      <div class="skeleton-block skeleton-image"></div>
-      <div class="skeleton-content">
-        <div class="skeleton-block skeleton-title"></div>
-        <div class="skeleton-block skeleton-subtitle"></div>
-        <div class="skeleton-block skeleton-meta"></div>
-        <div class="skeleton-block skeleton-meta short"></div>
-      </div>
-      <div class="skeleton-actions">
-        <div class="skeleton-block skeleton-button"></div>
-      </div>
+  @if (loading) {
+    <div class="recipes-skeleton-grid" aria-hidden="true">
+      @for (_ of [1, 2, 3, 4, 5, 6]; track _) {
+        <div class="recipe-skeleton-card">
+          <div class="skeleton-block skeleton-image"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-block skeleton-title"></div>
+            <div class="skeleton-block skeleton-subtitle"></div>
+            <div class="skeleton-block skeleton-meta"></div>
+            <div class="skeleton-block skeleton-meta short"></div>
+          </div>
+          <div class="skeleton-actions">
+            <div class="skeleton-block skeleton-button"></div>
+          </div>
+        </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- Error State -->
-  <div *ngIf="error && !loading" class="error-container" role="alert">
-    <mat-icon color="warn">error</mat-icon>
-    <p>{{ error }}</p>
-    <button mat-raised-button color="primary" (click)="loadRecipes()">Retry</button>
-  </div>
+  @if (error && !loading) {
+    <div class="error-container" role="alert">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadRecipes()">Retry</button>
+    </div>
+  }
 
   <!-- Recipes List -->
-  <div *ngIf="!loading && !error" class="recipes-grid">
-    <app-recipe-card
-      *ngFor="let recipe of recipes; trackBy: trackRecipe; let recipeIndex = index"
-      [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
-      [recipe]="recipe"
-      [canEdit]="canEditRecipe(recipe)"
-      [isSaved]="savedRecipeIds.has(recipe.id)"
-      [saving]="savingRecipeIds.has(recipe.id)"
-      [isLoggedIn]="(isLoggedIn$ | async) || false"
-      (mouseenter)="prefetchRecipeDetail(recipe.id)"
-      (focusin)="prefetchRecipeDetail(recipe.id)"
-      (touchstart)="prefetchRecipeDetail(recipe.id)"
-      (saveClick)="toggleSaveFromCard($event)"
-      (editClick)="openEditDialogFromCard($event)"
-      (deleteClick)="deleteRecipeFromCard($event)"
-    >
-    </app-recipe-card>
-
-    <div *ngIf="recipes.length === 0" class="empty-state">
-      <mat-icon>restaurant_menu</mat-icon>
-      <h3>No recipes found</h3>
-      <p>Try adjusting your filters or search criteria</p>
+  @if (!loading && !error) {
+    <div class="recipes-grid">
+      @for (recipe of recipes; track trackRecipe(recipeIndex, recipe); let recipeIndex = $index) {
+        <app-recipe-card
+          [imageLoading]="recipeIndex < 3 ? 'eager' : 'lazy'"
+          [recipe]="recipe"
+          [canEdit]="canEditRecipe(recipe)"
+          [isSaved]="savedRecipeIds.has(recipe.id)"
+          [saving]="savingRecipeIds.has(recipe.id)"
+          [isLoggedIn]="(isLoggedIn$ | async) || false"
+          (mouseenter)="prefetchRecipeDetail(recipe.id)"
+          (focusin)="prefetchRecipeDetail(recipe.id)"
+          (touchstart)="prefetchRecipeDetail(recipe.id)"
+          (saveClick)="toggleSaveFromCard($event)"
+          (editClick)="openEditDialogFromCard($event)"
+          (deleteClick)="deleteRecipeFromCard($event)"
+        >
+        </app-recipe-card>
+      }
+      @if (recipes.length === 0) {
+        <div class="empty-state">
+          <mat-icon>restaurant_menu</mat-icon>
+          <h3>No recipes found</h3>
+          <p>Try adjusting your filters or search criteria</p>
+        </div>
+      }
     </div>
-  </div>
+  }
 
-  <div *ngIf="!loading && !error && recipes.length > 0" class="pagination">
-    <button mat-raised-button [disabled]="currentPage === 0" (click)="previousPage()">
-      <mat-icon>chevron_left</mat-icon>
-      Previous
-    </button>
-
-    <span class="page-info"> Page {{ currentPage + 1 }} • {{ recipes.length }} results </span>
-
-    <button mat-raised-button [disabled]="recipes.length < pageSize" (click)="nextPage()">
-      Next
-      <mat-icon>chevron_right</mat-icon>
-    </button>
-  </div>
+  @if (!loading && !error && recipes.length > 0) {
+    <div class="pagination">
+      <button mat-raised-button [disabled]="currentPage === 0" (click)="previousPage()">
+        <mat-icon>chevron_left</mat-icon>
+        Previous
+      </button>
+      <span class="page-info"> Page {{ currentPage + 1 }} • {{ recipes.length }} results </span>
+      <button mat-raised-button [disabled]="recipes.length < pageSize" (click)="nextPage()">
+        Next
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  }
 </div>

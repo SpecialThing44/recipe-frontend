@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,6 +11,7 @@ import { AliasesFormComponent } from './aliases-form/aliases-form';
 import { TagsFormComponent } from './tags-form/tags-form';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [TagsFormComponent, AliasesFormComponent, RecipeIngredientsFormComponent],
   styles: [':host { display: block; box-sizing: border-box; padding: 12px; }'],
   template: `

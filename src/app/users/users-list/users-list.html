@@ -28,9 +28,11 @@
         <mat-form-field appearance="fill" class="filter-type" subscriptSizing="dynamic">
           <mat-label>Name Filter</mat-label>
           <mat-select formControlName="nameFilterType">
-            <mat-option *ngFor="let type of filterTypes" [value]="type.value">
-              {{ type.label }}
-            </mat-option>
+            @for (type of filterTypes; track type) {
+              <mat-option [value]="type.value">
+                {{ type.label }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
@@ -46,9 +48,11 @@
         <mat-form-field appearance="fill" class="filter-type" subscriptSizing="dynamic">
           <mat-label>Email Filter</mat-label>
           <mat-select formControlName="emailFilterType">
-            <mat-option *ngFor="let type of filterTypes" [value]="type.value">
-              {{ type.label }}
-            </mat-option>
+            @for (type of filterTypes; track type) {
+              <mat-option [value]="type.value">
+                {{ type.label }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
@@ -64,9 +68,11 @@
         <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Sort By</mat-label>
           <mat-select formControlName="sort">
-            <mat-option *ngFor="let option of sortOptions" [value]="option.value">
-              {{ option.label }}
-            </mat-option>
+            @for (option of sortOptions; track option) {
+              <mat-option [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            }
           </mat-select>
           <mat-icon matPrefix>sort</mat-icon>
         </mat-form-field>
@@ -74,9 +80,11 @@
         <mat-form-field appearance="fill" class="filter-field" subscriptSizing="dynamic">
           <mat-label>Results Per Page</mat-label>
           <mat-select formControlName="pageSize" (selectionChange)="onPageSizeChange()">
-            <mat-option *ngFor="let size of pageSizes" [value]="size">
-              {{ size }}
-            </mat-option>
+            @for (size of pageSizes; track size) {
+              <mat-option [value]="size">
+                {{ size }}
+              </mat-option>
+            }
           </mat-select>
           <mat-icon matPrefix>view_list</mat-icon>
         </mat-form-field>
@@ -96,74 +104,85 @@
   </mat-expansion-panel>
 
   <!-- Loading State -->
-  <div *ngIf="loading" class="loading-container">
-    <mat-spinner diameter="48"></mat-spinner>
-    <p>Loading users...</p>
-  </div>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading users...</p>
+    </div>
+  }
 
   <!-- Error State -->
-  <div *ngIf="error && !loading" class="error-container" role="alert">
-    <mat-icon color="warn">error</mat-icon>
-    <p>{{ error }}</p>
-    <button mat-raised-button color="primary" (click)="loadUsers()">Retry</button>
-  </div>
+  @if (error && !loading) {
+    <div class="error-container" role="alert">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" (click)="loadUsers()">Retry</button>
+    </div>
+  }
 
   <!-- Users List -->
-  <div *ngIf="!loading && !error" class="users-grid">
-    <mat-card *ngFor="let user of users" class="user-card" (click)="viewUser(user.id)">
-      <mat-card-header>
-        <div mat-card-avatar class="user-avatar">
-          <img
-            *ngIf="user.avatar?.thumbnail"
-            [src]="user.avatar?.thumbnail"
-            [alt]="user.name + ' avatar'"
-          />
-          <mat-icon *ngIf="!user.avatar?.thumbnail">person</mat-icon>
+  @if (!loading && !error) {
+    <div class="users-grid">
+      @for (user of users; track user) {
+        <mat-card class="user-card" (click)="viewUser(user.id)">
+          <mat-card-header>
+            <div mat-card-avatar class="user-avatar">
+              @if (user.avatar?.thumbnail) {
+                <img
+                  [src]="$safeNavigationMigration(user.avatar?.thumbnail)"
+                  [alt]="user.name + ' avatar'"
+                />
+              }
+              @if (!user.avatar?.thumbnail) {
+                <mat-icon>person</mat-icon>
+              }
+            </div>
+            <mat-card-title>{{ user.name }}</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="user-info">
+              <div class="info-row">
+                <mat-icon>fingerprint</mat-icon>
+                <span class="info-label">ID:</span>
+                <span class="info-value">{{ user.id }}</span>
+              </div>
+              @if (user.countryOfOrigin) {
+                <div class="info-row">
+                  <mat-icon>public</mat-icon>
+                  <span class="info-label">Country:</span>
+                  <span class="info-value">{{ user.countryOfOrigin }}</span>
+                </div>
+              }
+              <div class="info-row">
+                <mat-icon>schedule</mat-icon>
+                <span class="info-label">Created:</span>
+                <span class="info-value">{{ user.createdOn | date: 'short' }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+      @if (users.length === 0) {
+        <div class="empty-state">
+          <mat-icon>person_off</mat-icon>
+          <h3>No users found</h3>
+          <p>Try adjusting your filters or search criteria</p>
         </div>
-        <mat-card-title>{{ user.name }}</mat-card-title>
-      </mat-card-header>
-
-      <mat-card-content>
-        <div class="user-info">
-          <div class="info-row">
-            <mat-icon>fingerprint</mat-icon>
-            <span class="info-label">ID:</span>
-            <span class="info-value">{{ user.id }}</span>
-          </div>
-
-          <div class="info-row" *ngIf="user.countryOfOrigin">
-            <mat-icon>public</mat-icon>
-            <span class="info-label">Country:</span>
-            <span class="info-value">{{ user.countryOfOrigin }}</span>
-          </div>
-
-          <div class="info-row">
-            <mat-icon>schedule</mat-icon>
-            <span class="info-label">Created:</span>
-            <span class="info-value">{{ user.createdOn | date: 'short' }}</span>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <div *ngIf="users.length === 0" class="empty-state">
-      <mat-icon>person_off</mat-icon>
-      <h3>No users found</h3>
-      <p>Try adjusting your filters or search criteria</p>
+      }
     </div>
-  </div>
+  }
 
-  <div *ngIf="!loading && !error && users.length > 0" class="pagination">
-    <button mat-raised-button [disabled]="currentPage === 0" (click)="previousPage()">
-      <mat-icon>chevron_left</mat-icon>
-      Previous
-    </button>
-
-    <span class="page-info"> Page {{ currentPage + 1 }} • {{ users.length }} results </span>
-
-    <button mat-raised-button [disabled]="users.length < pageSize" (click)="nextPage()">
-      Next
-      <mat-icon>chevron_right</mat-icon>
-    </button>
-  </div>
+  @if (!loading && !error && users.length > 0) {
+    <div class="pagination">
+      <button mat-raised-button [disabled]="currentPage === 0" (click)="previousPage()">
+        <mat-icon>chevron_left</mat-icon>
+        Previous
+      </button>
+      <span class="page-info"> Page {{ currentPage + 1 }} • {{ users.length }} results </span>
+      <button mat-raised-button [disabled]="users.length < pageSize" (click)="nextPage()">
+        Next
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  }
 </div>

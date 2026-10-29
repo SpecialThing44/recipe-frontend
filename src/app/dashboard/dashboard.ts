@@ -1,7 +1,6 @@
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, inject, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,10 +12,10 @@ import { AuthService, User } from '../core/auth.service';
 import { RecipesService, Recipe, DEFAULT_ANALYTICAL_FILTER } from '../core/recipes.service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    CommonModule,
     RouterLink,
     MatCardModule,
     MatButtonModule,

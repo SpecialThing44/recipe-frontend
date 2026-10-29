@@ -1,6 +1,17 @@
 # RecipeFrontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.10.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.4.
+
+## Setup
+
+Use Node.js 24.15.0 or a newer supported version from `package.json`, then install dependencies with Corepack and Yarn 4.18.1:
+
+```bash
+corepack enable
+yarn install --immutable
+```
+
+Angular 22 requires TypeScript 6.0.x. Jasmine uses 6.3 because Jasmine 7 makes globals read-only, which prevents Zone.js from patching them.
 
 ## Development server
 

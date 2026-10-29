@@ -1,5 +1,5 @@
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Component, DestroyRef, inject, Input } from '@angular/core';
+import { Component, DestroyRef, inject, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AbstractControl, FormArray, FormBuilder, FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +12,7 @@ import { Observable, of, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-tags-form',
   standalone: true,
   imports: [

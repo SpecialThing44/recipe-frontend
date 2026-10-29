@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -20,6 +20,7 @@ import { combineLatest, Subject, Observable, Subscription, of } from 'rxjs';
 import { takeUntil, startWith, map, switchMap, catchError, finalize, distinctUntilChanged, tap } from 'rxjs/operators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   selector: 'app-user-profile',
   standalone: true,
   imports: [

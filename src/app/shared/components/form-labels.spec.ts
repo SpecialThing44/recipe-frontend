@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatFormFieldModule, MatInputModule, MatSelectModule],
   template: `
     <mat-form-field appearance="fill">
